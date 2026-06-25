@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LCR Calculator — ALM Platform</title>
+  <link rel="stylesheet" href="../../css/alm-platform.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+<div class="app-layout">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="flex items-center gap-2" style="font-weight:700;color:var(--primary);font-size:1.1rem;">
+        <div style="width:32px;height:32px;background:var(--primary);border-radius:6px;display:flex;align-items:center;justify-content:center;color:white;font-size:12px;">ALM</div>
+        <span class="nav-label">Platform</span>
+      </div>
+      <button class="sidebar-toggle" id="sidebarToggle"><i data-lucide="panel-left-close" style="width:18px;height:18px;"></i></button>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">
+        <div class="nav-section-title">Overview</div>
+        <a href="../../index.html" class="nav-item"><i data-lucide="layout-dashboard" class="nav-icon"></i><span class="nav-label">Dashboard</span></a>
+        <a href="../data-foundation/index.html" class="nav-item"><i data-lucide="database" class="nav-icon"></i><span class="nav-label">Data Foundation</span></a>
+      </div>
+      <div class="nav-section">
+        <div class="nav-section-title">Risk Modules</div>
+        <div class="nav-item has-submenu expanded"><i data-lucide="droplets" class="nav-icon"></i><span class="nav-label">Liquidity Risk</span><i data-lucide="chevron-right" class="nav-chevron" style="width:14px;height:14px;"></i></div>
+        <div class="nav-submenu open">
+          <a href="lcr-calculator.html" class="nav-item active">LCR Calculator</a>
+          <a href="nsfr-monitor.html" class="nav-item">NSFR Monitor</a>
+          <a href="stress-testing.html" class="nav-item">Stress Testing</a>
+        </div>
+        <div class="nav-item has-submenu"><i data-lucide="trending-up" class="nav-icon"></i><span class="nav-label">Interest Rate Risk</span><i data-lucide="chevron-right" class="nav-chevron" style="width:14px;height:14px;"></i></div>
+        <div class="nav-submenu">
+          <a href="../interest-rate-risk/eve-sensitivity.html" class="nav-item">EVE Sensitivity</a>
+          <a href="../interest-rate-risk/nii-forecast.html" class="nav-item">NII Forecast</a>
+          <a href="../interest-rate-risk/gap-analysis.html" class="nav-item">Gap Analysis</a>
+        </div>
+        <div class="nav-item has-submenu"><i data-lucide="shield" class="nav-icon"></i><span class="nav-label">Capital Management</span><i data-lucide="chevron-right" class="nav-chevron" style="width:14px;height:14px;"></i></div>
+        <div class="nav-submenu">
+          <a href="../capital-management/rwa-calculator.html" class="nav-item">RWA Calculator</a>
+          <a href="../capital-management/output-floor.html" class="nav-item">Output Floor</a>
+        </div>
+        <div class="nav-item has-submenu"><i data-lucide="alert-circle" class="nav-icon"></i><span class="nav-label">Expected Credit Loss</span><i data-lucide="chevron-right" class="nav-chevron" style="width:14px;height:14px;"></i></div>
+        <div class="nav-submenu">
+          <a href="../expected-credit-loss/ecl-engine.html" class="nav-item">ECL Engine</a>
+          <a href="../expected-credit-loss/sicr-monitor.html" class="nav-item">SICR Monitor</a>
+        </div>
+      </div>
+      <div class="nav-section">
+        <div class="nav-section-title">Pricing & Optimization</div>
+        <div class="nav-item has-submenu"><i data-lucide="arrow-left-right" class="nav-icon"></i><span class="nav-label">Funds Transfer Pricing</span><i data-lucide="chevron-right" class="nav-chevron" style="width:14px;height:14px;"></i></div>
+        <div class="nav-submenu">
+          <a href="../funds-transfer-pricing/curve-builder.html" class="nav-item">Curve Builder</a>
+          <a href="../funds-transfer-pricing/deal-pricer.html" class="nav-item">Deal Pricer</a>
+        </div>
+        <div class="nav-item has-submenu"><i data-lucide="bar-chart-3" class="nav-icon"></i><span class="nav-label">Balance Sheet Optimization</span><i data-lucide="chevron-right" class="nav-chevron" style="width:14px;height:14px;"></i></div>
+        <div class="nav-submenu">
+          <a href="../balance-sheet-optimization/nim-dashboard.html" class="nav-item">NIM Dashboard</a>
+          <a href="../balance-sheet-optimization/hedging-tracker.html" class="nav-item">Hedging Tracker</a>
+        </div>
+      </div>
+    </nav>
+  </aside>
+
+  <div class="main-content" id="mainContent">
+    <header class="top-header">
+      <div class="logo-area"><span style="font-weight:600;color:var(--text);">Asset &amp; Liability Management</span></div>
+      <div class="header-actions">
+        <button class="header-btn"><i data-lucide="calendar" style="width:14px;height:14px;"></i> 25 Jun 2026</button>
+        <button class="header-btn"><i data-lucide="building-2" style="width:14px;height:14px;"></i> Group Consolidated</button>
+        <div class="user-pill"><div class="avatar">JD</div><span>John Doe</span><i data-lucide="chevron-down" style="width:14px;height:14px;color:var(--text-muted);"></i></div>
+      </div>
+    </header>
+
+    <div class="content-area">
+      <div class="breadcrumbs" id="breadcrumbs"></div>
+      <h1 class="text-2xl font-bold mb-5">LCR Calculator</h1>
+
+      <div class="grid grid-2" style="grid-template-columns: 1fr 1fr;">
+        <!-- Inputs -->
+        <div class="card">
+          <div class="card-header"><h3>HQLA & Cash Flow Inputs (EUR M)</h3></div>
+          <div class="card-body">
+            <h4 class="text-sm font-semibold mb-3" style="color:var(--primary);">High-Quality Liquid Assets</h4>
+            <div class="grid grid-2">
+              <div class="form-group">
+                <label class="form-label">Level 1 Assets <span class="required">*</span></label>
+                <input type="number" class="form-input" id="l1Assets" value="2000" step="1">
+                <div class="form-hint">CB reserves, gov bonds (no haircut)</div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Level 2A Assets <span class="required">*</span></label>
+                <input type="number" class="form-input" id="l2aAssets" value="800" step="1">
+                <div class="form-hint">Covered bonds, agencies (15% haircut)</div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Level 2B Assets <span class="required">*</span></label>
+                <input type="number" class="form-input" id="l2bAssets" value="200" step="1">
+                <div class="form-hint">Corporate bonds, equities (50% haircut)</div>
+              </div>
+            </div>
+
+            <h4 class="text-sm font-semibold mb-3 mt-4" style="color:var(--primary);">Cash Outflows (30-day stress)</h4>
+            <div class="grid grid-2">
+              <div class="form-group">
+                <label class="form-label">Retail Stable Deposits</label>
+                <input type="number" class="form-input" id="retailStable" value="5000" step="1">
+                <div class="form-hint">5% run-off rate applied</div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Retail Non-Stable Deposits</label>
+                <input type="number" class="form-input" id="retailNonstable" value="1000" step="1">
+                <div class="form-hint">10% run-off rate applied</div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Operational Deposits</label>
+                <input type="number" class="form-input" id="operational" value="500" step="1">
+                <div class="form-hint">25% run-off rate applied</div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Wholesale Unsecured</label>
+                <input type="number" class="form-input" id="wholesaleUnsec" value="300" step="1">
+                <div class="form-hint">100% run-off rate applied</div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Wholesale Secured</label>
+                <input type="number" class="form-input" id="wholesaleSec" value="200" step="1">
+                <div class="form-hint">25% run-off rate applied</div>
+              </div>
+            </div>
+
+            <h4 class="text-sm font-semibold mb-3 mt-4" style="color:var(--primary);">Cash Inflows (30-day)</h4>
+            <div class="grid grid-2">
+              <div class="form-group">
+                <label class="form-label">Retail Inflows</label>
+                <input type="number" class="form-input" id="retailInflows" value="200" step="1">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Wholesale Inflows</label>
+                <input type="number" class="form-input" id="wholesaleInflows" value="100" step="1">
+                <div class="form-hint">Capped at 75% of outflows</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Results -->
+        <div>
+          <div class="card mb-4">
+            <div class="card-header"><h3>LCR Result</h3></div>
+            <div class="card-body text-center">
+              <div style="font-size:3rem;font-weight:700;" id="lcrValue">136.4%</div>
+              <div class="mb-3" id="lcrStatus"><span class="badge badge-success">Compliant (≥100%)</span></div>
+              <div style="width:100%;height:12px;background:var(--border);border-radius:6px;overflow:hidden;">
+                <div id="lcrBar" style="height:100%;width:68%;background:var(--success);border-radius:6px;transition:width 0.3s;"></div>
+              </div>
+              <div class="text-sm text-muted mt-2">Minimum requirement: 100%</div>
+            </div>
+          </div>
+
+          <div class="card mb-4">
+            <div class="card-header"><h3>Breakdown</h3></div>
+            <div class="card-body">
+              <div class="flex justify-between mb-2"><span class="text-sm">Adjusted HQLA</span><span class="text-sm font-semibold" id="hqlaValue">EUR 2,680M</span></div>
+              <div class="flex justify-between mb-2"><span class="text-sm">Total Outflows</span><span class="text-sm font-semibold" id="outflowsValue">EUR 1,175M</span></div>
+              <div class="flex justify-between mb-2"><span class="text-sm">Total Inflows</span><span class="text-sm font-semibold" id="inflowsValue">EUR 300M</span></div>
+              <div class="flex justify-between mb-2"><span class="text-sm">Effective Inflows</span><span class="text-sm font-semibold" id="effInflowsValue">EUR 225M</span></div>
+              <div class="border-t mt-2 pt-2 flex justify-between"><span class="text-sm font-semibold">Net Cash Outflows</span><span class="text-sm font-bold" id="netOutflowsValue">EUR 950M</span></div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header"><h3>LCR Waterfall</h3></div>
+            <div class="card-body"><div class="chart-container" style="height:220px;"><canvas id="lcrWaterfall"></canvas></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="../../js/charts.js"></script>
+<script src="../../js/calculators.js"></script>
+<script src="../../js/navigation.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    lucide.createIcons();
+    updateLCR();
+
+    document.querySelectorAll('#l1Assets, #l2aAssets, #l2bAssets, #retailStable, #retailNonstable, #operational, #wholesaleUnsec, #wholesaleSec, #retailInflows, #wholesaleInflows')
+      .forEach(el => el.addEventListener('input', updateLCR));
+
+    function updateLCR() {
+      const inputs = {
+        level1Assets: +document.getElementById('l1Assets').value,
+        level2aAssets: +document.getElementById('l2aAssets').value,
+        level2bAssets: +document.getElementById('l2bAssets').value,
+        retailStableOutflow: +document.getElementById('retailStable').value,
+        retailNonstableOutflow: +document.getElementById('retailNonstable').value,
+        operationalDeposits: +document.getElementById('operational').value,
+        wholesaleUnsecured: +document.getElementById('wholesaleUnsec').value,
+        wholesaleSecured: +document.getElementById('wholesaleSec').value,
+        retailInflows: +document.getElementById('retailInflows').value,
+        wholesaleInflows: +document.getElementById('wholesaleInflows').value
+      };
+      const r = calculateLCR(inputs);
+
+      document.getElementById('lcrValue').textContent = r.lcr.toFixed(1) + '%';
+      document.getElementById('lcrValue').style.color = r.status === 'green' ? 'var(--success)' : r.status === 'amber' ? 'var(--warning)' : 'var(--danger)';
+      document.getElementById('lcrStatus').innerHTML = r.status === 'green' ? '<span class="badge badge-success">Compliant (≥100%)</span>' : r.status === 'amber' ? '<span class="badge badge-warning">Watch (100-120%)</span>' : '<span class="badge badge-danger">Breach (&lt;100%)</span>';
+      document.getElementById('lcrBar').style.width = Math.min(r.lcr, 150) + '%';
+      document.getElementById('lcrBar').style.background = r.status === 'green' ? 'var(--success)' : r.status === 'amber' ? 'var(--warning)' : 'var(--danger)';
+
+      document.getElementById('hqlaValue').textContent = 'EUR ' + formatNumber(r.hqla) + 'M';
+      document.getElementById('outflowsValue').textContent = 'EUR ' + formatNumber(r.totalOutflows) + 'M';
+      document.getElementById('inflowsValue').textContent = 'EUR ' + formatNumber(r.totalInflows) + 'M';
+      document.getElementById('effInflowsValue').textContent = 'EUR ' + formatNumber(r.effectiveInflows) + 'M';
+      document.getElementById('netOutflowsValue').textContent = 'EUR ' + formatNumber(r.netCashOutflows) + 'M';
+
+      // Update waterfall
+      updateWaterfall(r);
+    }
+
+    let wfChart;
+    function updateWaterfall(r) {
+      const ctx = document.getElementById('lcrWaterfall');
+      if (!ctx) return;
+      if (wfChart) wfChart.destroy();
+      const data = [r.hqla, -r.totalOutflows, r.effectiveInflows, r.netCashOutflows];
+      const labels = ['HQLA', 'Outflows', 'Inflows', 'Net Outflows'];
+      let cum = 0;
+      const ds = [];
+      const colors = [];
+      data.forEach((v, i) => {
+        if (i === 0) { ds.push([0, v]); cum = v; colors.push(ALM_COLORS.primary); }
+        else if (i === data.length - 1) { ds.push([0, v]); colors.push(ALM_COLORS.danger); }
+        else { ds.push([cum, cum + v]); cum += v; colors.push(v >= 0 ? ALM_COLORS.success : ALM_COLORS.danger); }
+      });
+      wfChart = new Chart(ctx, {
+        type: 'bar',
+        data: { labels, datasets: [{ data: ds, backgroundColor: colors, borderRadius: 4 }] },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: '#f1f5f9' } }, x: { grid: { display: false } } } }
+      });
+    }
+  });
+</script>
+</body>
+</html>

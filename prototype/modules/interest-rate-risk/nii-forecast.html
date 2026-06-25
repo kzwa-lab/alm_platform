@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NII Forecast — ALM Platform</title>
+  <link rel="stylesheet" href="../../css/alm-platform.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+<div class="app-layout">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="flex items-center gap-2" style="font-weight:700;color:var(--primary);font-size:1.1rem;">
+        <div style="width:32px;height:32px;background:var(--primary);border-radius:6px;display:flex;align-items:center;justify-content:center;color:white;font-size:12px;">ALM</div>
+        <span class="nav-label">Platform</span>
+      </div>
+      <button class="sidebar-toggle" id="sidebarToggle"><i data-lucide="panel-left-close" style="width:18px;height:18px;"></i></button>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">
+        <div class="nav-section-title">Overview</div>
+        <a href="../../index.html" class="nav-item"><i data-lucide="layout-dashboard" class="nav-icon"></i><span class="nav-label">Dashboard</span></a>
+        <a href="../data-foundation/index.html" class="nav-item"><i data-lucide="database" class="nav-icon"></i><span class="nav-label">Data Foundation</span></a>
+      </div>
+      <div class="nav-section">
+        <div class="nav-section-title">Risk Modules</div>
+        <div class="nav-item has-submenu"><i data-lucide="droplets" class="nav-icon"></i><span class="nav-label">Liquidity Risk</span><i data-lucide="chevron-right" class="nav-chevron" style="width:14px;height:14px;"></i></div>
+        <div class="nav-submenu">
+          <a href="../liquidity-risk/lcr-calculator.html" class="nav-item">LCR Calculator</a>
+          <a href="../liquidity-risk/nsfr-monitor.html" class="nav-item">NSFR Monitor</a>
+          <a href="../liquidity-risk/stress-testing.html" class="nav-item">Stress Testing</a>
+        </div>
+        <div class="nav-item has-submenu expanded"><i data-lucide="trending-up" class="nav-icon"></i><span class="nav-label">Interest Rate Risk</span><i data-lucide="chevron-right" class="nav-chevron" style="width:14px;height:14px;"></i></div>
+        <div class="nav-submenu open">
+          <a href="eve-sensitivity.html" class="nav-item">EVE Sensitivity</a>
+          <a href="nii-forecast.html" class="nav-item active">NII Forecast</a>
+          <a href="gap-analysis.html" class="nav-item">Gap Analysis</a>
+        </div>
+        <div class="nav-item has-submenu"><i data-lucide="shield" class="nav-icon"></i><span class="nav-label">Capital Management</span><i data-lucide="chevron-right" class="nav-chevron" style="width:14px;height:14px;"></i></div>
+        <div class="nav-submenu">
+          <a href="../capital-management/rwa-calculator.html" class="nav-item">RWA Calculator</a>
+          <a href="../capital-management/output-floor.html" class="nav-item">Output Floor</a>
+        </div>
+        <div class="nav-item has-submenu"><i data-lucide="alert-circle" class="nav-icon"></i><span class="nav-label">Expected Credit Loss</span><i data-lucide="chevron-right" class="nav-chevron" style="width:14px;height:14px;"></i></div>
+        <div class="nav-submenu">
+          <a href="../expected-credit-loss/ecl-engine.html" class="nav-item">ECL Engine</a>
+          <a href="../expected-credit-loss/sicr-monitor.html" class="nav-item">SICR Monitor</a>
+        </div>
+      </div>
+      <div class="nav-section">
+        <div class="nav-section-title">Pricing & Optimization</div>
+        <div class="nav-item has-submenu"><i data-lucide="arrow-left-right" class="nav-icon"></i><span class="nav-label">Funds Transfer Pricing</span><i data-lucide="chevron-right" class="nav-chevron" style="width:14px;height:14px;"></i></div>
+        <div class="nav-submenu">
+          <a href="../funds-transfer-pricing/curve-builder.html" class="nav-item">Curve Builder</a>
+          <a href="../funds-transfer-pricing/deal-pricer.html" class="nav-item">Deal Pricer</a>
+        </div>
+        <div class="nav-item has-submenu"><i data-lucide="bar-chart-3" class="nav-icon"></i><span class="nav-label">Balance Sheet Optimization</span><i data-lucide="chevron-right" class="nav-chevron" style="width:14px;height:14px;"></i></div>
+        <div class="nav-submenu">
+          <a href="../balance-sheet-optimization/nim-dashboard.html" class="nav-item">NIM Dashboard</a>
+          <a href="../balance-sheet-optimization/hedging-tracker.html" class="nav-item">Hedging Tracker</a>
+        </div>
+      </div>
+    </nav>
+  </aside>
+
+  <div class="main-content" id="mainContent">
+    <header class="top-header">
+      <div class="logo-area"><span style="font-weight:600;color:var(--text);">Asset &amp; Liability Management</span></div>
+      <div class="header-actions">
+        <button class="header-btn"><i data-lucide="calendar" style="width:14px;height:14px;"></i> 25 Jun 2026</button>
+        <button class="header-btn"><i data-lucide="building-2" style="width:14px;height:14px;"></i> Group Consolidated</button>
+        <div class="user-pill"><div class="avatar">JD</div><span>John Doe</span><i data-lucide="chevron-down" style="width:14px;height:14px;color:var(--text-muted);"></i></div>
+      </div>
+    </header>
+
+    <div class="content-area">
+      <div class="breadcrumbs" id="breadcrumbs"></div>
+      <h1 class="text-2xl font-bold mb-5">NII Forecast</h1>
+
+      <div class="grid grid-2" style="grid-template-columns: 1fr 2fr;">
+        <div class="card">
+          <div class="card-header"><h3>Forecast Inputs</h3></div>
+          <div class="card-body">
+            <div class="form-group"><label class="form-label">Total Earning Assets (EUR M)</label><input type="number" class="form-input" id="earningAssets" value="8000" step="100"></div>
+            <div class="form-group"><label class="form-label">Interest-Bearing Liabilities (EUR M)</label><input type="number" class="form-input" id="intLiabs" value="7500" step="100"></div>
+            <div class="form-group"><label class="form-label">Current Asset Yield (%)</label><input type="number" class="form-input" id="assetYield" value="4.20" step="0.01"></div>
+            <div class="form-group"><label class="form-label">Current Liability Cost (%)</label><input type="number" class="form-input" id="liabCost" value="1.80" step="0.01"></div>
+            <div class="form-group"><label class="form-label">Asset Beta (repricing speed)</label><input type="number" class="form-input" id="assetBeta" value="0.85" step="0.05" max="1" min="0"><div class="form-hint">0 = fixed, 1 = instant reprice</div></div>
+            <div class="form-group"><label class="form-label">Liability Beta (deposit stickiness)</label><input type="number" class="form-input" id="liabBeta" value="0.35" step="0.05" max="1" min="0"><div class="form-hint">Retail current ≈ 0.1-0.3; wholesale ≈ 0.9-1.0</div></div>
+            <div class="form-group"><label class="form-label">Expected Rate Change (bps / 12m)</label><input type="number" class="form-input" id="rateChange" value="-50" step="5"><div class="form-hint">Negative = rate cuts expected</div></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h3>NII Forecast (36 Months)</h3>
+            <div class="tabs" id="forecastTabs" style="border-bottom:none;margin-bottom:0;">
+              <button class="tab-btn active" data-tab="base">Base Case</button>
+              <button class="tab-btn" data-tab="up">Rate Rise</button>
+              <button class="tab-btn" data-tab="down">Rate Cut</button>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="tab-panel active" data-panel="base"><div class="chart-container" style="height:300px;"><canvas id="niiChartBase"></canvas></div></div>
+            <div class="tab-panel" data-panel="up"><div class="chart-container" style="height:300px;"><canvas id="niiChartUp"></canvas></div></div>
+            <div class="tab-panel" data-panel="down"><div class="chart-container" style="height:300px;"><canvas id="niiChartDown"></canvas></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card mt-5">
+        <div class="card-header"><h3>Forecast Summary</h3></div>
+        <div class="card-body">
+          <div class="grid grid-4">
+            <div class="text-center"><div class="text-sm text-muted">Current NII (Annual)</div><div class="text-2xl font-bold" id="currNII">EUR 201M</div></div>
+            <div class="text-center"><div class="text-sm text-muted">Current NIM</div><div class="text-2xl font-bold" id="currNIM">2.51%</div></div>
+            <div class="text-center"><div class="text-sm text-muted">Forecast NII (Y1)</div><div class="text-2xl font-bold" id="forecastNII">EUR 198M</div></div>
+            <div class="text-center"><div class="text-sm text-muted">Forecast NIM (Y1)</div><div class="text-2xl font-bold" id="forecastNIM">2.47%</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="../../js/charts.js"></script>
+<script src="../../js/calculators.js"></script>
+<script src="../../js/navigation.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    lucide.createIcons();
+    initTabs('forecastTabs');
+
+    let charts = {};
+
+    function recalc() {
+      const ea = +document.getElementById('earningAssets').value;
+      const il = +document.getElementById('intLiabs').value;
+      const ay = +document.getElementById('assetYield').value;
+      const lc = +document.getElementById('liabCost').value;
+      const ab = +document.getElementById('assetBeta').value;
+      const lb = +document.getElementById('liabBeta').value;
+      const rc = +document.getElementById('rateChange').value;
+
+      const curr = calculateNIM(ea, il, ay, lc);
+      document.getElementById('currNII').textContent = 'EUR ' + formatNumber(curr.nii) + 'M';
+      document.getElementById('currNIM').textContent = curr.nim.toFixed(2) + '%';
+
+      const labels = Array.from({length:36}, (_,i) => 'M' + (i+1));
+
+      function makeSeries(rateShift) {
+        return labels.map((_,i) => {
+          const shift = (rateShift / 100) * (i / 12);
+          const newAY = ay + (shift * 100 * ab);
+          const newLC = lc + (shift * 100 * lb);
+          return calculateNIM(ea, il, newAY, newLC).nii;
+        });
+      }
+
+      const baseSeries = makeSeries(rc);
+      const upSeries = makeSeries(100);
+      const downSeries = makeSeries(-150);
+
+      document.getElementById('forecastNII').textContent = 'EUR ' + formatNumber(baseSeries[11]) + 'M';
+      document.getElementById('forecastNIM').textContent = ((baseSeries[11]/ea)*100).toFixed(2) + '%';
+
+      function renderChart(id, data, label, color) {
+        if (charts[id]) charts[id].destroy();
+        charts[id] = createLineChart(id, labels, [{ label, data, borderColor: color, backgroundColor: 'transparent', pointRadius: 0 }], { scales: { y: { min: Math.min(...data)*0.9 } } });
+      }
+
+      renderChart('niiChartBase', baseSeries, 'Base Case NII', ALM_COLORS.primary);
+      renderChart('niiChartUp', upSeries, 'Rate Rise +100bps', ALM_COLORS.success);
+      renderChart('niiChartDown', downSeries, 'Rate Cut -150bps', ALM_COLORS.danger);
+    }
+
+    ['earningAssets','intLiabs','assetYield','liabCost','assetBeta','liabBeta','rateChange'].forEach(id => {
+      document.getElementById(id).addEventListener('input', recalc);
+    });
+
+    recalc();
+  });
+</script>
+</body>
+</html>

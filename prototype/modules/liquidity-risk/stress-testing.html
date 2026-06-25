@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Liquidity Stress Testing — ALM Platform</title>
+  <link rel="stylesheet" href="../../css/alm-platform.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+<div class="app-layout">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="flex items-center gap-2" style="font-weight:700;color:var(--primary);font-size:1.1rem;">
+        <div style="width:32px;height:32px;background:var(--primary);border-radius:6px;display:flex;align-items:center;justify-content:center;color:white;font-size:12px;">ALM</div>
+        <span class="nav-label">Platform</span>
+      </div>
+      <button class="sidebar-toggle" id="sidebarToggle"><i data-lucide="panel-left-close" style="width:18px;height:18px;"></i></button>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">
+        <div class="nav-section-title">Overview</div>
+        <a href="../../index.html" class="nav-item"><i data-lucide="layout-dashboard" class="nav-icon"></i><span class="nav-label">Dashboard</span></a>
+        <a href="../data-foundation/index.html" class="nav-item"><i data-lucide="database" class="nav-icon"></i><span class="nav-label">Data Foundation</span></a>
+      </div>
+      <div class="nav-section">
+        <div class="nav-section-title">Risk Modules</div>
+        <div class="nav-item has-submenu expanded"><i data-lucide="droplets" class="nav-icon"></i><span class="nav-label">Liquidity Risk</span><i data-lucide="chevron-right" class="nav-chevron" style="width:14px;height:14px;"></i></div>
+        <div class="nav-submenu open">
+          <a href="lcr-calculator.html" class="nav-item">LCR Calculator</a>
+          <a href="nsfr-monitor.html" class="nav-item">NSFR Monitor</a>
+          <a href="stress-testing.html" class="nav-item active">Stress Testing</a>
+        </div>
+        <div class="nav-item has-submenu"><i data-lucide="trending-up" class="nav-icon"></i><span class="nav-label">Interest Rate Risk</span><i data-lucide="chevron-right" class="nav-chevron" style="width:14px;height:14px;"></i></div>
+        <div class="nav-submenu">
+          <a href="../interest-rate-risk/eve-sensitivity.html" class="nav-item">EVE Sensitivity</a>
+          <a href="../interest-rate-risk/nii-forecast.html" class="nav-item">NII Forecast</a>
+          <a href="../interest-rate-risk/gap-analysis.html" class="nav-item">Gap Analysis</a>
+        </div>
+        <div class="nav-item has-submenu"><i data-lucide="shield" class="nav-icon"></i><span class="nav-label">Capital Management</span><i data-lucide="chevron-right" class="nav-chevron" style="width:14px;height:14px;"></i></div>
+        <div class="nav-submenu">
+          <a href="../capital-management/rwa-calculator.html" class="nav-item">RWA Calculator</a>
+          <a href="../capital-management/output-floor.html" class="nav-item">Output Floor</a>
+        </div>
+        <div class="nav-item has-submenu"><i data-lucide="alert-circle" class="nav-icon"></i><span class="nav-label">Expected Credit Loss</span><i data-lucide="chevron-right" class="nav-chevron" style="width:14px;height:14px;"></i></div>
+        <div class="nav-submenu">
+          <a href="../expected-credit-loss/ecl-engine.html" class="nav-item">ECL Engine</a>
+          <a href="../expected-credit-loss/sicr-monitor.html" class="nav-item">SICR Monitor</a>
+        </div>
+      </div>
+      <div class="nav-section">
+        <div class="nav-section-title">Pricing & Optimization</div>
+        <div class="nav-item has-submenu"><i data-lucide="arrow-left-right" class="nav-icon"></i><span class="nav-label">Funds Transfer Pricing</span><i data-lucide="chevron-right" class="nav-chevron" style="width:14px;height:14px;"></i></div>
+        <div class="nav-submenu">
+          <a href="../funds-transfer-pricing/curve-builder.html" class="nav-item">Curve Builder</a>
+          <a href="../funds-transfer-pricing/deal-pricer.html" class="nav-item">Deal Pricer</a>
+        </div>
+        <div class="nav-item has-submenu"><i data-lucide="bar-chart-3" class="nav-icon"></i><span class="nav-label">Balance Sheet Optimization</span><i data-lucide="chevron-right" class="nav-chevron" style="width:14px;height:14px;"></i></div>
+        <div class="nav-submenu">
+          <a href="../balance-sheet-optimization/nim-dashboard.html" class="nav-item">NIM Dashboard</a>
+          <a href="../balance-sheet-optimization/hedging-tracker.html" class="nav-item">Hedging Tracker</a>
+        </div>
+      </div>
+    </nav>
+  </aside>
+
+  <div class="main-content" id="mainContent">
+    <header class="top-header">
+      <div class="logo-area"><span style="font-weight:600;color:var(--text);">Asset &amp; Liability Management</span></div>
+      <div class="header-actions">
+        <button class="header-btn"><i data-lucide="calendar" style="width:14px;height:14px;"></i> 25 Jun 2026</button>
+        <button class="header-btn"><i data-lucide="building-2" style="width:14px;height:14px;"></i> Group Consolidated</button>
+        <div class="user-pill"><div class="avatar">JD</div><span>John Doe</span><i data-lucide="chevron-down" style="width:14px;height:14px;color:var(--text-muted);"></i></div>
+      </div>
+    </header>
+
+    <div class="content-area">
+      <div class="breadcrumbs" id="breadcrumbs"></div>
+      <h1 class="text-2xl font-bold mb-5">Liquidity Stress Testing</h1>
+
+      <div class="grid grid-3 mb-5">
+        <div class="card" style="cursor:pointer;" onclick="selectScenario('mild')" id="cardMild">
+          <div class="card-body text-center">
+            <div style="width:48px;height:48px;border-radius:50%;background:rgba(16,185,129,0.1);display:flex;align-items:center;justify-content:center;margin:0 auto 12px;"><i data-lucide="cloud" style="width:24px;height:24px;color:var(--success);"></i></div>
+            <h3 class="text-lg font-semibold">Mild Stress</h3>
+            <p class="text-sm text-muted">Idiosyncratic event only. Limited market reaction. Deposit outflows 1.5x.</p>
+          </div>
+        </div>
+        <div class="card" style="cursor:pointer;border:2px solid var(--primary);" onclick="selectScenario('moderate')" id="cardModerate">
+          <div class="card-body text-center">
+            <div style="width:48px;height:48px;border-radius:50%;background:rgba(245,158,11,0.1);display:flex;align-items:center;justify-content:center;margin:0 auto 12px;"><i data-lucide="cloud-rain" style="width:24px;height:24px;color:var(--warning);"></i></div>
+            <h3 class="text-lg font-semibold">Moderate Stress</h3>
+            <p class="text-sm text-muted">Combined idiosyncratic + market-wide. Outflows 2.5x. Inflows halved.</p>
+          </div>
+        </div>
+        <div class="card" style="cursor:pointer;" onclick="selectScenario('severe')" id="cardSevere">
+          <div class="card-body text-center">
+            <div style="width:48px;height:48px;border-radius:50%;background:rgba(239,68,68,0.1);display:flex;align-items:center;justify-content:center;margin:0 auto 12px;"><i data-lucide="cloud-lightning" style="width:24px;height:24px;color:var(--danger);"></i></div>
+            <h3 class="text-lg font-semibold">Severe Stress</h3>
+            <p class="text-sm text-muted">Systemic crisis. Outflows 4x. HQLA haircuts increase 20pp.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-2">
+        <div class="card">
+          <div class="card-header"><h3>Stress Multipliers</h3></div>
+          <div class="card-body">
+            <div class="form-group"><label class="form-label">Retail Run-off Multiplier</label><input type="number" class="form-input" id="retailMult" value="2.5" step="0.1"><div class="form-hint">Applied to stable and non-stable retail outflows</div></div>
+            <div class="form-group"><label class="form-label">Wholesale Run-off Multiplier</label><input type="number" class="form-input" id="wholesaleMult" value="2.0" step="0.1"><div class="form-hint">Applied to wholesale unsecured outflows</div></div>
+            <div class="form-group"><label class="form-label">HQLA Haircut Addition</label><input type="number" class="form-input" id="hqlaAdd" value="0.10" step="0.01"><div class="form-hint">Additional haircut on Level 1/2 assets</div></div>
+            <div class="form-group"><label class="form-label">Inflow Reduction Factor</label><input type="number" class="form-input" id="inflowRed" value="0.50" step="0.05" max="1" min="0"><div class="form-hint">Proportion of inflows recognized under stress</div></div>
+          </div>
+        </div>
+
+        <div>
+          <div class="card mb-4">
+            <div class="card-header"><h3>Before / After LCR Comparison</h3></div>
+            <div class="card-body"><div class="chart-container" style="height:260px;"><canvas id="stressCompareChart"></canvas></div></div>
+          </div>
+          <div class="card">
+            <div class="card-header"><h3>Survival Horizon</h3></div>
+            <div class="card-body text-center">
+              <div style="font-size:2.5rem;font-weight:700;color:var(--warning);" id="survivalDays">45 days</div>
+              <div class="text-sm text-muted">Estimated days until HQLA exhausted under stress</div>
+              <div class="progress-bar mt-3"><div class="progress-fill amber" id="survivalBar" style="width:60%;"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="../../js/charts.js"></script>
+<script src="../../js/calculators.js"></script>
+<script src="../../js/navigation.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    lucide.createIcons();
+
+    const baseLCR = 136.4;
+    let compareChart;
+
+    function recalc() {
+      const retailMult = +document.getElementById('retailMult').value;
+      const wholesaleMult = +document.getElementById('wholesaleMult').value;
+      const hqlaAdd = +document.getElementById('hqlaAdd').value;
+      const inflowRed = +document.getElementById('inflowRed').value;
+
+      const base = calculateLCR({ level1Assets:2000, level2aAssets:800, level2bAssets:200, retailStableOutflow:5000, retailNonstableOutflow:1000, operationalDeposits:500, wholesaleUnsecured:300, wholesaleSecured:200, retailInflows:200, wholesaleInflows:100 });
+      const stressed = calculateLCR({
+        level1Assets: 2000 * (1 - hqlaAdd),
+        level2aAssets: 800 * (1 - hqlaAdd),
+        level2bAssets: 200 * (1 - hqlaAdd),
+        retailStableOutflow: 5000 * retailMult,
+        retailNonstableOutflow: 1000 * retailMult,
+        operationalDeposits: 500 * 1.5,
+        wholesaleUnsecured: 300 * wholesaleMult,
+        wholesaleSecured: 200 * wholesaleMult,
+        retailInflows: 200 * inflowRed,
+        wholesaleInflows: 100 * inflowRed
+      });
+
+      if (compareChart) compareChart.destroy();
+      compareChart = createBarChart('stressCompareChart',
+        ['HQLA','Outflows','Inflows','Net Outflows','LCR'],
+        [
+          { label: 'Base', data: [base.hqla, base.totalOutflows, base.effectiveInflows, base.netCashOutflows, base.lcr], backgroundColor: ALM_COLORS.primary, borderRadius: 4 },
+          { label: 'Stressed', data: [stressed.hqla, stressed.totalOutflows, stressed.effectiveInflows, stressed.netCashOutflows, stressed.lcr], backgroundColor: ALM_COLORS.danger, borderRadius: 4 }
+        ]
+      );
+
+      const survival = Math.max(0, Math.round(stressed.hqla / (stressed.netCashOutflows / 30)));
+      document.getElementById('survivalDays').textContent = survival + ' days';
+      document.getElementById('survivalDays').style.color = survival >= 30 ? 'var(--success)' : survival >= 15 ? 'var(--warning)' : 'var(--danger)';
+      document.getElementById('survivalBar').style.width = Math.min(survival / 60 * 100, 100) + '%';
+      document.getElementById('survivalBar').className = 'progress-fill ' + (survival >= 30 ? 'green' : survival >= 15 ? 'amber' : 'red');
+    }
+
+    ['retailMult','wholesaleMult','hqlaAdd','inflowRed'].forEach(id => document.getElementById(id).addEventListener('input', recalc));
+
+    window.selectScenario = function(scenario) {
+      document.getElementById('cardMild').style.border = '1px solid var(--border)';
+      document.getElementById('cardModerate').style.border = '1px solid var(--border)';
+      document.getElementById('cardSevere').style.border = '1px solid var(--border)';
+      document.getElementById('card' + scenario.charAt(0).toUpperCase() + scenario.slice(1)).style.border = '2px solid var(--primary)';
+
+      const map = { mild: [1.5,1.2,0.05,0.80], moderate: [2.5,2.0,0.10,0.50], severe: [4.0,3.0,0.20,0.20] };
+      const vals = map[scenario];
+      document.getElementById('retailMult').value = vals[0];
+      document.getElementById('wholesaleMult').value = vals[1];
+      document.getElementById('hqlaAdd').value = vals[2];
+      document.getElementById('inflowRed').value = vals[3];
+      recalc();
+    };
+
+    recalc();
+  });
+</script>
+</body>
+</html>
