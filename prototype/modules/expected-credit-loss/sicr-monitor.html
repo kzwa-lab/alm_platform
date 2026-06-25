@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SICR Monitor — ALM Platform</title>
+  <link rel="stylesheet" href="../../css/alm-platform.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+<div class="app-layout">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="flex items-center gap-2" style="font-weight:700;color:var(--primary);font-size:1.1rem;">
+        <div style="width:32px;height:32px;background:var(--primary);border-radius:6px;display:flex;align-items:center;justify-content:center;color:white;font-size:12px;">ALM</div>
+        <span class="nav-label">Platform</span>
+      </div>
+      <button class="sidebar-toggle" id="sidebarToggle"><i data-lucide="panel-left-close" style="width:18px;height:18px;"></i></button>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">
+        <div class="nav-section-title">Overview</div>
+        <a href="../../index.html" class="nav-item"><i data-lucide="layout-dashboard" class="nav-icon"></i><span class="nav-label">Dashboard</span></a>
+        <a href="../data-foundation/index.html" class="nav-item"><i data-lucide="database" class="nav-icon"></i><span class="nav-label">Data Foundation</span></a>
+      </div>
+      <div class="nav-section">
+        <div class="nav-section-title">Risk Modules</div>
+        <div class="nav-item has-submenu"><i data-lucide="droplets" class="nav-icon"></i><span class="nav-label">Liquidity Risk</span><i data-lucide="chevron-right" class="nav-chevron" style="width:14px;height:14px;"></i></div>
+        <div class="nav-submenu">
+          <a href="../liquidity-risk/lcr-calculator.html" class="nav-item">LCR Calculator</a>
+          <a href="../liquidity-risk/nsfr-monitor.html" class="nav-item">NSFR Monitor</a>
+          <a href="../liquidity-risk/stress-testing.html" class="nav-item">Stress Testing</a>
+        </div>
+        <div class="nav-item has-submenu"><i data-lucide="trending-up" class="nav-icon"></i><span class="nav-label">Interest Rate Risk</span><i data-lucide="chevron-right" class="nav-chevron" style="width:14px;height:14px;"></i></div>
+        <div class="nav-submenu">
+          <a href="../interest-rate-risk/eve-sensitivity.html" class="nav-item">EVE Sensitivity</a>
+          <a href="../interest-rate-risk/nii-forecast.html" class="nav-item">NII Forecast</a>
+          <a href="../interest-rate-risk/gap-analysis.html" class="nav-item">Gap Analysis</a>
+        </div>
+        <div class="nav-item has-submenu"><i data-lucide="shield" class="nav-icon"></i><span class="nav-label">Capital Management</span><i data-lucide="chevron-right" class="nav-chevron" style="width:14px;height:14px;"></i></div>
+        <div class="nav-submenu">
+          <a href="../capital-management/rwa-calculator.html" class="nav-item">RWA Calculator</a>
+          <a href="../capital-management/output-floor.html" class="nav-item">Output Floor</a>
+        </div>
+        <div class="nav-item has-submenu expanded"><i data-lucide="alert-circle" class="nav-icon"></i><span class="nav-label">Expected Credit Loss</span><i data-lucide="chevron-right" class="nav-chevron" style="width:14px;height:14px;"></i></div>
+        <div class="nav-submenu open">
+          <a href="ecl-engine.html" class="nav-item">ECL Engine</a>
+          <a href="sicr-monitor.html" class="nav-item active">SICR Monitor</a>
+        </div>
+      </div>
+      <div class="nav-section">
+        <div class="nav-section-title">Pricing & Optimization</div>
+        <div class="nav-item has-submenu"><i data-lucide="arrow-left-right" class="nav-icon"></i><span class="nav-label">Funds Transfer Pricing</span><i data-lucide="chevron-right" class="nav-chevron" style="width:14px;height:14px;"></i></div>
+        <div class="nav-submenu">
+          <a href="../funds-transfer-pricing/curve-builder.html" class="nav-item">Curve Builder</a>
+          <a href="../funds-transfer-pricing/deal-pricer.html" class="nav-item">Deal Pricer</a>
+        </div>
+        <div class="nav-item has-submenu"><i data-lucide="bar-chart-3" class="nav-icon"></i><span class="nav-label">Balance Sheet Optimization</span><i data-lucide="chevron-right" class="nav-chevron" style="width:14px;height:14px;"></i></div>
+        <div class="nav-submenu">
+          <a href="../balance-sheet-optimization/nim-dashboard.html" class="nav-item">NIM Dashboard</a>
+          <a href="../balance-sheet-optimization/hedging-tracker.html" class="nav-item">Hedging Tracker</a>
+        </div>
+      </div>
+    </nav>
+  </aside>
+
+  <div class="main-content" id="mainContent">
+    <header class="top-header">
+      <div class="logo-area"><span style="font-weight:600;color:var(--text);">Asset &amp; Liability Management</span></div>
+      <div class="header-actions">
+        <button class="header-btn"><i data-lucide="calendar" style="width:14px;height:14px;"></i> 25 Jun 2026</button>
+        <button class="header-btn"><i data-lucide="building-2" style="width:14px;height:14px;"></i> Group Consolidated</button>
+        <div class="user-pill"><div class="avatar">JD</div><span>John Doe</span><i data-lucide="chevron-down" style="width:14px;height:14px;color:var(--text-muted);"></i></div>
+      </div>
+    </header>
+
+    <div class="content-area">
+      <div class="breadcrumbs" id="breadcrumbs"></div>
+      <h1 class="text-2xl font-bold mb-5">SICR Monitor</h1>
+
+      <div class="grid grid-4 mb-5">
+        <div class="kpi-card">
+          <div class="kpi-icon green"><i data-lucide="check-circle" style="width:20px;height:20px;"></i></div>
+          <div class="kpi-label">Stage 1 Loans</div>
+          <div class="kpi-value">92.4%</div>
+          <div class="text-sm text-muted">EUR 22.1bn exposure</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-icon amber"><i data-lucide="alert-triangle" style="width:20px;height:20px;"></i></div>
+          <div class="kpi-label">Stage 2 Loans</div>
+          <div class="kpi-value">6.1%</div>
+          <div class="text-sm text-muted">EUR 1.5bn exposure</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-icon red"><i data-lucide="x-circle" style="width:20px;height:20px;"></i></div>
+          <div class="kpi-label">Stage 3 Loans</div>
+          <div class="kpi-value">1.5%</div>
+          <div class="text-sm text-muted">EUR 0.4bn exposure</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-icon blue"><i data-lucide="arrow-up-right" style="width:20px;height:20px;"></i></div>
+          <div class="kpi-label">SICR Transfers (MTD)</div>
+          <div class="kpi-value">+42</div>
+          <div class="text-sm text-muted">12 → Stage 2</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h3>Loan Portfolio — Staging & SICR Indicators</h3>
+          <div class="flex gap-2">
+            <button class="btn btn-sm btn-secondary" onclick="bulkStage(1)">Bulk Stage 1</button>
+            <button class="btn btn-sm btn-secondary" onclick="bulkStage(2)">Bulk Stage 2</button>
+            <button class="btn btn-sm btn-secondary" onclick="bulkStage(3)">Bulk Stage 3</button>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="table-container">
+            <table class="data-table" id="sicrTable">
+              <thead>
+                <tr>
+                  <th><input type="checkbox" id="selectAll" onchange="toggleAll()"></th>
+                  <th data-sort="1">Loan ID</th>
+                  <th data-sort="2">Counterparty</th>
+                  <th data-sort="3">Segment</th>
+                  <th data-sort="4" data-sort-type="number">Exposure (EUR M)</th>
+                  <th data-sort="5" data-sort-type="number">Origination PD</th>
+                  <th data-sort="6" data-sort-type="number">Current PD</th>
+                  <th data-sort="7">PD Trend</th>
+                  <th data-sort="8">Stage</th>
+                  <th data-sort="9">SICR Trigger</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td><input type="checkbox" class="row-check"></td><td>L-2024-001</td><td>Deutsche Industrie AG</td><td>Corporate</td><td>12.5</td><td>0.80%</td><td>0.85%</td><td><canvas class="sparkline" width="60" height="20"></canvas></td><td><span class="badge badge-success">Stage 1</span></td><td>No</td></tr>
+                <tr><td><input type="checkbox" class="row-check"></td><td>L-2024-002</td><td>Müller GmbH</td><td>SME</td><td>4.2</td><td>1.20%</td><td>2.50%</td><td><canvas class="sparkline" width="60" height="20"></canvas></td><td><span class="badge badge-warning">Stage 2</span></td><td><span class="text-warning font-semibold">Relative +108%</span></td></tr>
+                <tr><td><input type="checkbox" class="row-check"></td><td>L-2023-891</td><td>Schmidt Bau AG</td><td>Corporate</td><td>8.0</td><td>0.50%</td><td>0.48%</td><td><canvas class="sparkline" width="60" height="20"></canvas></td><td><span class="badge badge-success">Stage 1</span></td><td>No</td></tr>
+                <tr><td><input type="checkbox" class="row-check"></td><td>L-2023-445</td><td>Klein Retail KG</td><td>Retail</td><td>0.3</td><td>2.00%</td><td>5.50%</td><td><canvas class="sparkline" width="60" height="20"></canvas></td><td><span class="badge badge-danger">Stage 3</span></td><td><span class="text-danger font-semibold">Impaired (90 DPD)</span></td></tr>
+                <tr><td><input type="checkbox" class="row-check"></td><td>L-2024-105</td><td> Bauer Tech SE</td><td>Corporate</td><td>25.0</td><td>0.30%</td><td>0.55%</td><td><canvas class="sparkline" width="60" height="20"></canvas></td><td><span class="badge badge-warning">Stage 2</span></td><td><span class="text-warning font-semibold">Absolute +25bps</span></td></tr>
+                <tr><td><input type="checkbox" class="row-check"></td><td>L-2024-312</td><td>Huber Logistics</td><td>SME</td><td>2.1</td><td>1.50%</td><td>1.45%</td><td><canvas class="sparkline" width="60" height="20"></canvas></td><td><span class="badge badge-success">Stage 1</span></td><td>No</td></tr>
+                <tr><td><input type="checkbox" class="row-check"></td><td>L-2022-999</td><td>Fischer GmbH</td><td>SME</td><td>1.8</td><td>1.00%</td><td>3.20%</td><td><canvas class="sparkline" width="60" height="20"></canvas></td><td><span class="badge badge-warning">Stage 2</span></td><td><span class="text-warning font-semibold">Relative +220%</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="../../js/charts.js"></script>
+<script src="../../js/calculators.js"></script>
+<script src="../../js/navigation.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    lucide.createIcons();
+    initSortableTable('sicrTable');
+
+    // Draw sparklines
+    document.querySelectorAll('.sparkline').forEach((canvas, idx) => {
+      const ctx = canvas.getContext('2d');
+      const data = generateTrendSeries(12, 0.5 + idx*0.2, (idx % 3 === 1 ? 0.3 : -0.05), 0.15);
+      const min = Math.min(...data), max = Math.max(...data);
+      const w = canvas.width, h = canvas.height;
+      ctx.strokeStyle = idx % 3 === 1 ? 'var(--danger)' : idx % 3 === 2 ? 'var(--warning)' : 'var(--success)';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      data.forEach((v, i) => {
+        const x = (i / (data.length - 1)) * w;
+        const y = h - ((v - min) / (max - min || 1)) * h;
+        if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      });
+      ctx.stroke();
+    });
+  });
+
+  function toggleAll() {
+    const checked = document.getElementById('selectAll').checked;
+    document.querySelectorAll('.row-check').forEach(cb => cb.checked = checked);
+  }
+
+  function bulkStage(stage) {
+    const labels = ['<span class="badge badge-success">Stage 1</span>', '<span class="badge badge-warning">Stage 2</span>', '<span class="badge badge-danger">Stage 3</span>'];
+    document.querySelectorAll('.row-check:checked').forEach(cb => {
+      const row = cb.closest('tr');
+      row.cells[8].innerHTML = labels[stage-1];
+    });
+  }
+</script>
+</body>
+</html>

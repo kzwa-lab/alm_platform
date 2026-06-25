@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NIM Dashboard — ALM Platform</title>
+  <link rel="stylesheet" href="../../css/alm-platform.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+<div class="app-layout">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="flex items-center gap-2" style="font-weight:700;color:var(--primary);font-size:1.1rem;">
+        <div style="width:32px;height:32px;background:var(--primary);border-radius:6px;display:flex;align-items:center;justify-content:center;color:white;font-size:12px;">ALM</div>
+        <span class="nav-label">Platform</span>
+      </div>
+      <button class="sidebar-toggle" id="sidebarToggle"><i data-lucide="panel-left-close" style="width:18px;height:18px;"></i></button>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">
+        <div class="nav-section-title">Overview</div>
+        <a href="../../index.html" class="nav-item"><i data-lucide="layout-dashboard" class="nav-icon"></i><span class="nav-label">Dashboard</span></a>
+        <a href="../data-foundation/index.html" class="nav-item"><i data-lucide="database" class="nav-icon"></i><span class="nav-label">Data Foundation</span></a>
+      </div>
+      <div class="nav-section">
+        <div class="nav-section-title">Risk Modules</div>
+        <div class="nav-item has-submenu"><i data-lucide="droplets" class="nav-icon"></i><span class="nav-label">Liquidity Risk</span><i data-lucide="chevron-right" class="nav-chevron" style="width:14px;height:14px;"></i></div>
+        <div class="nav-submenu">
+          <a href="../liquidity-risk/lcr-calculator.html" class="nav-item">LCR Calculator</a>
+          <a href="../liquidity-risk/nsfr-monitor.html" class="nav-item">NSFR Monitor</a>
+          <a href="../liquidity-risk/stress-testing.html" class="nav-item">Stress Testing</a>
+        </div>
+        <div class="nav-item has-submenu"><i data-lucide="trending-up" class="nav-icon"></i><span class="nav-label">Interest Rate Risk</span><i data-lucide="chevron-right" class="nav-chevron" style="width:14px;height:14px;"></i></div>
+        <div class="nav-submenu">
+          <a href="../interest-rate-risk/eve-sensitivity.html" class="nav-item">EVE Sensitivity</a>
+          <a href="../interest-rate-risk/nii-forecast.html" class="nav-item">NII Forecast</a>
+          <a href="../interest-rate-risk/gap-analysis.html" class="nav-item">Gap Analysis</a>
+        </div>
+        <div class="nav-item has-submenu"><i data-lucide="shield" class="nav-icon"></i><span class="nav-label">Capital Management</span><i data-lucide="chevron-right" class="nav-chevron" style="width:14px;height:14px;"></i></div>
+        <div class="nav-submenu">
+          <a href="../capital-management/rwa-calculator.html" class="nav-item">RWA Calculator</a>
+          <a href="../capital-management/output-floor.html" class="nav-item">Output Floor</a>
+        </div>
+        <div class="nav-item has-submenu"><i data-lucide="alert-circle" class="nav-icon"></i><span class="nav-label">Expected Credit Loss</span><i data-lucide="chevron-right" class="nav-chevron" style="width:14px;height:14px;"></i></div>
+        <div class="nav-submenu">
+          <a href="../expected-credit-loss/ecl-engine.html" class="nav-item">ECL Engine</a>
+          <a href="../expected-credit-loss/sicr-monitor.html" class="nav-item">SICR Monitor</a>
+        </div>
+      </div>
+      <div class="nav-section">
+        <div class="nav-section-title">Pricing & Optimization</div>
+        <div class="nav-item has-submenu"><i data-lucide="arrow-left-right" class="nav-icon"></i><span class="nav-label">Funds Transfer Pricing</span><i data-lucide="chevron-right" class="nav-chevron" style="width:14px;height:14px;"></i></div>
+        <div class="nav-submenu">
+          <a href="../funds-transfer-pricing/curve-builder.html" class="nav-item">Curve Builder</a>
+          <a href="../funds-transfer-pricing/deal-pricer.html" class="nav-item">Deal Pricer</a>
+        </div>
+        <div class="nav-item has-submenu expanded"><i data-lucide="bar-chart-3" class="nav-icon"></i><span class="nav-label">Balance Sheet Optimization</span><i data-lucide="chevron-right" class="nav-chevron" style="width:14px;height:14px;"></i></div>
+        <div class="nav-submenu open">
+          <a href="nim-dashboard.html" class="nav-item active">NIM Dashboard</a>
+          <a href="hedging-tracker.html" class="nav-item">Hedging Tracker</a>
+        </div>
+      </div>
+    </nav>
+  </aside>
+
+  <div class="main-content" id="mainContent">
+    <header class="top-header">
+      <div class="logo-area"><span style="font-weight:600;color:var(--text);">Asset &amp; Liability Management</span></div>
+      <div class="header-actions">
+        <button class="header-btn"><i data-lucide="calendar" style="width:14px;height:14px;"></i> 25 Jun 2026</button>
+        <button class="header-btn"><i data-lucide="building-2" style="width:14px;height:14px;"></i> Group Consolidated</button>
+        <div class="user-pill"><div class="avatar">JD</div><span>John Doe</span><i data-lucide="chevron-down" style="width:14px;height:14px;color:var(--text-muted);"></i></div>
+      </div>
+    </header>
+
+    <div class="content-area">
+      <div class="breadcrumbs" id="breadcrumbs"></div>
+      <h1 class="text-2xl font-bold mb-5">NIM Dashboard</h1>
+
+      <div class="grid grid-4 mb-5">
+        <div class="kpi-card">
+          <div class="kpi-icon blue"><i data-lucide="percent" style="width:20px;height:20px;"></i></div>
+          <div class="kpi-label">NIM (TTM)</div>
+          <div class="kpi-value">1.85%</div>
+          <div class="kpi-change up">+2bp vs Budget</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-icon green"><i data-lucide="trending-up" style="width:20px;height:20px;"></i></div>
+          <div class="kpi-label">NII (TTM)</div>
+          <div class="kpi-value">EUR 201M</div>
+          <div class="kpi-change up">+3.2% YoY</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-icon amber"><i data-lucide="pie-chart" style="width:20px;height:20px;"></i></div>
+          <div class="kpi-label">Earning Assets</div>
+          <div class="kpi-value">EUR 10.9bn</div>
+          <div class="kpi-change text-muted">+1.1% vs Q1</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-icon red"><i data-lucide="activity" style="width:20px;height:20px;"></i></div>
+          <div class="kpi-label">Cost of Funds</div>
+          <div class="kpi-value">1.80%</div>
+          <div class="kpi-change down">+5bp vs Q1</div>
+        </div>
+      </div>
+
+      <div class="grid grid-2 mb-5">
+        <div class="card">
+          <div class="card-header"><h3>NIM Attribution Waterfall</h3></div>
+          <div class="card-body"><div class="chart-container" style="height:320px;"><canvas id="nimWaterfallChart"></canvas></div></div>
+        </div>
+        <div class="card">
+          <div class="card-header"><h3>Budget vs Actual</h3></div>
+          <div class="card-body"><div class="chart-container" style="height:320px;"><canvas id="budgetActualChart"></canvas></div></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><h3>NIM Trend (12 Months)</h3></div>
+        <div class="card-body"><div class="chart-container" style="height:300px;"><canvas id="nimTrendChart"></canvas></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="../../js/charts.js"></script>
+<script src="../../js/calculators.js"></script>
+<script src="../../js/navigation.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    lucide.createIcons();
+
+    // NIM Waterfall
+    const wfLabels = ['Budget NIM','Volume Effect','Rate Effect','Mix Effect','FTP Effect','Actual NIM'];
+    const wfValues = [1.80, 0.08, -0.05, 0.03, -0.01, 1.85];
+    createWaterfallChart('nimWaterfallChart', wfLabels, wfValues);
+
+    // Budget vs Actual
+    createBarChart('budgetActualChart',
+      ['Q3 2025','Q4 2025','Q1 2026','Q2 2026'],
+      [
+        { label: 'Budget NIM', data: [1.75,1.78,1.80,1.82], backgroundColor: ALM_COLORS.slate[2], borderRadius: 4 },
+        { label: 'Actual NIM', data: [1.78,1.82,1.83,1.85], backgroundColor: ALM_COLORS.primary, borderRadius: 4 }
+      ]
+    );
+
+    // Trend
+    const trendLabels = generateMonthlyLabels(12);
+    createLineChart('nimTrendChart', trendLabels, [
+      { label: 'NIM %', data: generateTrendSeries(12, 1.78, 0.005, 0.03), borderColor: ALM_COLORS.primary, backgroundColor: 'transparent' },
+      { label: 'Budget', data: Array(12).fill(1.80), borderColor: ALM_COLORS.slate[2], backgroundColor: 'transparent', borderDash: [5,5] }
+    ]);
+  });
+</script>
+</body>
+</html>

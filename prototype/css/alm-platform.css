@@ -479,6 +479,14 @@ a:hover { text-decoration: underline; }
 /* ------------------------------------------------------------
    17. Print
    ------------------------------------------------------------ */
+@media (max-width: 768px) {
+  .sidebar { transform: translateX(-100%); width: var(--sidebar-width) !important; }
+  .sidebar.mobile-open { transform: translateX(0); }
+  .main-content { margin-left: 0 !important; }
+  .top-header .logo-area #mobileMenuToggle { display: flex !important; }
+}
+
+
 @media print {
   .sidebar, .top-header { display: none !important; }
   .main-content { margin-left: 0 !important; }

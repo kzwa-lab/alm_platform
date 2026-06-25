@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Output Floor — ALM Platform</title>
+  <link rel="stylesheet" href="../../css/alm-platform.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+<div class="app-layout">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="flex items-center gap-2" style="font-weight:700;color:var(--primary);font-size:1.1rem;">
+        <div style="width:32px;height:32px;background:var(--primary);border-radius:6px;display:flex;align-items:center;justify-content:center;color:white;font-size:12px;">ALM</div>
+        <span class="nav-label">Platform</span>
+      </div>
+      <button class="sidebar-toggle" id="sidebarToggle"><i data-lucide="panel-left-close" style="width:18px;height:18px;"></i></button>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">
+        <div class="nav-section-title">Overview</div>
+        <a href="../../index.html" class="nav-item"><i data-lucide="layout-dashboard" class="nav-icon"></i><span class="nav-label">Dashboard</span></a>
+        <a href="../data-foundation/index.html" class="nav-item"><i data-lucide="database" class="nav-icon"></i><span class="nav-label">Data Foundation</span></a>
+      </div>
+      <div class="nav-section">
+        <div class="nav-section-title">Risk Modules</div>
+        <div class="nav-item has-submenu"><i data-lucide="droplets" class="nav-icon"></i><span class="nav-label">Liquidity Risk</span><i data-lucide="chevron-right" class="nav-chevron" style="width:14px;height:14px;"></i></div>
+        <div class="nav-submenu">
+          <a href="../liquidity-risk/lcr-calculator.html" class="nav-item">LCR Calculator</a>
+          <a href="../liquidity-risk/nsfr-monitor.html" class="nav-item">NSFR Monitor</a>
+          <a href="../liquidity-risk/stress-testing.html" class="nav-item">Stress Testing</a>
+        </div>
+        <div class="nav-item has-submenu"><i data-lucide="trending-up" class="nav-icon"></i><span class="nav-label">Interest Rate Risk</span><i data-lucide="chevron-right" class="nav-chevron" style="width:14px;height:14px;"></i></div>
+        <div class="nav-submenu">
+          <a href="../interest-rate-risk/eve-sensitivity.html" class="nav-item">EVE Sensitivity</a>
+          <a href="../interest-rate-risk/nii-forecast.html" class="nav-item">NII Forecast</a>
+          <a href="../interest-rate-risk/gap-analysis.html" class="nav-item">Gap Analysis</a>
+        </div>
+        <div class="nav-item has-submenu expanded"><i data-lucide="shield" class="nav-icon"></i><span class="nav-label">Capital Management</span><i data-lucide="chevron-right" class="nav-chevron" style="width:14px;height:14px;"></i></div>
+        <div class="nav-submenu open">
+          <a href="rwa-calculator.html" class="nav-item">RWA Calculator</a>
+          <a href="output-floor.html" class="nav-item active">Output Floor</a>
+        </div>
+        <div class="nav-item has-submenu"><i data-lucide="alert-circle" class="nav-icon"></i><span class="nav-label">Expected Credit Loss</span><i data-lucide="chevron-right" class="nav-chevron" style="width:14px;height:14px;"></i></div>
+        <div class="nav-submenu">
+          <a href="../expected-credit-loss/ecl-engine.html" class="nav-item">ECL Engine</a>
+          <a href="../expected-credit-loss/sicr-monitor.html" class="nav-item">SICR Monitor</a>
+        </div>
+      </div>
+      <div class="nav-section">
+        <div class="nav-section-title">Pricing & Optimization</div>
+        <div class="nav-item has-submenu"><i data-lucide="arrow-left-right" class="nav-icon"></i><span class="nav-label">Funds Transfer Pricing</span><i data-lucide="chevron-right" class="nav-chevron" style="width:14px;height:14px;"></i></div>
+        <div class="nav-submenu">
+          <a href="../funds-transfer-pricing/curve-builder.html" class="nav-item">Curve Builder</a>
+          <a href="../funds-transfer-pricing/deal-pricer.html" class="nav-item">Deal Pricer</a>
+        </div>
+        <div class="nav-item has-submenu"><i data-lucide="bar-chart-3" class="nav-icon"></i><span class="nav-label">Balance Sheet Optimization</span><i data-lucide="chevron-right" class="nav-chevron" style="width:14px;height:14px;"></i></div>
+        <div class="nav-submenu">
+          <a href="../balance-sheet-optimization/nim-dashboard.html" class="nav-item">NIM Dashboard</a>
+          <a href="../balance-sheet-optimization/hedging-tracker.html" class="nav-item">Hedging Tracker</a>
+        </div>
+      </div>
+    </nav>
+  </aside>
+
+  <div class="main-content" id="mainContent">
+    <header class="top-header">
+      <div class="logo-area"><span style="font-weight:600;color:var(--text);">Asset &amp; Liability Management</span></div>
+      <div class="header-actions">
+        <button class="header-btn"><i data-lucide="calendar" style="width:14px;height:14px;"></i> 25 Jun 2026</button>
+        <button class="header-btn"><i data-lucide="building-2" style="width:14px;height:14px;"></i> Group Consolidated</button>
+        <div class="user-pill"><div class="avatar">JD</div><span>John Doe</span><i data-lucide="chevron-down" style="width:14px;height:14px;color:var(--text-muted);"></i></div>
+      </div>
+    </header>
+
+    <div class="content-area">
+      <div class="breadcrumbs" id="breadcrumbs"></div>
+      <h1 class="text-2xl font-bold mb-5">Basel III Output Floor (72.5%)</h1>
+
+      <div class="grid grid-2" style="grid-template-columns: 1fr 1fr;">
+        <div class="card">
+          <div class="card-header"><h3>Inputs (EUR M)</h3></div>
+          <div class="card-body">
+            <div class="form-group"><label class="form-label">Standardized Approach RWA</label><input type="number" class="form-input" id="saRWA" value="10000" step="100"><div class="form-hint">S-TREA: Standardized Total Risk Exposure Amount</div></div>
+            <div class="form-group"><label class="form-label">Internal Models RWA (Unfloored)</label><input type="number" class="form-input" id="irbRWA" value="6500" step="100"><div class="form-hint">U-TREA: Unfloored Internal Models RWA</div></div>
+            <div class="form-group"><label class="form-label">Output Floor Percentage</label><input type="number" class="form-input" id="floorPct" value="72.5" step="0.1" max="100" min="0"><div class="form-hint">CRR3 mandates 72.5% from 1 Jan 2025</div></div>
+          </div>
+        </div>
+
+        <div>
+          <div class="card mb-4">
+            <div class="card-header"><h3>Output Floor Result</h3></div>
+            <div class="card-body">
+              <div class="flex justify-between mb-2"><span class="text-sm">SA RWA</span><span class="text-sm font-semibold" id="resSA">EUR 10,000M</span></div>
+              <div class="flex justify-between mb-2"><span class="text-sm">IRB RWA (unfloored)</span><span class="text-sm font-semibold" id="resIRB">EUR 6,500M</span></div>
+              <div class="flex justify-between mb-2"><span class="text-sm">Floor RWA (72.5% of SA)</span><span class="text-sm font-semibold" id="resFloor">EUR 7,250M</span></div>
+              <div class="border-t mt-2 pt-2 flex justify-between"><span class="text-sm font-semibold">Final RWA</span><span class="text-sm font-bold" id="resFinal">EUR 7,250M</span></div>
+              <div class="mt-3" id="floorBinding"><span class="badge badge-danger">Floor is BINDING</span></div>
+              <div class="flex justify-between mt-2"><span class="text-sm">Capital Add-on</span><span class="text-sm font-semibold" id="resAddon">EUR 750M</span></div>
+              <div class="flex justify-between"><span class="text-sm">Additional Capital Required (8%)</span><span class="text-sm font-semibold text-danger" id="resImpact">EUR 60M</span></div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header"><h3>Side-by-Side Comparison</h3></div>
+            <div class="card-body"><div class="chart-container" style="height:260px;"><canvas id="floorCompareChart"></canvas></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="../../js/charts.js"></script>
+<script src="../../js/calculators.js"></script>
+<script src="../../js/navigation.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    lucide.createIcons();
+
+    let compareChart;
+    function recalc() {
+      const sa = +document.getElementById('saRWA').value;
+      const irb = +document.getElementById('irbRWA').value;
+      const pct = +document.getElementById('floorPct').value / 100;
+      const r = calculateOutputFloor(sa, irb, pct);
+
+      document.getElementById('resSA').textContent = 'EUR ' + formatNumber(r.saRWA) + 'M';
+      document.getElementById('resIRB').textContent = 'EUR ' + formatNumber(r.irbRWA) + 'M';
+      document.getElementById('resFloor').textContent = 'EUR ' + formatNumber(r.floorRWA) + 'M';
+      document.getElementById('resFinal').textContent = 'EUR ' + formatNumber(r.finalRWA) + 'M';
+      document.getElementById('resAddon').textContent = 'EUR ' + formatNumber(r.capitalAddon) + 'M';
+      document.getElementById('resImpact').textContent = 'EUR ' + formatNumber(r.capitalImpact) + 'M';
+      document.getElementById('floorBinding').innerHTML = r.binding ? '<span class="badge badge-danger">Floor is BINDING</span>' : '<span class="badge badge-success">Floor NOT binding</span>';
+
+      if (compareChart) compareChart.destroy();
+      compareChart = createBarChart('floorCompareChart',
+        ['SA RWA','IRB RWA','Floor RWA','Final RWA'],
+        [{ data: [r.saRWA, r.irbRWA, r.floorRWA, r.finalRWA], backgroundColor: [ALM_COLORS.primary, ALM_COLORS.info, ALM_COLORS.warning, ALM_COLORS.danger], borderRadius: 4 }]
+      , { plugins: { legend: { display: false } } });
+    }
+
+    ['saRWA','irbRWA','floorPct'].forEach(id => document.getElementById(id).addEventListener('input', recalc));
+    recalc();
+  });
+</script>
+</body>
+</html>

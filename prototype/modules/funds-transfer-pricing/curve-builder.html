@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FTP Curve Builder — ALM Platform</title>
+  <link rel="stylesheet" href="../../css/alm-platform.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+<div class="app-layout">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="flex items-center gap-2" style="font-weight:700;color:var(--primary);font-size:1.1rem;">
+        <div style="width:32px;height:32px;background:var(--primary);border-radius:6px;display:flex;align-items:center;justify-content:center;color:white;font-size:12px;">ALM</div>
+        <span class="nav-label">Platform</span>
+      </div>
+      <button class="sidebar-toggle" id="sidebarToggle"><i data-lucide="panel-left-close" style="width:18px;height:18px;"></i></button>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">
+        <div class="nav-section-title">Overview</div>
+        <a href="../../index.html" class="nav-item"><i data-lucide="layout-dashboard" class="nav-icon"></i><span class="nav-label">Dashboard</span></a>
+        <a href="../data-foundation/index.html" class="nav-item"><i data-lucide="database" class="nav-icon"></i><span class="nav-label">Data Foundation</span></a>
+      </div>
+      <div class="nav-section">
+        <div class="nav-section-title">Risk Modules</div>
+        <div class="nav-item has-submenu"><i data-lucide="droplets" class="nav-icon"></i><span class="nav-label">Liquidity Risk</span><i data-lucide="chevron-right" class="nav-chevron" style="width:14px;height:14px;"></i></div>
+        <div class="nav-submenu">
+          <a href="../liquidity-risk/lcr-calculator.html" class="nav-item">LCR Calculator</a>
+          <a href="../liquidity-risk/nsfr-monitor.html" class="nav-item">NSFR Monitor</a>
+          <a href="../liquidity-risk/stress-testing.html" class="nav-item">Stress Testing</a>
+        </div>
+        <div class="nav-item has-submenu"><i data-lucide="trending-up" class="nav-icon"></i><span class="nav-label">Interest Rate Risk</span><i data-lucide="chevron-right" class="nav-chevron" style="width:14px;height:14px;"></i></div>
+        <div class="nav-submenu">
+          <a href="../interest-rate-risk/eve-sensitivity.html" class="nav-item">EVE Sensitivity</a>
+          <a href="../interest-rate-risk/nii-forecast.html" class="nav-item">NII Forecast</a>
+          <a href="../interest-rate-risk/gap-analysis.html" class="nav-item">Gap Analysis</a>
+        </div>
+        <div class="nav-item has-submenu"><i data-lucide="shield" class="nav-icon"></i><span class="nav-label">Capital Management</span><i data-lucide="chevron-right" class="nav-chevron" style="width:14px;height:14px;"></i></div>
+        <div class="nav-submenu">
+          <a href="../capital-management/rwa-calculator.html" class="nav-item">RWA Calculator</a>
+          <a href="../capital-management/output-floor.html" class="nav-item">Output Floor</a>
+        </div>
+        <div class="nav-item has-submenu"><i data-lucide="alert-circle" class="nav-icon"></i><span class="nav-label">Expected Credit Loss</span><i data-lucide="chevron-right" class="nav-chevron" style="width:14px;height:14px;"></i></div>
+        <div class="nav-submenu">
+          <a href="../expected-credit-loss/ecl-engine.html" class="nav-item">ECL Engine</a>
+          <a href="../expected-credit-loss/sicr-monitor.html" class="nav-item">SICR Monitor</a>
+        </div>
+      </div>
+      <div class="nav-section">
+        <div class="nav-section-title">Pricing & Optimization</div>
+        <div class="nav-item has-submenu expanded"><i data-lucide="arrow-left-right" class="nav-icon"></i><span class="nav-label">Funds Transfer Pricing</span><i data-lucide="chevron-right" class="nav-chevron" style="width:14px;height:14px;"></i></div>
+        <div class="nav-submenu open">
+          <a href="curve-builder.html" class="nav-item active">Curve Builder</a>
+          <a href="deal-pricer.html" class="nav-item">Deal Pricer</a>
+        </div>
+        <div class="nav-item has-submenu"><i data-lucide="bar-chart-3" class="nav-icon"></i><span class="nav-label">Balance Sheet Optimization</span><i data-lucide="chevron-right" class="nav-chevron" style="width:14px;height:14px;"></i></div>
+        <div class="nav-submenu">
+          <a href="../balance-sheet-optimization/nim-dashboard.html" class="nav-item">NIM Dashboard</a>
+          <a href="../balance-sheet-optimization/hedging-tracker.html" class="nav-item">Hedging Tracker</a>
+        </div>
+      </div>
+    </nav>
+  </aside>
+
+  <div class="main-content" id="mainContent">
+    <header class="top-header">
+      <div class="logo-area"><span style="font-weight:600;color:var(--text);">Asset &amp; Liability Management</span></div>
+      <div class="header-actions">
+        <button class="header-btn"><i data-lucide="calendar" style="width:14px;height:14px;"></i> 25 Jun 2026</button>
+        <button class="header-btn"><i data-lucide="building-2" style="width:14px;height:14px;"></i> Group Consolidated</button>
+        <div class="user-pill"><div class="avatar">JD</div><span>John Doe</span><i data-lucide="chevron-down" style="width:14px;height:14px;color:var(--text-muted);"></i></div>
+      </div>
+    </header>
+
+    <div class="content-area">
+      <div class="breadcrumbs" id="breadcrumbs"></div>
+      <h1 class="text-2xl font-bold mb-5">FTP Curve Builder</h1>
+
+      <div class="grid grid-2" style="grid-template-columns: 1fr 2fr;">
+        <div class="card">
+          <div class="card-header"><h3>Market Rate Inputs (%)</h3></div>
+          <div class="card-body">
+            <div class="form-group"><label class="form-label">ESTR O/N</label><input type="number" class="form-input" id="rateON" value="2.50" step="0.01"></div>
+            <div class="form-group"><label class="form-label">3M EURIBOR</label><input type="number" class="form-input" id="rate3M" value="2.65" step="0.01"></div>
+            <div class="form-group"><label class="form-label">6M EURIBOR</label><input type="number" class="form-input" id="rate6M" value="2.75" step="0.01"></div>
+            <div class="form-group"><label class="form-label">1Y IRS</label><input type="number" class="form-input" id="rate1Y" value="2.90" step="0.01"></div>
+            <div class="form-group"><label class="form-label">2Y IRS</label><input type="number" class="form-input" id="rate2Y" value="3.05" step="0.01"></div>
+            <div class="form-group"><label class="form-label">5Y IRS</label><input type="number" class="form-input" id="rate5Y" value="3.20" step="0.01"></div>
+            <div class="form-group"><label class="form-label">10Y IRS</label><input type="number" class="form-input" id="rate10Y" value="3.35" step="0.01"></div>
+            <div class="form-group"><label class="form-label">30Y IRS</label><input type="number" class="form-input" id="rate30Y" value="3.50" step="0.01"></div>
+            <div class="border-t pt-3 mt-3">
+              <div class="form-group"><label class="form-label">Bank Funding Spread (bps)</label><input type="number" class="form-input" id="bankSpread" value="15" step="1"><div class="form-hint">Added to all tenors</div></div>
+            </div>
+            <button class="btn btn-primary w-full mt-2" onclick="exportCurve()"><i data-lucide="download" style="width:16px;height:16px;"></i> Export Curve</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><h3>FTP Curve — EUR 25 Jun 2026</h3></div>
+          <div class="card-body"><div class="chart-container" style="height:420px;"><canvas id="ftpCurveChart"></canvas></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="../../js/charts.js"></script>
+<script src="../../js/calculators.js"></script>
+<script src="../../js/navigation.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    lucide.createIcons();
+
+    let curveChart;
+    function recalc() {
+      const points = [
+        { tenorMonths: 0, rate: +document.getElementById('rateON').value },
+        { tenorMonths: 3, rate: +document.getElementById('rate3M').value },
+        { tenorMonths: 6, rate: +document.getElementById('rate6M').value },
+        { tenorMonths: 12, rate: +document.getElementById('rate1Y').value },
+        { tenorMonths: 24, rate: +document.getElementById('rate2Y').value },
+        { tenorMonths: 60, rate: +document.getElementById('rate5Y').value },
+        { tenorMonths: 120, rate: +document.getElementById('rate10Y').value },
+        { tenorMonths: 360, rate: +document.getElementById('rate30Y').value }
+      ];
+      const spread = +document.getElementById('bankSpread').value / 100;
+
+      const fullTenors = [0, 3, 6, 12, 24, 36, 60, 84, 120, 180, 240, 360];
+      const ftpRates = fullTenors.map(t => interpolateFTP(t, points) + spread);
+
+      if (curveChart) curveChart.destroy();
+      curveChart = createLineChart('ftpCurveChart',
+        fullTenors.map(t => t >= 12 ? (t/12) + 'Y' : t + 'M'),
+        [
+          { label: 'Market Curve', data: fullTenors.map(t => interpolateFTP(t, points)), borderColor: ALM_COLORS.info, backgroundColor: 'transparent', pointRadius: 3 },
+          { label: 'FTP Curve (+spread)', data: ftpRates, borderColor: ALM_COLORS.primary, backgroundColor: 'transparent', pointRadius: 3 }
+        ]
+      );
+    }
+
+    ['rateON','rate3M','rate6M','rate1Y','rate2Y','rate5Y','rate10Y','rate30Y','bankSpread'].forEach(id => {
+      document.getElementById(id).addEventListener('input', recalc);
+    });
+    recalc();
+
+    window.exportCurve = function() {
+      alert('Curve exported to FTP_EUR_2026-06-25.csv');
+    };
+  });
+</script>
+</body>
+</html>

@@ -137,7 +137,7 @@ function interpolateFTP(tenorMonths, curvePoints) {
   if (tenorMonths >= sorted[sorted.length - 1].tenorMonths) return sorted[sorted.length - 1].rate;
 
   for (let i = 0; i < sorted.length - 1; i++) {
-    if (tenorMonths >= sorted[i].tenorMonths && tenorMonths <= sorted[i + 1].tenenorMonths) {
+    if (tenorMonths >= sorted[i].tenorMonths && tenorMonths <= sorted[i + 1].tenorMonths) {
       const t = (tenorMonths - sorted[i].tenorMonths) / (sorted[i + 1].tenorMonths - sorted[i].tenorMonths);
       return sorted[i].rate + t * (sorted[i + 1].rate - sorted[i].rate);
     }
