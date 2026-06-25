@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ALM Platform — Dashboard</title>
+  <link rel="stylesheet" href="css/alm-platform.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+<div class="app-layout">
+
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="flex items-center gap-2" style="font-weight:700;color:var(--primary);font-size:1.1rem;">
+        <div style="width:32px;height:32px;background:var(--primary);border-radius:6px;display:flex;align-items:center;justify-content:center;color:white;font-size:12px;">ALM</div>
+        <span class="nav-label">Platform</span>
+      </div>
+      <button class="sidebar-toggle" id="sidebarToggle"><i data-lucide="panel-left-close" style="width:18px;height:18px;"></i></button>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">
+        <div class="nav-section-title">Overview</div>
+        <a href="index.html" class="nav-item active"><i data-lucide="layout-dashboard" class="nav-icon"></i><span class="nav-label">Dashboard</span></a>
+        <a href="modules/data-foundation/index.html" class="nav-item"><i data-lucide="database" class="nav-icon"></i><span class="nav-label">Data Foundation</span></a>
+      </div>
+      <div class="nav-section">
+        <div class="nav-section-title">Risk Modules</div>
+        <div class="nav-item has-submenu"><i data-lucide="droplets" class="nav-icon"></i><span class="nav-label">Liquidity Risk</span><i data-lucide="chevron-right" class="nav-chevron" style="width:14px;height:14px;"></i></div>
+        <div class="nav-submenu">
+          <a href="modules/liquidity-risk/lcr-calculator.html" class="nav-item">LCR Calculator</a>
+          <a href="modules/liquidity-risk/nsfr-monitor.html" class="nav-item">NSFR Monitor</a>
+          <a href="modules/liquidity-risk/stress-testing.html" class="nav-item">Stress Testing</a>
+        </div>
+        <div class="nav-item has-submenu"><i data-lucide="trending-up" class="nav-icon"></i><span class="nav-label">Interest Rate Risk</span><i data-lucide="chevron-right" class="nav-chevron" style="width:14px;height:14px;"></i></div>
+        <div class="nav-submenu">
+          <a href="modules/interest-rate-risk/eve-sensitivity.html" class="nav-item">EVE Sensitivity</a>
+          <a href="modules/interest-rate-risk/nii-forecast.html" class="nav-item">NII Forecast</a>
+          <a href="modules/interest-rate-risk/gap-analysis.html" class="nav-item">Gap Analysis</a>
+        </div>
+        <div class="nav-item has-submenu"><i data-lucide="shield" class="nav-icon"></i><span class="nav-label">Capital Management</span><i data-lucide="chevron-right" class="nav-chevron" style="width:14px;height:14px;"></i></div>
+        <div class="nav-submenu">
+          <a href="modules/capital-management/rwa-calculator.html" class="nav-item">RWA Calculator</a>
+          <a href="modules/capital-management/output-floor.html" class="nav-item">Output Floor</a>
+        </div>
+        <div class="nav-item has-submenu"><i data-lucide="alert-circle" class="nav-icon"></i><span class="nav-label">Expected Credit Loss</span><i data-lucide="chevron-right" class="nav-chevron" style="width:14px;height:14px;"></i></div>
+        <div class="nav-submenu">
+          <a href="modules/expected-credit-loss/ecl-engine.html" class="nav-item">ECL Engine</a>
+          <a href="modules/expected-credit-loss/sicr-monitor.html" class="nav-item">SICR Monitor</a>
+        </div>
+      </div>
+      <div class="nav-section">
+        <div class="nav-section-title">Pricing & Optimization</div>
+        <div class="nav-item has-submenu"><i data-lucide="arrow-left-right" class="nav-icon"></i><span class="nav-label">Funds Transfer Pricing</span><i data-lucide="chevron-right" class="nav-chevron" style="width:14px;height:14px;"></i></div>
+        <div class="nav-submenu">
+          <a href="modules/funds-transfer-pricing/curve-builder.html" class="nav-item">Curve Builder</a>
+          <a href="modules/funds-transfer-pricing/deal-pricer.html" class="nav-item">Deal Pricer</a>
+        </div>
+        <div class="nav-item has-submenu"><i data-lucide="bar-chart-3" class="nav-icon"></i><span class="nav-label">Balance Sheet Optimization</span><i data-lucide="chevron-right" class="nav-chevron" style="width:14px;height:14px;"></i></div>
+        <div class="nav-submenu">
+          <a href="modules/balance-sheet-optimization/nim-dashboard.html" class="nav-item">NIM Dashboard</a>
+          <a href="modules/balance-sheet-optimization/hedging-tracker.html" class="nav-item">Hedging Tracker</a>
+        </div>
+      </div>
+    </nav>
+  </aside>
+
+  <!-- Main Content -->
+  <div class="main-content" id="mainContent">
+    <!-- Top Header -->
+    <header class="top-header">
+      <div class="logo-area">
+        <button class="header-btn" id="mobileMenuToggle" style="display:none;"><i data-lucide="menu" style="width:16px;height:16px;"></i></button>
+        <span style="font-weight:600;color:var(--text);">Asset &amp; Liability Management</span>
+      </div>
+      <div class="header-actions">
+        <button class="header-btn"><i data-lucide="calendar" style="width:14px;height:14px;"></i> 25 Jun 2026</button>
+        <button class="header-btn"><i data-lucide="building-2" style="width:14px;height:14px;"></i> Group Consolidated</button>
+        <div class="user-pill">
+          <div class="avatar">JD</div>
+          <span>John Doe</span>
+          <i data-lucide="chevron-down" style="width:14px;height:14px;color:var(--text-muted);"></i>
+        </div>
+      </div>
+    </header>
+
+    <div class="content-area">
+      <div class="breadcrumbs" id="breadcrumbs"></div>
+      <h1 class="text-2xl font-bold mb-5" style="color:var(--text);">Dashboard Overview</h1>
+
+      <!-- KPI Cards -->
+      <div class="grid grid-5 mb-5">
+        <div class="kpi-card">
+          <div class="flex justify-between items-start">
+            <div class="kpi-icon green"><i data-lucide="shield-check" style="width:20px;height:20px;"></i></div>
+            <span class="badge badge-success">Compliant</span>
+          </div>
+          <div class="kpi-label">CET1 Ratio</div>
+          <div class="kpi-value">14.2%</div>
+          <div class="kpi-change up"><i data-lucide="trending-up" style="width:14px;height:14px;"></i> +0.3pp vs Q1</div>
+        </div>
+        <div class="kpi-card">
+          <div class="flex justify-between items-start">
+            <div class="kpi-icon green"><i data-lucide="droplets" style="width:20px;height:20px;"></i></div>
+            <span class="badge badge-success">Compliant</span>
+          </div>
+          <div class="kpi-label">LCR</div>
+          <div class="kpi-value">136.4%</div>
+          <div class="kpi-change down"><i data-lucide="trending-down" style="width:14px;height:14px;"></i> -1.2pp vs Q1</div>
+        </div>
+        <div class="kpi-card">
+          <div class="flex justify-between items-start">
+            <div class="kpi-icon green"><i data-lucide="activity" style="width:20px;height:20px;"></i></div>
+            <span class="badge badge-success">Compliant</span>
+          </div>
+          <div class="kpi-label">NSFR</div>
+          <div class="kpi-value">123.6%</div>
+          <div class="kpi-change up"><i data-lucide="trending-up" style="width:14px;height:14px;"></i> +0.4pp vs Q1</div>
+        </div>
+        <div class="kpi-card">
+          <div class="flex justify-between items-start">
+            <div class="kpi-icon amber"><i data-lucide="zap" style="width:20px;height:20px;"></i></div>
+            <span class="badge badge-warning">Watch</span>
+          </div>
+          <div class="kpi-label">EVE Sensitivity</div>
+          <div class="kpi-value">-8.4%</div>
+          <div class="kpi-change down"><i data-lucide="trending-down" style="width:14px;height:14px;"></i> -0.8pp vs Q1</div>
+        </div>
+        <div class="kpi-card">
+          <div class="flex justify-between items-start">
+            <div class="kpi-icon blue"><i data-lucide="percent" style="width:20px;height:20px;"></i></div>
+            <span class="badge badge-info">Stable</span>
+          </div>
+          <div class="kpi-label">NIM</div>
+          <div class="kpi-value">1.85%</div>
+          <div class="kpi-change up"><i data-lucide="trending-up" style="width:14px;height:14px;"></i> +2bp vs Q1</div>
+        </div>
+      </div>
+
+      <!-- Row 2: Charts & Alerts -->
+      <div class="grid grid-3 mb-5" style="grid-template-columns: 2fr 1fr 1fr;">
+        <div class="card">
+          <div class="card-header"><h3>Total RWA Trend</h3><span class="text-sm text-muted">EUR bn</span></div>
+          <div class="card-body"><div class="chart-container"><canvas id="rwaTrendChart"></canvas></div></div>
+        </div>
+        <div class="card">
+          <div class="card-header"><h3>RWA by Risk Type</h3></div>
+          <div class="card-body"><div class="chart-container"><canvas id="rwaPieChart"></canvas></div></div>
+        </div>
+        <div class="card">
+          <div class="card-header"><h3>Compliance Status</h3></div>
+          <div class="card-body">
+            <div style="display:flex;flex-direction:column;gap:12px;">
+              <div class="flex justify-between items-center"><span class="text-sm">LCR &ge; 100%</span><span class="traffic-light green"></span></div>
+              <div class="flex justify-between items-center"><span class="text-sm">NSFR &ge; 100%</span><span class="traffic-light green"></span></div>
+              <div class="flex justify-between items-center"><span class="text-sm">CET1 &ge; 4.5%</span><span class="traffic-light green"></span></div>
+              <div class="flex justify-between items-center"><span class="text-sm">Leverage &ge; 3%</span><span class="traffic-light green"></span></div>
+              <div class="flex justify-between items-center"><span class="text-sm">EVE &lt; -15%</span><span class="traffic-light amber"></span></div>
+              <div class="flex justify-between items-center"><span class="text-sm">NII Sensitivity</span><span class="traffic-light green"></span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Row 3: Alerts, Quick Links, Calendar, Activity -->
+      <div class="grid grid-2 mb-5">
+        <div class="card">
+          <div class="card-header"><h3><i data-lucide="bell" style="width:16px;height:16px;display:inline;vertical-align:middle;margin-right:6px;"></i>Active Alerts</h3></div>
+          <div class="card-body" style="display:flex;flex-direction:column;gap:10px;">
+            <div class="alert alert-warning"><i data-lucide="alert-triangle" style="width:16px;height:16px;flex-shrink:0;"></i><span><strong>EVE Sensitivity</strong> approaching internal threshold (-10%). Current: -8.4%. Review hedging position.</span></div>
+            <div class="alert alert-info"><i data-lucide="info" style="width:16px;height:16px;flex-shrink:0;"></i><span><strong>CRR3 Output Floor</strong> transitional period active. Full effectiveness 2033. Review IRB eligibility mapping.</span></div>
+            <div class="alert alert-success"><i data-lucide="check-circle" style="width:16px;height:16px;flex-shrink:0;"></i><span><strong>LCR</strong> remains well above minimum at 136.4%. HQLA portfolio optimised post-TLTRO repayment.</span></div>
+            <div class="alert alert-danger"><i data-lucide="x-circle" style="width:16px;height:16px;flex-shrink:0;"></i><span><strong>IFRS 9 Overlay</strong> review required for Q2. Climate risk PMA under scrutiny by supervisor.</span></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><h3>Quick Links</h3></div>
+          <div class="card-body">
+            <div class="grid grid-2" style="gap:10px;">
+              <a href="modules/liquidity-risk/lcr-calculator.html" class="btn btn-secondary" style="justify-content:flex-start;"><i data-lucide="calculator" style="width:16px;height:16px;"></i> LCR Calculator</a>
+              <a href="modules/interest-rate-risk/eve-sensitivity.html" class="btn btn-secondary" style="justify-content:flex-start;"><i data-lucide="zap" style="width:16px;height:16px;"></i> EVE Analysis</a>
+              <a href="modules/capital-management/rwa-calculator.html" class="btn btn-secondary" style="justify-content:flex-start;"><i data-lucide="shield" style="width:16px;height:16px;"></i> RWA Calculator</a>
+              <a href="modules/expected-credit-loss/ecl-engine.html" class="btn btn-secondary" style="justify-content:flex-start;"><i data-lucide="alert-circle" style="width:16px;height:16px;"></i> ECL Engine</a>
+              <a href="modules/funds-transfer-pricing/curve-builder.html" class="btn btn-secondary" style="justify-content:flex-start;"><i data-lucide="arrow-left-right" style="width:16px;height:16px;"></i> FTP Curve</a>
+              <a href="modules/balance-sheet-optimization/nim-dashboard.html" class="btn btn-secondary" style="justify-content:flex-start;"><i data-lucide="bar-chart-3" style="width:16px;height:16px;"></i> NIM Dashboard</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Row 4: Calendar & Activity -->
+      <div class="grid grid-2">
+        <div class="card">
+          <div class="card-header"><h3><i data-lucide="calendar-days" style="width:16px;height:16px;display:inline;vertical-align:middle;margin-right:6px;"></i>Key Dates</h3></div>
+          <div class="card-body">
+            <div class="data-table" style="font-size:0.875rem;">
+              <table style="width:100%;border-collapse:collapse;">
+                <tbody>
+                  <tr><td style="padding:10px 0;border-bottom:1px solid var(--border-light);"><span class="badge badge-danger">Critical</span></td><td style="padding:10px 0;border-bottom:1px solid var(--border-light);">30 Jun 2026</td><td style="padding:10px 0;border-bottom:1px solid var(--border-light);">Q2 ALCO Meeting &amp; Pack Submission</td></tr>
+                  <tr><td style="padding:10px 0;border-bottom:1px solid var(--border-light);"><span class="badge badge-warning">Important</span></td><td style="padding:10px 0;border-bottom:1px solid var(--border-light);">15 Jul 2026</td><td style="padding:10px 0;border-bottom:1px solid var(--border-light);">EBA LCR/NSFR Monitoring Report Due</td></tr>
+                  <tr><td style="padding:10px 0;border-bottom:1px solid var(--border-light);"><span class="badge badge-info">Planned</span></td><td style="padding:10px 0;border-bottom:1px solid var(--border-light);">01 Aug 2026</td><td style="padding:10px 0;border-bottom:1px solid var(--border-light);">IRRBB Shock Recalibration Go-Live</td></tr>
+                  <tr><td style="padding:10px 0;border-bottom:1px solid var(--border-light);"><span class="badge badge-success">Completed</span></td><td style="padding:10px 0;border-bottom:1px solid var(--border-light);">15 Jun 2026</td><td style="padding:10px 0;border-bottom:1px solid var(--border-light);">ICAAP Stress Testing Submission</td></tr>
+                  <tr><td style="padding:10px 0;"><span class="badge badge-info">Planned</span></td><td style="padding:10px 0;">15 Sep 2026</td><td style="padding:10px 0;">Basel III Monitoring Exercise</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><h3><i data-lucide="clock" style="width:16px;height:16px;display:inline;vertical-align:middle;margin-right:6px;"></i>Recent Activity</h3></div>
+          <div class="card-body">
+            <div style="display:flex;flex-direction:column;gap:14px;">
+              <div class="flex gap-3">
+                <div style="width:32px;height:32px;border-radius:50%;background:rgba(16,185,129,0.1);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i data-lucide="check" style="width:14px;height:14px;color:var(--success);"></i></div>
+                <div>
+                  <div class="text-sm font-medium">LCR calculation approved</div>
+                  <div class="text-xs text-muted">Maria Schmidt · 2 hours ago</div>
+                </div>
+              </div>
+              <div class="flex gap-3">
+                <div style="width:32px;height:32px;border-radius:50%;background:rgba(245,158,11,0.1);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i data-lucide="edit" style="width:14px;height:14px;color:var(--warning);"></i></div>
+                <div>
+                  <div class="text-sm font-medium">FTP curve updated — 3M ESTR +15bps</div>
+                  <div class="text-xs text-muted">Thomas Weber · 4 hours ago</div>
+                </div>
+              </div>
+              <div class="flex gap-3">
+                <div style="width:32px;height:32px;border-radius:50%;background:rgba(239,68,68,0.1);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i data-lucide="alert-circle" style="width:14px;height:14px;color:var(--danger);"></i></div>
+                <div>
+                  <div class="text-sm font-medium">ECL overlay review flagged</div>
+                  <div class="text-xs text-muted">Risk Committee · Yesterday</div>
+                </div>
+              </div>
+              <div class="flex gap-3">
+                <div style="width:32px;height:32px;border-radius:50%;background:rgba(30,64,175,0.1);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i data-lucide="file-text" style="width:14px;height:14px;color:var(--primary);"></i></div>
+                <div>
+                  <div class="text-sm font-medium">Q2 RWA report published</div>
+                  <div class="text-xs text-muted">Automated · Yesterday</div>
+                </div>
+              </div>
+              <div class="flex gap-3">
+                <div style="width:32px;height:32px;border-radius:50%;background:rgba(6,182,212,0.1);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i data-lucide="users" style="width:14px;height:14px;color:var(--info);"></i></div>
+                <div>
+                  <div class="text-sm font-medium">ALCO meeting scheduled</div>
+                  <div class="text-xs text-muted">Anna Müller · 2 days ago</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="js/charts.js"></script>
+<script src="js/calculators.js"></script>
+<script src="js/navigation.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    lucide.createIcons();
+
+    // RWA Trend Chart
+    const labels = generateMonthlyLabels(12);
+    createLineChart('rwaTrendChart', labels, [
+      { label: 'Credit RWA', data: generateTrendSeries(12, 45, 0.2, 1.5), borderColor: ALM_COLORS.primary, backgroundColor: 'transparent' },
+      { label: 'Market RWA', data: generateTrendSeries(12, 8, -0.05, 0.8), borderColor: ALM_COLORS.info, backgroundColor: 'transparent' },
+      { label: 'Op Risk RWA', data: generateTrendSeries(12, 12, 0.1, 0.3), borderColor: ALM_COLORS.warning, backgroundColor: 'transparent' }
+    ], { scales: { y: { min: 0 } } });
+
+    // RWA Pie Chart
+    createPieChart('rwaPieChart',
+      ['Credit Risk', 'Market Risk', 'Op Risk', 'CVA', 'Settlement'],
+      [62.5, 11.2, 16.8, 6.3, 3.2]
+    );
+  });
+</script>
+</body>
+</html>
