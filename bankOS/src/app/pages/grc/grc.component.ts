@@ -591,7 +591,7 @@ export class GrcComponent implements AfterViewInit {
   constructor(private cdr: ChangeDetectorRef) {}
 
   ngAfterViewInit() {
-    this.renderCharts();
+    setTimeout(() => this.renderCharts(), 100);
   }
 
   onTabChange(index: number) {

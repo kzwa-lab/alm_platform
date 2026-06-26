@@ -946,12 +946,9 @@ export class LiquidityComponent implements AfterViewInit {
   ngAfterViewInit(): void {
     setTimeout(() => {
       this.destroyCharts();
+      // Only init charts for the default tab (tab 0 = LCR)
+      // Other tabs' canvases don't exist in the DOM yet (hidden by @if)
       this.initLcrTabCharts();
-      this.initNsfrTabCharts();
-      this.initStressTabCharts();
-      this.initCfpTabCharts();
-      this.initGapTabCharts();
-      this.initBurnTabCharts();
     }, 100);
   }
 
@@ -985,7 +982,18 @@ export class LiquidityComponent implements AfterViewInit {
   }
 
   onTabChange(index: number): void {
+    this.destroyCharts();
     this.activeTab = index;
+    setTimeout(() => {
+      switch (index) {
+        case 0: this.initLcrTabCharts(); break;
+        case 1: this.initNsfrTabCharts(); break;
+        case 2: this.initStressTabCharts(); break;
+        case 3: this.initCfpTabCharts(); break;
+        case 4: this.initGapTabCharts(); break;
+        case 5: this.initBurnTabCharts(); break;
+      }
+    }, 100);
   }
 
   parseFloat(value: string): number {

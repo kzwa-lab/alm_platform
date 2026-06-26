@@ -1080,22 +1080,32 @@ export class DataFoundationComponent implements AfterViewInit {
     setTimeout(() => {
       this.destroyCharts();
       this.initIngestionTabCharts();
-      this.initMasterDataTabCharts();
-      this.initDqTabCharts();
-      this.initAlcoTabCharts();
-      this.initAuditTabCharts();
-      this.initControlTowerTabCharts();
-      this.initModelingTabCharts();
     }, 100);
   }
 
   onTabChange(index: number): void {
+    this.destroyCharts();
     this.activeTab = index;
+    setTimeout(() => {
+      this.renderChartsForActiveTab();
+    }, 100);
   }
 
   private destroyCharts(): void {
     this.charts.forEach(c => c.destroy());
     this.charts = [];
+  }
+
+  private renderChartsForActiveTab(): void {
+    switch (this.activeTab) {
+      case 0: this.initIngestionTabCharts(); break;
+      case 1: this.initMasterDataTabCharts(); break;
+      case 2: this.initDqTabCharts(); break;
+      case 3: this.initAlcoTabCharts(); break;
+      case 4: this.initAuditTabCharts(); break;
+      case 5: this.initControlTowerTabCharts(); break;
+      case 6: this.initModelingTabCharts(); break;
+    }
   }
 
   // ==========================================================================

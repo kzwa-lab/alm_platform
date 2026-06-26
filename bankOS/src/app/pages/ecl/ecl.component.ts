@@ -600,6 +600,7 @@ export class ECLComponent implements AfterViewInit, OnDestroy {
   // ── Lifecycle ──────────────────────────────────────────────────────
 
   ngAfterViewInit() {
+    this.destroyCharts();
     setTimeout(() => this.initCharts(), 100);
   }
 

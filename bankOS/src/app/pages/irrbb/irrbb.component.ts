@@ -1079,15 +1079,40 @@ export class IRRBBComponent implements AfterViewInit {
 
   // ── Lifecycle ──
   ngAfterViewInit(): void {
-    this.createAllCharts();
+    this.destroyCharts();
+    // Only init charts for the default tab (tab 0 = EVE Sensitivity)
+    // Other tabs' canvases don't exist in the DOM yet (hidden by @if)
+    this.createEveImpactChart();
+    this.createEveCurrencyChart();
   }
 
   onTabChange(index: number): void {
+    this.destroyCharts();
     this.activeTab = index;
     // Small delay to ensure DOM renders before chart initialisation
     setTimeout(() => {
-      this.destroyCharts();
-      this.createAllCharts();
+      switch (index) {
+        case 0:
+          this.createEveImpactChart();
+          this.createEveCurrencyChart();
+          break;
+        case 1:
+          this.createNiiForecastChart();
+          this.createNiiProductChart();
+          break;
+        case 2:
+          this.createCumulativeGapChart();
+          this.createGapDistributionChart();
+          break;
+        case 3:
+          this.createDerivativeMaturityChart();
+          this.createHedgeEffectivenessChart();
+          break;
+        case 4:
+          this.createDurationGapTrendChart();
+          this.createPriceSensitivityChart();
+          break;
+      }
     }, 50);
   }
 

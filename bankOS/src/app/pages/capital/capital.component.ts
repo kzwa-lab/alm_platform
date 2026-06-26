@@ -412,6 +412,7 @@ export class CapitalComponent implements AfterViewInit {
   constructor(private cdr: ChangeDetectorRef) {}
 
   ngAfterViewInit() {
+    this.destroyCharts();
     this.renderCharts();
   }
 

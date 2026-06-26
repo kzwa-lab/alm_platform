@@ -762,15 +762,22 @@ export class FTPComponent implements AfterViewInit {
   // ── Lifecycle ──
 
   ngAfterViewInit(): void {
-    this.createAllCharts();
+    this.destroyCharts();
+    this.createFtpCurveCharts();
   }
 
   onTabChange(index: number): void {
+    this.destroyCharts();
     this.activeTab = index;
     setTimeout(() => {
-      this.destroyCharts();
-      this.createAllCharts();
-    }, 50);
+      if (this.activeTab === 0) {
+        this.createFtpCurveCharts();
+      } else if (this.activeTab === 1) {
+        this.createDealPricingCharts();
+      } else if (this.activeTab === 2) {
+        this.createNmdCharts();
+      }
+    }, 100);
   }
 
   // ── Chart helpers ──
@@ -780,11 +787,17 @@ export class FTPComponent implements AfterViewInit {
     this.chartInstances = [];
   }
 
-  private createAllCharts(): void {
+  private createFtpCurveCharts(): void {
     this.createGhsFtpCurveChart();
     this.createMultiCcyCurveChart();
+  }
+
+  private createDealPricingCharts(): void {
     this.createMarginWaterfallChart();
     this.createRoeRarocChart();
+  }
+
+  private createNmdCharts(): void {
     this.createReplicatingPortfolioChart();
     this.createCoreRatioTrendChart();
   }
