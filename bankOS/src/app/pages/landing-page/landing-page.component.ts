@@ -108,6 +108,42 @@ import { RouterModule } from '@angular/router';
                 description="NIM attribution, what-if scenarios, balance sheet planning"
                 route="/optimization">
               </module-card>
+              <module-card
+                title="Recovery Planning"
+                icon="🔄"
+                description="Recovery options, triggers, plan repository, BoG submission"
+                route="/recovery">
+              </module-card>
+              <module-card
+                title="GRC"
+                icon="🔒"
+                description="RMF, Risk Universe, RAS, 3LoD RBAC, Limit Breach Workflow"
+                route="/grc">
+              </module-card>
+              <module-card
+                title="Data Foundation"
+                icon="🏗"
+                description="ETL, MDM, Data Quality, ALCO Workflow, Control Tower"
+                route="/data-foundation">
+              </module-card>
+              <module-card
+                title="Regulatory Reporting"
+                icon="📋"
+                description="BoG templates, ORASS integration, submission scheduler"
+                route="/regulatory-reporting">
+              </module-card>
+              <module-card
+                title="Behavioral Models"
+                icon="📊"
+                description="NMD core/volatile, CPR, TDRR, BoG regulatory caps"
+                route="/behavioral-models">
+              </module-card>
+              <module-card
+                title="RTGS Intraday"
+                icon="⚡"
+                description="Real-time feed, intraday liquidity, LRMD capability"
+                route="/rtgs">
+              </module-card>
             </div>
           </section>
         </div>

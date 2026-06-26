@@ -1,7 +1,7 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { ThemeService } from '../services/theme.service';
+import { ThemeService } from '../../services/theme.service';
 
 @Component({
   selector: 'app-sidebar',
@@ -57,19 +57,25 @@ export class SidebarComponent {
 
   modules = [
     { name: 'Dashboard', route: '/', icon: '📊' },
+    { name: 'Data Foundation', route: '/data-foundation', icon: '🏗' },
     { name: 'Liquidity', route: '/liquidity', icon: '💧' },
     { name: 'Capital', route: '/capital', icon: '🛡' },
     { name: 'IRRBB', route: '/irrbb', icon: '📈' },
     { name: 'ECL', route: '/ecl', icon: '⚠' },
     { name: 'FTP', route: '/ftp', icon: '🔄' },
     { name: 'Optimization', route: '/optimization', icon: '🎯' },
+    { name: 'Recovery', route: '/recovery', icon: '🔄' },
+    { name: 'GRC', route: '/grc', icon: '🔒' },
+    { name: 'Regulatory', route: '/regulatory-reporting', icon: '📋' },
+    { name: 'Behavioral', route: '/behavioral-models', icon: '📊' },
+    { name: 'RTGS', route: '/rtgs', icon: '⚡' },
   ];
 
   themeIcon = '🌙';
   themeText = 'Dark Mode';
 
   constructor(private themeService: ThemeService) {
-    this.themeService.isDark$.subscribe(isDark => {
+    this.themeService.isDark$.subscribe((isDark: boolean) => {
       this.themeIcon = isDark ? '☀️' : '🌙';
       this.themeText = isDark ? 'Light Mode' : 'Dark Mode';
     });
