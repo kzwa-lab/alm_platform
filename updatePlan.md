@@ -1,8 +1,8 @@
-# PRD Update Plan — Aligning ALM Platform with BoG 2026 Solution Architecture
+/mode# PRD Update Plan — Aligning ALM Platform with BoG 2026 Solution Architecture
 
 **Date:** 2026-06-25  
 **Goal:** Produce a complete, Ghana-localised set of PRDs that covers every requirement in `BoG_2026_Solution_Architecture.txt`.  
-**Status:** ✅ COMPLETED — All 14 PRDs created/updated with Ghana/BoG-specific requirements.
+**Status:** Baseline PRDs exist (`docs/prd/00-07`); missing modules and Ghana-specific details must be added.
 
 ---
 
@@ -167,15 +167,13 @@ Each PRD must contain the following sections, aligned with the existing format:
 
 ## 5. Definition of Done
 
-- [x] All 8 existing PRDs are updated with Ghana/BoG-specific requirements.
-- [x] All 6 new PRDs are created and reviewed for consistency.
-- [x] Every BoG requirement in `BoG_2026_Solution_Architecture.txt` is traceable to at least one PRD section.
-- [x] A coverage traceability matrix is appended to this plan and maintained in `findings.md`.
-- [x] All PRDs follow the same content template and terminology.
-- [x] The `prototype/` screens and `docs/visuals/` are flagged for update where new modules require new UI.
-- [x] A follow-up task is created to align `docs/architecture/system-overview.md` and `README.md` with the new PRD set.
-
-**Completion Date:** 2026-06-25
+- [ ] All 8 existing PRDs are updated with Ghana/BoG-specific requirements.
+- [ ] All 6 new PRDs are created and reviewed for consistency.
+- [ ] Every BoG requirement in `BoG_2026_Solution_Architecture.txt` is traceable to at least one PRD section.
+- [ ] A coverage traceability matrix is appended to this plan or maintained in `findings.md`.
+- [ ] All PRDs follow the same content template and terminology.
+- [ ] The `prototype/` screens and `docs/visuals/` are flagged for update where new modules require new UI.
+- [ ] A follow-up task is created to align `docs/architecture/system-overview.md` and `README.md` with the new PRD set.
 
 ---
 
@@ -188,9 +186,9 @@ docs/prd/
 ├── 02-liquidity-risk.md                 (updated)
 ├── 03-interest-rate-risk.md             (updated)
 ├── 04-capital-management.md             (updated)
-├── 05-ecl.md                            (updated)
+├── 05-ecl.md                            (lightly updated)
 ├── 06-ftp.md                            (updated)
-├── 07-balance-sheet-optimization.md       (updated)
+├── 07-balance-sheet-optimization.md     (updated)
 ├── 08-recovery-planning.md              (new)
 ├── 09-grc-risk-framework.md             (new)
 ├── 10-regulatory-reporting-orass.md     (new)
@@ -199,25 +197,15 @@ docs/prd/
 └── 13-rtgs-intraday-liquidity.md        (new)
 ```
 
-**Total: 14 PRDs**
-
 ---
 
 ## 7. Next Immediate Actions
 
-1. ✅ **Approve this plan** — confirmed module split and prioritisation.
-2. ✅ **Create `12-cyber-security-data-residency.md` first** — established hosting and integration constraints.
-3. ✅ **Create/update data-foundation PRD** — normalised data layer with Ghana-specific elements.
-4. ✅ **Maintain a live traceability matrix** in `findings.md` — all requirements marked as covered.
-
-### Follow-Up Actions
-
-1. **Align `docs/architecture/system-overview.md`** with the new PRD set.
-2. **Update `README.md`** to reflect the BoG 2026-aligned platform scope.
-3. **Update `prototype/` screens** to reflect new modules (recovery planning, GRC, ORASS, behavioural models, RTGS).
-4. **Update `docs/visuals/`** to include Ghana-specific UI mockups.
-5. **Create implementation roadmap** from PRDs to prototype/code.
+1. **Approve this plan** — confirm the module split and prioritisation.
+2. **Create `12-cyber-security-data-residency.md` first** because it constrains hosting and integration choices for all other PRDs.
+3. **Create/update data-foundation PRD** next because every downstream module depends on the normalised data layer.
+4. **Maintain a live traceability matrix** in `findings.md` as each PRD is completed, marking requirements as covered.
 
 ---
 
-*End of update plan — All deliverables completed.*
+*End of update plan.*
