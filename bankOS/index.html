@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BankOS - ALM Platform Training</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css">
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    pre { font-family: 'JetBrains Mono', monospace; }
+    .sticky-header th { background-color: #F8FAFC; }
+    .dark .sticky-header th { background-color: #1E293B; }
+  </style>
+  <script>
+    mermaid.initialize({ startOnLoad: false, theme: 'default', themeVariables: { fontSize: '12px' }, flowchart: { useMaxWidth: true, htmlLabels: true, curve: 'basis' } });
+    window.tailwind.config = { darkMode: 'class' };
+  </script>
+</head>
+<body class="bg-neutral-50 dark:bg-neutral-900 transition-colors min-h-screen">
+  <div class="flex min-h-screen">
+    <nav class="fixed inset-y-0 left-0 z-30 flex flex-col h-full w-64">
+      <div class="flex flex-col h-full bg-white dark:bg-neutral-800 border-r border-neutral-200 dark:border-neutral-700">
+        <div class="h-16 flex items-center justify-between px-4 border-b border-neutral-200 dark:border-neutral-700">
+          <span class="text-sm font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">BankOS</span>
+        </div>
+        <div class="flex-1 py-4 overflow-y-auto">
+          <a href="#" data-page="landing" class="nav-item flex items-center gap-3 px-4 py-3 text-neutral-600 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-700 border-l-4 border-transparent transition-colors cursor-pointer">
+            <span class="text-lg">🏠</span><span>Dashboard</span>
+          </a>
+          <a href="#" data-page="liquidity" class="nav-item flex items-center gap-3 px-4 py-3 text-neutral-600 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-700 border-l-4 border-transparent transition-colors cursor-pointer">
+            <span class="text-lg">💧</span><span>Liquidity Risk</span>
+          </a>
+          <a href="#" data-page="capital" class="nav-item flex items-center gap-3 px-4 py-3 text-neutral-600 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-700 border-l-4 border-transparent transition-colors cursor-pointer">
+            <span class="text-lg">🛡</span><span>Capital Management</span>
+          </a>
+          <a href="#" data-page="irrbb" class="nav-item flex items-center gap-3 px-4 py-3 text-neutral-600 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-700 border-l-4 border-transparent transition-colors cursor-pointer">
+            <span class="text-lg">📈</span><span>IRRBB</span>
+          </a>
+          <a href="#" data-page="ecl" class="nav-item flex items-center gap-3 px-4 py-3 text-neutral-600 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-700 border-l-4 border-transparent transition-colors cursor-pointer">
+            <span class="text-lg">⚠</span><span>ECL / Credit Risk</span>
+          </a>
+          <a href="#" data-page="ftp" class="nav-item flex items-center gap-3 px-4 py-3 text-neutral-600 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-700 border-l-4 border-transparent transition-colors cursor-pointer">
+            <span class="text-lg">🔄</span><span>FTP & Pricing</span>
+          </a>
+          <a href="#" data-page="optimization" class="nav-item flex items-center gap-3 px-4 py-3 text-neutral-600 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-700 border-l-4 border-transparent transition-colors cursor-pointer">
+            <span class="text-lg">🎯</span><span>Optimization</span>
+          </a>
+        </div>
+        <div class="border-t border-neutral-200 dark:border-neutral-700 p-4">
+          <button id="theme-toggle" class="flex items-center gap-3 px-4 py-3 text-neutral-600 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-700 rounded-lg transition-colors w-full">
+            <span class="text-lg">🌙</span><span>Dark Mode</span>
+          </button>
+        </div>
+      </div>
+    </nav>
+    <main class="flex-1 ml-64 transition-all duration-300 p-8">
+      <div id="content" class="max-w-7xl mx-auto"></div>
+    </main>
+  </div>
+<script type="module" src="./app.js"></script>
+</body>
+</html>

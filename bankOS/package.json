@@ -1,0 +1,15 @@
+{
+  "name": "bankos",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "npx http-server -p 4201",
+    "build": "echo 'Static site - no build needed'"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "ALM Platform Training for Bank Staff",
+  "devDependencies": {
+    "http-server": "^14.1.1"
+  }
+}
