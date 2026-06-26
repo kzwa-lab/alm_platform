@@ -1,0 +1,343 @@
+TECHNICAL SOLUTION ARCHITECTURE
+An Integrated Prudential Risk & Regulatory
+Reporting Platform
+
+Designed to the Bank of Ghana 2026 Prudential Reform Package
+LMTD · LRMD · IRRBB · Recovery Planning · Risk Management (2021)
+Prepared by Gigaflow Solutions
+For the Managing Directors, member banks of the Ghana Association of Banks
+Version 1.0 · June 2026 · Confidential
+
+
+Contents
+
+
+
+
+1. Executive Summary
+Purpose. This document specifies the technical architecture for a single, integrated platform that enables a Ghanaian bank to comply with the five instruments of the Bank of Ghana (BoG) 2026 prudential reform package. It is the engineering blueprint behind the modular platform set out in the accompanying briefing, and it is intended for review by technology, treasury, risk and audit leadership.
+The core thesis. The five instruments — the Liquidity Monitoring Tools Directive (LMTD), the Liquidity Risk Management Directive (LRMD), the IRRBB Guideline, the Recovery Planning Directive, and the foundational Risk Management Directive (RMD 2021) — are not independent compliance tasks. They share one technical spine: board-approved frameworks, granular and consistently classified data, scenario and stress engines, prescribed-template regulatory reporting on tight cadences, and real-time monitoring. The most cost-effective response is therefore not five point solutions but one normalised data layer serving four specialised modules and a governance/reporting layer above them.
+All five are exposure drafts issued February 2026, open for comment until 30 June 2026, with a common effective date of 1 January 2027 and a governance/systems alignment deadline of 31 December 2026. Because the drafts may change, the architecture treats every threshold, time-bucket definition, behavioural assumption, shock factor and report template as configuration data, not code — so finalisation of the drafts is a configuration change, not a re-build.
+Hosting posture. The parallel Cyber & Information Security Directive (CISD) 2026 requires core systems and sensitive customer data to remain within Ghana. The architecture is therefore designed for in-country deployment (on-premise or sovereign/in-country cloud), with only non-sensitive, front-end components eligible for external hosting.
+2. Scope and Design Principles
+2.1 In scope
+• Computation of all six LMTD monitoring tools and the four BoG prudential liquidity ratios (Narrow and Broad bases).
+• Liquidity stress testing, contingency funding plan (CFP) linkage, intraday liquidity monitoring and ILAAP support (LRMD).
+• IRRBB measurement under the standardised framework — ?EVE and ?NII across the prescribed shock scenarios, 19-bucket repricing, behavioural modelling and the outlier test.
+• Recovery plan indicators, early-warning triggers and the real-time monitoring MIS (Recovery Planning Directive).
+• Enterprise risk governance, segregation of duties, audit trails and limit monitoring (RMD 2021).
+• Generation of BoG-prescribed return templates and supervisory disclosures, with defined submission cadences.
+2.2 Out of scope
+• Replacement of the core banking system (CBS), treasury front-office dealing system, or general ledger — the platform consumes from these, it does not replace them.
+• Credit origination, KYC/AML transaction monitoring and payment processing.
+2.3 Design principles
+1. Configuration over code. Thresholds, time buckets, behavioural scalars, shock factors and report templates are externalised into a versioned rules repository.
+2. Single source of truth. Every module reads from one normalised data layer; no metric is computed from a divergent copy of the data.
+3. Reproducibility. Every regulatory figure is reproducible from immutable, point-in-time data snapshots, with full lineage from source record to reported number.
+4. Proportionality. Modules are independently deployable, so an SDI or smaller institution can adopt the liquidity modules without the full IRRBB engine.
+5. Auditability by design. Every calculation, override and approval is logged in a tamper-evident trail aligned to RMD 2021 and the independent-review requirements of each instrument.
+3. Logical Architecture
+The platform is organised into five horizontal tiers. Data flows upward from source systems through a normalised data layer into computation modules, then into a governance and reporting layer, and finally out to the regulator and the board.
+3.1 Tier overview
+TierResponsibilityKey components5 · Reporting & supervisoryProduce prescribed BoG returns, board packs and public disclosuresTemplate engine, submission scheduler, disclosure generator, board MIS dashboard4 · Governance & controlFramework governance, approvals, limits, audit, RBACGRC workflow, limit framework, audit-trail service, identity & access3 · Computation modulesDirective-specific calculation and scenario logicLiquidity & ALM, IRRBB engine, Recovery & stress, behavioural model library2 · Normalised data layerSingle classified, time-bucketed, lineage-tracked datasetPosition store, classification engine, encumbrance register, rate/curve store1 · Ingestion & integrationAcquire and validate source dataCBS connector, treasury connector, RTGS/settlement feed, market-data feed
+Cross-cutting services span all tiers: the rules & configuration repository, the scenario library, the snapshot/lineage service, and the scheduler/orchestrator that drives cadenced computation and submission.
+3.2 Data flow
+1. Source systems (CBS, treasury, RTGS, market data) push or are pulled into the ingestion tier on defined schedules — intraday for settlement balances, daily for positions, real-time-eligible for market rates.
+2. The normalised data layer classifies every instrument (e.g. Narrow vs Broad liquid asset), tags encumbrance status, slots cash flows into the relevant time bands, and writes an immutable snapshot.
+3. Computation modules read the snapshot and apply directive-specific logic using parameters drawn from the rules repository.
+4. Results pass to the governance layer for limit checks, trigger evaluation and approval, then to the reporting layer for template population.
+5. Returns are submitted on the prescribed cadence; all intermediate values remain reproducible from the snapshot.
+4. The Normalised Data Layer
+This layer is the foundation of the entire platform and the single most important build. It converts raw source records into the classified, bucketed, lineage-tracked dataset that every module depends on. Building it once and serving all five instruments from it is what makes the integrated approach economical.
+4.1 Asset and liability classification engine
+Classifies every balance against the LMTD definitions and maintains the mappings as configurable rules:
+• Narrow Liquid Assets: cash, balances at BoG, operational nostro balances, AAA-rated non-resident placements, unencumbered GoG T-bills and BoG bills up to one year, qualifying ?1-year foreign sovereign/MDB securities, claims on other domestic banks.
+• Broad Liquid Assets: all narrow assets plus unencumbered GoG bonds over one year (if marketable and transferable) plus GSE-listed equities, with the equities subject to a configurable BoG haircut and a 10%-of-total-liquid-assets cap.
+• Liability classification: volatile liabilities (demand and call), short-term liabilities (maturing within one year), and total deposits — each mapped from CBS account types.
+4.2 Encumbrance register
+Tracks, per asset, whether it is subject to legal, regulatory, contractual or other restrictions, with the restriction type and counterparty. This drives the Available Unencumbered Assets tool and the collateral-eligibility view, and reconciles continuously to the asset ledger so that encumbrance status is a system attribute rather than a spreadsheet annotation.
+4.3 Cash-flow bucketing engine
+Slots every instrument's contractual cash and security flows into the prescribed time bands on a residual-maturity basis. Two distinct bucket structures are maintained because the directives prescribe different grids:
+UsePrescribed bandsSource instrumentContractual Maturity MismatchOvernight, 7-day, 14-day, 1/2/3/6/9 month, 1/2/3/5 and >5 year (13 bands)LMTDIRRBB repricing19 standardised buckets with defined midpointsIRRBB Guideline
+Bucketing assumptions are enforced in the engine: no rollover of existing liabilities is assumed and no new asset contracts are entered; undated items (e.g. capital, non-performing loans) are reported separately; securities flows, collateral swaps and rehypothecated customer collateral are captured distinctly.
+4.4 Rate and curve store
+Holds yield curves, reference rates (including the Ghana Reference Rate), and the configurable shock-factor table. Shock factors are versioned so that the Basel July-2024 recalibration approach — currency-specific factors at the 99.9th percentile, rounded to 25 basis points — can be updated without code change as BoG finalises its scenarios.
+5. Computation Modules
+5.1 Liquidity & ALM module (LMTD + LRMD)
+Computes all liquidity metrics and supports the qualitative LRMD framework.
+• Prudential ratio engine: computes the four ratios on Narrow and Broad bases (eight variants), applies bank vs SDI threshold logic, and flags breaches. For SDIs the ratios are binding; for banks they are monitoring tools.
+• Contractual maturity mismatch: produces the 13-band gap ladder and cumulative net mismatch positions against board-set limits for short-term buckets and per significant currency.
+• Funding concentration: groups counterparties under the connected-counterparty tests (control and economic interdependence) and measures concentration by counterparty, product and currency against configurable significance thresholds.
+• Multi-currency LCR: isolates HQLA and net outflows per significant currency.
+• Stress testing & CFP: applies institution-specific and market-wide stress assumptions to the cash-flow ladder and HQLA buffer, and links early-warning triggers to the documented contingency funding plan and escalation actions.
+• Intraday liquidity monitor: consumes the RTGS/settlement feed to present live balances, throughput and largest positions through the day — the capability the bank must demonstrate to the regulator.
+5.2 IRRBB module
+Implements the standardised framework of the IRRBB Guideline.
+• ?EVE engine: present-values all banking-book notional repricing cash flows under each prescribed shock scenario and computes the change in economic value of equity.
+• ?NII engine: simulates net interest income over a one-to-three-year horizon on a constant or run-off balance sheet under the rate scenarios.
+• Standardisation categorisation: classifies positions as amenable, less amenable, or not amenable to standardisation, and slots them into the 19 buckets.
+• Outlier test: computes ?EVE against live Tier 1 capital and raises a supervisory alert where exposure exceeds 15% of Tier 1.
+• ICAAP & disclosure: feeds Pillar 2 capital assessment and generates the qualitative and quantitative IRRBB disclosures.
+5.3 Behavioural model library (shared service)
+A shared service consumed primarily by the IRRBB module but reusable by liquidity stress testing:
+• Non-maturity deposits (NMD): estimates core vs non-core split with the regulatory caps on core proportion and average maturity by category.
+• Prepayment risk: applies scenario-dependent Conditional Prepayment Rates (CPR) to fixed-rate loans.
+• Early-redemption risk: applies scenario-dependent Term Deposit Redemption Rate (TDRR) scalars.
+All behavioural parameters are configurable and back-testable, so assumptions can be validated against the bank's own observed behaviour and updated as the drafts finalise.
+5.4 Recovery & stress module
+• Recovery plan repository: version-controlled plan with a scenario library and catalogue of credible recovery options.
+• Indicator engine: computes quantitative recovery indicators against thresholds with tiered early-warning triggers and escalation logic.
+• Real-time MIS: aggregates indicators drawn from liquidity, capital and earnings data into a live dashboard showing trigger status — the cross-domain, real-time capability the directive requires.
+6. Governance, Control and Security
+6.1 GRC and approvals
+A workflow engine manages framework documentation, board approval of the metric suite and risk appetite, annual review scheduling, and evidence capture for independent (internal audit or BoG-approved external) review. Each instrument's board and senior-management responsibilities are modelled as approval and review tasks with due dates and audit evidence.
+6.2 Limit framework
+A configurable limit framework covering liquidity (maturity mismatch, funding concentration, per-currency), IRRBB (gap, basis, option, aggregate EVE), and counterparty limits, with automated breach detection and escalation routing. This extends the narrow credit-limit scope of a typical CBS to the market and liquidity limits the package requires.
+6.3 Segregation, audit and access
+• Segregation of duties: role-based access enforces front-office / back-office / risk separation per RMD 2021.
+• Audit trail: an append-only, tamper-evident log records every calculation run, parameter change, override and approval, with user, timestamp and before/after values.
+• Reproducibility: any historical return can be regenerated from its point-in-time snapshot and the rules version in force at that time.
+6.4 Security and data residency (CISD 2026 alignment)
+• Data residency: core systems and sensitive customer data hosted within Ghana; only non-sensitive, front-end components may sit externally.
+• Standards: control framework aligned to ISO 27001 and NIST, with quarterly penetration testing and board-level cyber reporting as the directive expects.
+• Encryption & access: encryption in transit and at rest, least-privilege access, and full integration with the bank's identity provider.
+7. Reporting Layer and Cadences
+The reporting layer maps computed results onto the exact BoG-prescribed return templates and schedules submission. Because templates are configuration, a change to a BoG template is a configuration update rather than a code release.
+Return / outputInstrumentCadenceDeadlineLiquidity monitoring tools (6 metrics)LMTDMonthly? 9 days after month-endIRRBB returns (?EVE, ?NII, outlier)IRRBBQuarterly (pilot)? 9 days after quarter-endRecovery indicators / trigger statusRecoveryReal-time + periodicContinuous monitoringILAAP / liquidity adequacyLRMDAnnualPer supervisory cycleBoard risk packAllMonthly / quarterlyPer board calendarPublic IRRBB disclosuresIRRBBAnnualPer disclosure cycle
+On-demand re-run. The platform supports ad-hoc recomputation and resubmission on regulator request, satisfying the LMTD expectation that institutions can report on a more frequent basis when required.
+8. Integration Requirements
+Source systemData consumedFrequencyNotesCore banking systemPositions, balances, account types, deposits, loansDaily (min)Primary classification sourceTreasury / dealing systemMoney-market, FX, securities, derivatives positionsDaily / intradayFeeds repricing and option riskRTGS / settlementIntraday settlement balances and throughputReal-time / intradayCritical for intraday liquidity monitorMarket dataYield curves, reference rates, pricesDaily / real-timeFeeds rate/curve store and market signalsGeneral ledgerCapital, Tier 1, reservesPeriod-endFeeds outlier test and ratios
+Integration is delivered through documented connectors using the bank's existing interfaces (file-based, API or message queue). The hardest integration — and the one to de-risk earliest — is the real-time RTGS/settlement feed required for intraday liquidity monitoring.
+9. Phased Delivery
+PhaseFocusIndicative window1 · DiagnosticPer-bank gap assessment against the mapped requirements; prioritised capability backlogQ3 20262 · Data layerBuild the normalised data layer — classification, encumbrance, bucketing, rate storeQ3–Q4 20263 · Modules & reportingStand up liquidity/ALM, IRRBB, recovery and GRC modules; wire BoG templatesQ4 20264 · Pilot & parallel runIRRBB pilot reporting and parallel liquidity returns; tune behavioural assumptionsLate 20265 · Go-liveFull compliant reporting from 1 January 2027; ongoing recalibration as drafts finaliseJan 202710. Key Risks and Mitigations
+RiskMitigationExposure drafts change before finalisationExternalise all thresholds, buckets, scalars, shock factors and templates as configuration; finalisation becomes a config change.Intraday liquidity feed unavailable or unreliableDe-risk RTGS/settlement integration in Phase 2; provide a near-real-time fallback while the live feed is hardened.Behavioural assumptions (NMD/CPR/TDRR) lack local dataBack-test against the bank's own history; treat scalars as tunable; document assumptions for supervisory review.Source data quality gaps in CBSValidation and reconciliation at ingestion; exception reporting; data-quality dashboard before go-live.Data residency / cyber non-complianceIn-country hosting by design; ISO 27001 / NIST alignment; quarterly penetration testing; board cyber reporting.Tight runway to 1 January 2027Phased delivery with parallel run; independently deployable modules so liquidity returns can go live ahead of IRRBB.11. Conclusion
+The BoG 2026 package rewards an integrated response. A single normalised data layer feeding four specialised modules and a governance/reporting layer lets a bank satisfy all five instruments from one foundation, report cleanly from the 1 January 2027 effective date, and absorb the final shape of the drafts as configuration rather than rework. Built in-country and aligned to CISD 2026, the platform is compliant by design on both the prudential and the cyber fronts.
+Recommended next step: a short per-bank diagnostic to convert these public requirements into an institution-specific capability backlog and a firm delivery plan.
+
+
+Appendix A — Primary Sources
+• Liquidity Monitoring Tools Directive, 2026 (Exposure Draft) — Bank of Ghana, February 2026.
+• Liquidity Risk Management Directive, 2026 (Exposure Draft) — Bank of Ghana, February 2026.
+• Guideline on the Management and Measurement of Interest Rate Risk in the Banking Book, 2026 (Exposure Draft) — Bank of Ghana, February 2026.
+• Recovery Planning Directive, 2026 (Exposure Draft) — Bank of Ghana, February 2026.
+• Risk Management Directive, 2021 — Bank of Ghana.
+• Cyber & Information Security Directive (CISD) 2026 — Bank of Ghana, launched March 2026.
+• Banks and Specialised Deposit-Taking Institutions Act, 2016 (Act 930), ss. 36(2), 92(1).
+• Basel Committee on Banking Supervision — IRRBB standards (April 2016) and shock recalibration (July 2024); Basel III liquidity monitoring tools (January 2013).
+• Financial Stability Board — Key Attributes of Effective Resolution Regimes for Financial Institutions (2011).
+
+Note: All five BoG instruments referenced are exposure drafts open for comment until 30 June 2026. Final published versions may differ; this architecture is designed to absorb such changes through configuration.
+
+Tier-Specific Deep Dive & Capabilities
+Tier 1: Ingestion & Integration (System Connectors)
+Standard core banking systems only capture historical transactional data, creating a lag in risk monitoring. The Ingestion Tier closes this gap by connecting directly to the bank’s primary IT infrastructure :
+* Core Banking Connection (Daily): Extracts account-level balances, depositor details, loan maturity schedules, and counterparty metadata.
+* General Ledger Parser (Period-end): Pulls capital tier structures, reserves, and general financial ledger states.
+* Treasury API (Daily/Intraday): Captures money-market placements, foreign exchange positions, sovereign debt securities, and derivatives.
+* RTGS / Settlement Feed (Real-Time): Connects to the central payment clearing system to capture intraday incoming/outgoing settlement flows, which is essential for tracking intraday liquidity throughput. Note: Because this is the most technically demanding integration, it must be de-risked early in the implementation cycle.
+* Market Data Feed (Real-Time/Daily): Ingests yield curves, foreign exchange rates, and early-warning equity market indicators.
+Tier 2: Normalized Data Layer (The System Spine)
+This layer acts as the single source of truth, converting raw, disjointed transaction entries into standardized records before they hit any computation engine :
+* Asset/Liability Classification Engine: Maps ledger items to LMTD definitions. It separates Narrow Liquid Assets (cash, operational nostro balances, AAA-rated placements, unencumbered GoG bills $\le 1$ year) from Broad Liquid Assets (adding GoG bonds $>1$ year, and GSE-listed equities subject to a 10% total liquid assets cap and prescribed regulatory haircuts).
+* Dynamic Encumbrance Register: Maintains a real-time, ledger-reconciled record of all pledged, collateralized, or contractually restricted assets to dynamically drive the "Available Unencumbered Assets" tool.
+* Multi-Format Cash-Flow Bucketing Engine: Slots cash flows on a contractually residual maturity basis into two distinct structures:
+1. LMTD Contractual Mismatch: 13 prescribed time bands (Overnight, 7-day, 14-day, 1/2/3/6/9 months, 1/2/3/5, and $>5$ years) enforcing a strict "no-rollover" liability assumption.
+2. IRRBB Repricing Schedule: 19 standardized maturity buckets.
+Tier 3: Computation Modules (The Risk Engines)
+The computation tier consists of four modular, independently deployable software engines :
+1. Liquidity & ALM Module (LMTD + LRMD Compliance)
+* Prudential Ratio Engine: Computes the four core ratios (liquid assets to volatile liabilities, short-term liabilities, total assets, and total deposits) across Narrow and Broad bases, running eight total variants. It applies bank vs. SDI thresholds and generates alerts if limits are breached.
+* Contractual Mismatch Engine: Computes maturity gaps and cumulative mismatch positions across significant currencies under Board-approved limits.
+* Funding Concentration Analyzer: Identifies connected-counterparty groups through control and economic-interdependence tests, calculating concentrations by counterparty, currency, and product.
+* Intraday Liquidity Monitor: Implements the Basel Monitoring Tools for Intraday Liquidity Management standard, presenting live settlement balances, throughput ratios, and peak intraday funding demands.
+2. IRRBB Engine
+* $\Delta\text{EVE}$ Sensitivity Engine: Models banking book repricing cash flows under the six Basel-standardized interest rate shock scenarios. It present-values cash flows using the risk-free curve to calculate potential changes in the Economic Value of Equity.
+* $\Delta\text{NII}$ Simulation Engine: Simulates net interest income over a 1-to-3-year horizon on a constant or run-off balance sheet basis under multiple rate scenarios.
+* Supervisory Outlier Test (SOT) Flag: Connects the EVE results with the General Ledger’s Tier 1 Capital, generating a critical alert if the projected EVE drop under any of the six scenarios exceeds the 15% threshold:
+$$\Delta\text{EVE} > 0.15 \times \text{Tier 1 Capital}$$
+3. Behavioral Model Library (Shared Modeling Service)
+Allows risk managers to define, back-test, and refine local modeling assumptions to feed both the IRRBB and liquidity stress engines :
+* NMD Core Deposit Modeler: Estimates the core vs. non-core split of non-maturity deposits, enforcing the regulatory caps on stable proportions and average maturities.
+* Prepayment (CPR) Modeler: Applies scenario-dependent Conditional Prepayment Rates to fixed-rate credit portfolios.
+* Early-Redemption (TDRR) Modeler: Calculates scenario-dependent Term Deposit Redemption Rates.
+4. Recovery & Stress Module (RPD Compliance)
+* Stress Test Scenario Engine: Simulates idiosyncratic shocks (e.g., mass loss of retail deposits), market-wide disruptions (e.g., sovereign bond re-pricing, interbank freeze), and combined stress events.
+* Indicator & Trigger Engine: Translates the bank's risk appetite into quantitative recovery indicators (Capital, Liquidity, Earnings, Asset Quality). It establishes a multi-tiered alert workflow, treating triggers as prompts to convene executive recovery committees rather than executing automatic, rigid balance-sheet actions.
+* Contingency Funding Plan (CFP) Link: Maps operational recovery menu options (e.g., strategic asset divestments, liability restructuring) to defined trigger indicators.
+Tier 4: Governance & Control (The GRC Backbone)
+The GRC backbone establishes the software environment to satisfy the qualitative risk standards of the foundational Risk Management Directive (RMD 2021) :
+* System of Record for the RMF: digitizes the bank's entire Risk Management Framework, policies, and committee approval workflows, moving away from unmanaged static documents.
+* Risk Universe Register: Tracks every risk named under Paragraph 17 of the directive, including credit, market, operational, compliance, reputation, cyber, ESG, and climate risks (including the Climate-Related Financial Risk Directive requirements effective for banks since January 2026).
+* Identity & Three Lines of Defense RBAC: Enforces role-based access control, physically and logically segregating front-office execution platforms from back-office clearance and settlement functions. It ensures absolute functional independence for the Chief Risk Officer (CRO), blocking "dual-hatting" permissions (the CRO cannot hold COO, CFO, or Internal Audit roles).
+* Tamper-Evident Audit Logging: Employs an append-only, cryptographic log that records every risk decision, credit limit override, model parameter change, and board approval. This ensures absolute data lineage and point-in-time calculation reproducibility for annual third-party and regulatory audits.
+Tier 5: Reporting & Integration Layer
+* XML/XBRL Standard Template Engine: Maps computed data from the Tier 2/Tier 3 engines directly into BoG's exact reporting returns (LMTD, IRRBB, LRMD, Recovery trigger states).
+* ORASS Integration Endpoint: Embeds a secure, encrypted API client that authenticates, packages, and pushes completed returns directly to the regulator's receiver endpoints.
+Part 2: The Regulator Software Platform (SupTech Architecture)
+For the Bank of Ghana, achieving its supervisory mandate requires an advanced, centralized platform that transitions supervision from periodic, manual audits to continuous, risk-based, and systemic surveillance. This is delivered through the Online Regulatory and Analytical Surveillance Software (ORASS), powered by a customized, scalable SupTech platform (the Regnology/Vizor supervisory suite).
+  
+The Reconstruction of Ghanaian Banking Resilience: An Analytical Deep Dive into the Bank of Ghana 2026 Prudential Framework
+The Ghanaian banking sector enters 2026 at a defining policy and structural juncture. Emerging from a protracted period of severe macroeconomic volatility—characterized by hyperinflation, exchange-rate volatility, and the balance-sheet shocks of the Domestic Debt Exchange Programme (DDEP)—the financial ecosystem is transitioning from defensive survival to strategic capital reallocation. This recovery is supported by a sharp deceleration in headline inflation, which fell from 23.8% in 2024 to 8% by the end of 2025, allowing the Bank of Ghana (BoG) to pivot its monetary policy stance and lower the policy rate to encourage credit expansion.
+However, this macroeconomic stabilization coincides with the full withdrawal of the regulatory reliefs and accounting forbearance granted during the DDEP. These temporary cushions, which included reduced capital conservation buffers and staggered impairment recognition, were fully phased out by December 2025, requiring Regulated Financial Institutions (RFIs) to comply with fully loaded, pre-crisis prudential standards. Concurrently, the central bank has accelerated its modernization agenda, mandating the conversion of rural banks into community banks with enhanced capital requirements of GH¢5 million by March 2026. To govern this demanding environment, prevent systemic insolvencies, and align the domestic banking sector with international standards, the Bank of Ghana has implemented a comprehensive suite of directives. This report provides an analysis of the five core regulatory directives shaping risk management, liquidity adequacy, and structural capital resilience in 2026.
+Directive 1: Liquidity Monitoring Tools Directive (LMTD), 2026
+The Liquidity Monitoring Tools Directive (LMTD) establishes a standardized quantitative framework to assess the cash flow profiles, balance sheet structures, and collateral availability of RFIs. Recognizing that traditional backward-looking accounting ratios are insufficient to capture rapid liquidity depletion, the Bank of Ghana has adopted the Basel Committee on Banking Supervision (BCBS) 2013 liquidity monitoring standards to complement the existing Liquidity Coverage Ratio (LCR) and Net Stable Funding Ratio (NSFR) requirements. The LMTD applies to all banks, savings and loans companies, finance houses, finance and leasing companies, and financial holding companies licensed under Act 930.
+The Six Mandated Liquidity Monitoring Metrics
+The directive requires RFIs to implement, calculate, and report six specific liquidity metrics designed to capture various dimensions of funding and mismatch risks.
+1. Bank of Ghana Prudential Liquidity Ratios
+These ratios measure the relationship between an institution's liquid assets and its liabilities across various maturity and volatility bands. The BoG distinguishes between Narrow and Broad Liquid Assets to ensure that cash-like reserves are separated from longer-term marketable securities that may suffer from execution delays or systemic haircuts during market stress.
+* Narrow Liquid Assets: Comprise cash and coins, unencumbered operational balances held in non-resident institutions, placements with AAA-rated financial institutions, operational balances with the Bank of Ghana, Government of Ghana (GoG) and Bank of Ghana bills with maturities up to one year, unencumbered foreign sovereign securities with maturities up to one year, and short-term domestic bank claims.
+* Broad Liquid Assets: Include all components of Narrow Liquid Assets plus marketable and transferable Government of Ghana bonds with maturities exceeding one year, and equities listed on the Ghana Stock Exchange (GSE), capped at 10% of total liquid assets and subject to regulatory haircuts prescribed by the Bank of Ghana.
+To ensure structural safety, the BoG mandates distinct compliance thresholds for commercial banks and Specialised Deposit-Taking Institutions (SDIs), treating these monitoring tools as strict regulatory limits for the latter.
+The four core ratios are calculated as follows:
+Liquid Assets to Volatile Liabilities
+This ratio measures an RFI's capacity to absorb sudden, unpredictable drawdowns of call and demand deposits. 
+$$\text{Liquid Assets (Narrow or Broad) to Volatile Liabilities} = \frac{\text{Narrow or Broad Liquid Assets}}{\text{Volatile Liabilities}}$$
+Liquid Assets to Short-Term Liabilities
+This metric assesses the institution's ability to cover obligations maturing within a one-year horizon. 
+$$\text{Liquid Assets (Narrow or Broad) to Short-Term Liabilities} = \frac{\text{Narrow or Broad Liquid Assets}}{\text{Short-Term Liabilities}}$$
+Liquid Assets to Total Assets
+This metric evaluates the overall structural asset liquidity of the institution's balance sheet. 
+$$\text{Liquid Assets (Narrow or Broad) to Total Assets} = \frac{\text{Narrow or Broad Liquid Assets}}{\text{Total Assets}}$$
+Liquid Assets to Total Deposits
+This ratio determines the coverage of total deposit liabilities by high-quality liquid reserves. 
+$$\text{Liquid Assets (Narrow or Broad) to Total Deposits} = \frac{\text{Narrow or Broad Liquid Assets}}{\text{Total Deposits}}$$
+Prudential Ratio MetricRegulatory ComponentSpecialised Deposit-Taking Institutions (SDIs) LimitsCommercial Banks LimitsLiquid Assets to Volatile LiabilitiesNarrow Liquid Assets Base$\ge 90\%$$\ge 80\%$Broad Liquid Assets Base$\ge 100\%$$\ge 100\%$Liquid Assets to Short-Term LiabilitiesNarrow Liquid Assets Base$\ge 50\%$$\ge 50\%$Broad Liquid Assets Base$\ge 60\%$$\ge 70\%$Liquid Assets to Total AssetsNarrow Liquid Assets Base$\ge 30\%$$\ge 30\%$Broad Liquid Assets Base$\ge 40\%$$\ge 50\%$Liquid Assets to Total DepositsNarrow Liquid Assets Base$\ge 60\%$$\ge 60\%$Broad Liquid Assets Base$\ge 70\%$$\ge 80\%$2. Contractual Maturity Mismatch
+This tool maps all contractual cash inflows and outflows across defined maturity bands. It isolates the extent of maturity transformation undertaken by the RFI, identifying cumulative cash flow gaps and highlighting the potential funding requirements if liabilities are not rolled over at contractual maturity.
+3. Concentration of Funding
+This metric identifies and monitors the RFI’s reliance on single counterparties, connected depositors, or specific funding instruments. It is designed to mitigate the risk of sudden liquidity runs originating from a concentrated wholesale funding base.
+4. Available Unencumbered Assets
+This tool tracks assets that are legally and operationally free of restrictions and can be readily liquidated, sold, or pledged as collateral in repo markets or with the central bank to secure emergency liquidity.
+5. Liquidity Coverage Ratio (LCR) by Significant Currency
+Recognizing the high level of dollarization and foreign exchange transaction volumes in the Ghanaian economy, this tool requires RFIs to calculate and monitor their LCR separately for each foreign currency that constitutes a significant proportion of their business. Under the significant currency rules, the Board of Directors must review and set formal maturity mismatch limits for individual currencies in which the RFI has significant activity, and the bank’s risk framework must establish a formal mechanism for identifying these currencies and counterparties.
+6. Market-Related Monitoring Tools
+These consist of real-time market indicators, such as equity price movements, interbank lending spreads, and sovereign debt yields, which serve as early-warning signals of systemic or idiosyncratic liquidity stress.
+Reporting Schedules and Submission Templates
+To facilitate continuous supervisory oversight, the Bank of Ghana mandates a rigorous reporting regime. RFIs must submit fully completed Excel templates—specifically mapped to each of the monitoring metrics (Prudential Ratios, Contractual Maturity Mismatch, Concentration of Funding, Unencumbered Assets, and LCR by Significant Currency)—on a monthly basis. These submissions must reach the Bank of Ghana within nine days of the end of the reporting month. Furthermore, institutions are required to maintain internal systems capable of generating these metrics on a more frequent (such as weekly or daily) ad-hoc basis if requested by the regulator during periods of heightened market instability.
+Directive 2: Liquidity Risk Management Directive (LRMD), 2026
+Complementing the quantitative monitoring of the LMTD, the Liquidity Risk Management Directive (LRMD) establishes the qualitative governance and operational expectations of the regulator. The fundamental role of banks in maturity transformation—converting short-term deposits into long-term loans—makes them inherently vulnerable to sudden liquidity shocks, as illustrated by the global bank runs of 2023. The LRMD translates global best practices into binding local obligations to ensure RFIs maintain adequate qualitative frameworks.
+Board-Level Liquidity Risk Governance
+The Board of Directors of an RFI retains ultimate responsibility for the institution’s liquidity risk posture. The LRMD outlines specific board-level governance mandates:
+* Framework Approval and Annual Reviews: The Board must review and approve a robust liquidity risk management framework, encompassing the bank’s liquidity strategies, policies, and operational processes, at least annually.
+* Risk Appetite Calibration: The Board is required to establish a formal liquidity risk tolerance and appetite statement. This statement must define the maximum level of liquidity risk the institution is willing to accept, ensuring that normal operations are structured to withstand severe, prolonged stress events.
+* Resource and Expertise Allocation: The Board must ensure that senior management and risk officers possess the necessary technical expertise, system capabilities, and administrative resources to monitor and mitigate liquidity risk.
+* Quarterly Liquidity Adequacy Statements (LAS): On a quarterly basis, the Board must provide a formal assessment of the RFI’s liquidity position to the Bank of Ghana. This assessment must be supported by the Internal Liquidity Adequacy Assessment Process (ILAAP) and integrated directly into the bank's annual Internal Capital Adequacy Assessment Process (ICAAP) report.
+* Remedial Oversight: The Board is required to challenge stress-testing assumptions and actively ensure that senior management implements prompt corrective actions when vulnerabilities are identified.
+Stress Testing Frameworks and Scenario Design
+RFIs must establish comprehensive liquidity stress testing programs designed to evaluate their survival horizons under extreme but plausible scenarios. The directive mandates that stress-testing programs evaluate three primary scenarios:
+Idiosyncratic (Institution-Specific) Events
+These scenarios simulate events such as a significant credit rating downgrade, a sudden loss of major corporate or retail deposits, a dramatic increase in loan utilization rates, or the rapid crystallization of off-balance sheet contingent liabilities (such as committed credit facilities or e-money float accounts).
+Market-Wide Disruptions
+These scenarios model systemic events, including a severe contraction in interbank liquidity, a sudden re-pricing of sovereign bonds, a flight to quality assets, or a macroeconomic shock that restricts access to domestic or international wholesale funding markets.
+Combined Stress Scenarios
+These scenarios assess the simultaneous occurrence of both idiosyncratic and market-wide stresses, evaluating the compounding effect on funding outflows and asset liquidations.
+Furthermore, senior management must conduct an annual reassessment of asset haircuts and liquidity values under stressed conditions, updating these parameters more frequently during periods of active market volatility. An overview of these stress-testing methodologies must be published on the RFI's website and included in its audited financial statements by March 31 of the following year.
+Contingency Funding Plans (CFPs)
+The LRMD requires every RFI to maintain a documented, Board-approved Contingency Funding Plan (CFP). The CFP acts as the operational playbook during crisis events, defining the policies, procedures, and clear lines of command for responding to severe liquidity disruptions. Crucially, the CFP must be directly linked to the outcomes of the bank's liquidity stress-testing programs. It must specify the triggers for activating the emergency plan, identify diversified sources of backstop funding, outline procedures for managing internal and external communications to maintain market confidence, and list the remedial actions required to conserve liquidity and restore balance sheet health.
+Real-Time Intraday Liquidity Monitoring and System Capability Demonstration
+Managing intraday liquidity is vital to ensuring that an RFI can meet its payment and settlement obligations in real time through payment systems such as Real-Time Gross Settlement (RTGS). Failure to manage intraday liquidity can trigger systemic settlement gridlocks across the payment ecosystem. Under the LRMD, banks must implement systems and methodologies aligned with the Basel Monitoring Tools for Intraday Liquidity Management standard. RFIs are required to measure intraday throughput, tracking the percentage of daily outgoing payments that settle within specific hourly windows during the business day.
+Crucially, banks must demonstrate their system capabilities directly to the regulator. This system capability demonstration requires banks to prove to Bank of Ghana examiners that their core banking systems, treasury management platforms, and risk engines can aggregate data and generate real-time intraday liquidity profiles without manual intervention. The demonstration ensures that the bank has the technology to monitor cash flows as they occur and can report intraday liquidity positions under stressed parameters instantly. The directive also closes regulatory loopholes by prohibiting the artificial reduction of statutory reserve requirements. This includes banning the misclassification of retail customer deposits as interbank borrowings and establishing explicit prudential rules for the treatment of e-money float accounts held by electronic payment providers.
+Directive 3: Interest Rate Risk in the Banking Book (IRRBB) Guidelines, 2026
+Interest Rate Risk in the Banking Book (IRRBB) represents the exposure of an RFI’s financial condition to adverse movements in interest rates, which directly affects both capital and earnings. Unlike the trading book, where positions are marked to market daily, banking book assets and liabilities (such as loans, deposits, and long-term sovereign bonds) are structurally exposed to interest rate volatility over extended horizons. The BoG’s 2026 IRRBB Guidelines are aligned with the revised global standards established by the Basel Committee on Banking Supervision (BCBS).
+Dual Measurement Perspectives: EVE and NII
+The guidelines require RFIs to measure and manage IRRBB from two distinct, complementary perspectives:
+Short-Term Earnings Perspective (Net Interest Income - NII Sensitivity)
+This measures the impact of interest rate fluctuations on the bank's interest income and interest expenses over a rolling 12-month horizon. It isolates how changes in rates will directly affect current profitability and earnings volatility.
+Long-Term Net Worth Perspective (Economic Value of Equity - EVE Sensitivity)
+This measures the change in the present value of the bank's assets, liabilities, and off-balance sheet items under various interest rate shock scenarios. EVE represents the net present value of the bank's future cash flows, providing a comprehensive assessment of the long-term impact of rate movements on capital adequacy.
+While EVE and NII are both critical, they frequently move in opposite directions when interest rates change, necessitating a coordinated Asset-Liability Committee (ALCO) strategy to manage the trade-offs.
+Structural Risk Components: Repricing Gap, Basis Risk, and Yield Curve Modeling
+The measurement framework requires the isolation of specific interest rate risk drivers:
+Repricing Gap Analysis
+This is the foundational risk measurement technique where all interest-rate-sensitive assets, liabilities, and off-balance sheet items are clustered into specific time bands according to their remaining time to repricing (for floating-rate instruments) or contractual maturity (for fixed-rate instruments). The difference between rate-sensitive assets and rate-sensitive liabilities within each time band determines the repricing gap, indicating whether the bank is asset-sensitive (benefiting from rising rates) or liability-sensitive (benefiting from falling rates).
+Basis Risk Assessment
+This measures the potential loss arising from pricing mismatches where assets and liabilities reprice at the same time but are linked to different reference rate indices. For instance, if a bank funds a loan priced off the Bank of Ghana Policy Rate with deposits priced off the 91-day Treasury Bill yield, it is exposed to basis risk if the spread between those two reference indices narrows.
+Yield Curve Risk Modeling
+This evaluates the impact of non-parallel shifts in the yield curve on the bank's EVE and NII. Yield curve risk modeling moves beyond simple parallel shift assumptions, requiring RFIs to simulate steepening, flattening, and short-rate shocks. This allows the bank to identify vulnerabilities in scenarios where short-term rates rise while long-term rates remain flat or decline.
+Standardised Framework Maturity Slotting and Shock Scenarios
+Under the Standardised Framework (SF), RFIs are required to allocate all interest-rate-sensitive assets, liabilities, and off-balance sheet cash flows into a standardized maturity schedule containing 19 defined time buckets.
+The slotting of cash flows is determined by the contractual and behavioral features of the instruments:
+* Fixed-Rate Positions: For instruments where cash flows are contractually fixed (e.g., fixed-rate commercial loans, mortgages without prepayment options, and government bonds), all coupon payments and principal repayments must be slotted into the time bucket midpoints closest to their contractual maturity dates.
+* Floating-Rate Positions: For instruments where cash flows reset dynamically based on external reference rates, the positions are slotted based on the next contractual repricing date rather than the final maturity date.
+* Behavioral Modeling for Non-Maturity Deposits (NMDs): For deposits that have no contractually defined maturity date (such as savings and current accounts), banks must model behavioral assumptions to estimate the portion of "core" stable deposits versus volatile "non-core" deposits. The Standardised Framework prescribes conservative limits on the proportion of NMDs that can be treated as stable and slotted into longer-term buckets.
+Under this directive, the primary regulatory threshold is the Supervisory Outlier Test (SOT). If an RFI’s projected decline in EVE under any of the six prescribed Basel interest rate shock scenarios exceeds 15% of its Tier 1 Capital, the institution is designated as a "supervisory outlier". This triggers immediate central bank intervention, potential capital add-ons under Pillar 2, and mandates for structural balance sheet de-risking.
+IRRBB Measurement ComponentRegulatory MetricKey Analysis MandateSOT Outlier ThresholdShort-Term SensitivityNet Interest Income (NII)Rolling 12-month net interest income projection across multiple shock scenarios.Evaluated under Pillar 2 capital adequacy buffers.Long-Term WorthEconomic Value of Equity (EVE)Discounted cash flow modeling of total assets, liabilities, and off-balance sheet items.$\Delta \text{EVE} > 15\%$ of Tier 1 Capital under any of the 6 scenarios.Structural Maturity SlottingStandardised Schedule19 defined time buckets for cash flow allocation based on maturity or repricing.Standardized slotting rules apply for fixed and floating rates.Behavioral ModelingNon-Maturity Deposits (NMDs)Separation of core (stable) vs. non-core (volatile) retail and corporate deposits.Fully prescribed stable caps under the Standardised Approach.Reports covering interest rate-sensitive positions must be submitted quarterly to the Bank of Ghana, covering all major currencies that account for more than 5% of the bank's banking book assets or liabilities.
+Directive 4: Recovery Planning Directive, 2026
+The Recovery Planning Directive (RPD) constitutes a pillar of the post-crisis regulatory reform agenda, seeking to eliminate the systemic risk of tax-funded bailouts and promote institutional self-sufficiency during severe crises. Prepared in alignment with the Financial Stability Board (FSB) Key Attributes for Effective Resolution Regimes, the directive requires banks, Specialized Deposit-Taking Institutions, and Financial Holding Companies to maintain a comprehensive Recovery Plan. The plan must prove that the institution has credible, actionable strategies to restore its financial viability, conserve capital, and rebuild liquidity under extreme stress, without assuming any access to public financial support or emergency central bank liquidity.
+Menu of Recovery Options
+The Recovery Plan must contain a wide, diversified menu of credible recovery options, mapped to different stress scenarios. These options must be operationally viable, legally sound, and capable of swift execution. They must include:
+* Capital Conservation Measures: Strategies to suspend dividend payments, freeze variable staff compensation, or convert debt instruments into equity.
+* Liability Restructuring: Re-negotiating the terms of institutional debt or retail liability structures to extend maturities and lower funding costs.
+* Strategic Divestments: Detailed plans for selling off non-core assets, business lines, or foreign subsidiaries to generate immediate capital or liquidity.
+* Balance Sheet De-risking: Reductions in the bank’s risk-weighted asset profile, such as selling credit portfolios or shifting new originations into zero-risk-weighted sovereign securities.
+Quantitative Indicators and Early Warning Triggers
+A core requirement is the design of a robust monitoring framework using quantitative indicators to detect financial deterioration. RFIs must identify a diverse range of metrics covering capital adequacy (CAR, CET1), liquidity (LCR, NSFR), asset quality (NPL ratios, loan loss coverage), and profitability (ROA, NIM). These indicators must be calibrated against the bank’s defined risk appetite and risk tolerance.
+The directive specifies that the activation of an Early Warning Trigger (EWT) or a Recovery Trigger (RT) must not be treated as an automatic switch for predefined management actions. Instead, it serves as a formal prompt to convene senior management and the Board to assess the severity of the crisis and select the most appropriate operational recovery option from their menu. RFIs must justify the calibration of their triggers to the BoG, demonstrating that the thresholds are forward-looking and provide sufficient lead time to execute options before regulatory insolvency. This justification must factor in the range of credible options (having robust, late-stage options that can be implemented quickly allows the bank to set triggers closer to regulatory limits) and the expected execution and governance timelines (if the selected recovery options require complex regulatory approvals across jurisdictions or legal restructuring, the triggers must be calibrated significantly higher to provide sufficient advance warning).
+Management Information System (MIS) Requirements
+RFIs must possess advanced Management Information Systems (MIS) capable of aggregating and reporting risk metrics in a timely manner. The MIS must support the continuous, automated tracking of recovery indicators and triggers. Under the directive, the Recovery Plan must explicitly detail the methodology used to establish internal exposure limits, identify all significant off-balance sheet exposures, and map these exposures to core business lines and critical operations. Furthermore, institutions must conduct an annual self-assessment to identify any deficiencies or data-aggregation weaknesses in their MIS, detailing the remedial actions and timelines to address these gaps. The complete, Board-approved Recovery Plan must be submitted to the Bank of Ghana annually by December 31.
+Directive 5: Foundational Risk Management Directive (RMD)
+The Foundational Risk Management Directive (RMD), issued pursuant to Section 92(1) of the Banks and Specialised Deposit-Taking Institutions Act, 2016 (Act 930), serves as the overarching supervisory framework for the Ghanaian banking sector. It mandates that all Banks, Savings and Loans, Finance Houses, and Financial Holding Companies establish a comprehensive Risk Management Framework (RMF) commensurate with their size, transaction complexity, and risk profile. RFIs that operate as the parent of a financial group must apply the directive on a consolidated basis across all group entities, including unregulated subsidiaries.
+Organizational Independence: The Three Lines of Defence
+The RMD enforces a rigorous organizational structure to ensure unbiased risk oversight, utilizing the internationally recognized Three Lines of Defence model:
+First Line of Defence
+The business units, front-office personnel, and revenue-generating departments that directly take on risk in their daily operations.
+Second Line of Defence
+The independent risk management and compliance functions. These functions are responsible for establishing policies, defining risk measurement methodologies, and monitoring compliance with risk limits.
+Third Line of Defence
+The independent internal audit function, which provides objective assurance to the Board Audit Committee regarding the overall effectiveness of the risk management and internal control framework.
+To maintain independence, the RMD mandates a strict segregation of duties:
+* The Chief Risk Officer (CRO) Independence: The CRO must be completely independent from all business lines, lending activities, and finance-related functions. "Dual-hatting" (e.g., combining the CRO role with that of the CFO, COO, or Chief Internal Auditor) is strictly prohibited.
+* Reporting Lines: The CRO must report directly to the Chief Executive Officer (CEO) and have an unfettered, direct reporting line to the Board of Directors and the Board Risk Committee.
+Mandatory Structural Controls: Segregation, Audit Trails, and Real-Time Position Reporting
+The directive enforces specific operational safeguards that must be hardcoded into the RFI's daily processes:
+Front/Back Office Segregation
+To prevent conflicts of interest, market manipulation, and operational fraud, banks must maintain complete physical and logical separation of duties. The departments responsible for initiating transactions (the front office dealing rooms and loan underwriting desks) must be structurally separated from the departments responsible for trade verification, clearing, reconciliation, and settlement (the back office operations). No front-office staff may have administrative or input access to back-office verification systems.
+Audit Trails
+The bank's transaction systems must maintain comprehensive, unalterable audit trails. This requires the automated logging of every transaction lifecycle event, including the identity of the initiator, the verifier, the time of execution, any parameter modifications, and any credit limit overrides. These audit trails must be stored in a secure environment that is accessible to internal and external audit teams during the mandatory annual reviews.
+Limit Monitoring
+The Risk Appetite Framework (RAF) defines the comprehensive approach through which an RFI establishes, communicates, and monitors its risk boundaries. The Board-approved Risk Appetite Statement (RAS) must include both quantitative limits (expressed relative to capital, earnings, liquidity, and asset concentration metrics) and qualitative statements addressing reputation, conduct, money laundering, and compliance risks. The CRO is responsible for translating these high-level appetite metrics into a granular structure of Risk Limits allocated to specific business lines, portfolios, and individual counterparties. The RFI's MIS must be supported by a robust data architecture that enables the rapid aggregation of risk exposures and ensures prompt notification to senior management when a risk limit is breached.
+Real-Time Position Reporting
+To prevent unauthorized trading or overnight exposure runs, the treasury and investment platforms must be capable of real-time position reporting. This ensures that the bank's foreign exchange net open positions, counterparty credit concentrations, and sovereign bond duration limits are compiled and reported continuously throughout the trading day. Real-time tracking enables risk officers to intervene immediately if an intraday limit is breached, rather than discovering risk overruns during end-of-day batch processing.
+Structural ControlPrimary Operational ObjectiveTechnical Implementation RequirementAudit/Compliance CheckFront/Back Office SegregationPrevent transaction fraud and conflicts of interest.Complete logical and system access separation between deal generation and settlement.Verification of separate system profile permissions and org charts.Audit TrailsEnsure full accountability and transaction traceability.Automated, immutable system logging of all user actions, parameter changes, and limit overrides.Reviewed by internal and external audit at least once a year.Limit MonitoringOperationalize the Board's Risk Appetite Statement (RAS).Automated alert generation and hard-blocks on credit and treasury systems when limits are approached.Prompt reporting of limit breaches via robust risk engines.Real-Time Position ReportingControl intraday risk accumulation and FX exposure.Continuous valuation and position aggregation tools for fx and counterparty exposures.10-day formal notification to BoG in the event of major framework breaches.RFIs must ensure that compliance with, and the effectiveness of, their risk management framework is subject to a review by internal and/or external audit at least once a year, with outcomes reported to the Board Audit Committee. In the event of a significant breach of its risk limits, a material deviation from its approved Risk Management Framework, or if the RMF has failed to adequately address a material risk, the bank must notify the Bank of Ghana in writing within ten business days. The Board of Directors must issue an annual Risk Management Declaration to the Bank of Ghana, certifying that the bank's internal control and risk management systems are operating effectively and comply fully with the RMD.
+Integrated Supervisory Synthesis
+The Bank of Ghana’s regulatory framework for 2026 represents a highly integrated prudential architecture, shifting away from isolated compliance checkboxes toward a holistic, risk-based supervisory ecosystem. For executive management and Board Risk Committees, the true challenge lies in understanding the complex interdependencies and causal relationships that link these five directives together.
+Rather than operating in silos, the directives are designed to function as a continuous loop of quantitative and qualitative risk mitigation:
+                  ???????????????????????????????????????????????????????????????
+                  ?                                                             ?
+   ???????????????????????????????                                              ?
+   ?  Foundational Risk          ?  ??? Establish Segregation, Audit Trails,    ?
+   ?  Management Directive (RMD) ?      Limit Monitoring & Position Reports     ?
+   ???????????????????????????????      [Dir 5]                                 ?
+                  ?                                                             ?
+                  ?                                                             ?
+   ???????????????????????????????                                              ?
+   ?  IRRBB Guidelines           ?  ??? Map repricing gaps to EVE & NII         ?
+   ?  & Monitoring               ?      under yield shocks [Dir 3]              ?
+   ???????????????????????????????                                              ?
+                  ?                                                             ?
+                  ?                                                             ?
+   ???????????????????????????????                                              ?
+   ?  Liquidity Monitoring       ?  ??? Run daily/weekly metrics and track      ?
+   ?  Tools Directive (LMTD)     ?      contractual maturity mismatches [Dir 1] ?
+   ???????????????????????????????                                              ?
+                  ?                                                             ?
+                  ?                                                             ?
+   ???????????????????????????????                                              ?
+   ?  Liquidity Risk             ?  ??? Design RFI-specific/systemic stress     ?
+   ?  Management Directive (LRMD)?      scenarios & CFPs; Demonstrate system    ?
+   ???????????????????????????????      capability to BoG [Dir 2]               ?
+                  ?                                                             ?
+                  ?                                                             ?
+   ???????????????????????????????                                              ?
+   ?  Recovery Planning          ?  ??? Calibrate triggers to prompt action     ?
+   ?  Directive (RPD)            ?      before capital/liquidity failure [Dir 4]?
+   ???????????????????????????????                                              ?
+                  ???????????????????????????????????????????????????????????????
+At the core, the Foundational Risk Management Directive establishes the operational infrastructure, organizational segregation, immutable audit trails, and real-time position reporting capabilities. This internal risk control setup directly governs how market and interest rate risks are monitored under the IRRBB Guidelines. When interest rates shift, the repricing mismatches measured under the IRRBB framework directly alter the present value of the bank's assets and liabilities (EVE) and its short-term earnings (NII). These valuation changes feed directly into the quantitative liquidity metrics of the Liquidity Monitoring Tools Directive (LMTD), affecting the market value of unencumbered assets, changing the contractual maturity cash flow mismatches, and altering the LCR by significant currency.
+In turn, these quantitative metrics provide the baseline data for the Liquidity Risk Management Directive (LRMD). Under the LRMD, the bank tests its balance sheet against severe, institution-specific and market-wide stress scenarios (such as sudden deposit outflows or the inability to liquidate government securities). To prove that the bank can handle these stresses dynamically, treasury officers must demonstrate their system capability to supervisors, showing that the core systems can aggregate real-time intraday data and generate accurate reports. The outcomes of these liquidity stress tests are used to design and calibrate the Contingency Funding Plan (CFP), establishing the operational playbook for responding to a funding squeeze.
+Finally, the entire quantitative and qualitative risk posture culminates in the Recovery Planning Directive (RPD). The quantitative boundaries established across the LMTD, LRMD, and IRRBB guidelines—including the 15% EVE outlier threshold and the 30-day HQLA stress coverage metrics—serve as the early warning indicators and recovery triggers. If a severe shock causes these indicators to breach their thresholds, the automated MIS flags the trigger. This does not lead to automated actions but instead prompts the Board to activate the Recovery Plan, implementing decisive restructuring, liability changes, or asset sales to restore capital and liquidity before the institution reaches insolvency.
+By treating these directives as an interconnected, dynamic ecosystem, the Bank of Ghana has created a regulatory framework designed to ensure that Ghanaian banks maintain strong risk governance, withstand future macroeconomic shocks, and support sustainable economic credit intermediation in 2026 and beyond.
+Regulatory Attribute / MetricDirective 1: Liquidity Monitoring Tools (LMTD)Directive 2: Liquidity Risk Management (LRMD)Directive 3: IRRBB GuidelinesDirective 4: Recovery Planning (RPD)Directive 5: Foundational Risk Management (RMD)Primary Regulatory FocusQuantitative tracking of liquid assets, cash flows, and collateral.Board oversight, stress testing, CFPs, and intraday monitoring.Balance sheet sensitivity to interest rate movements.Crisis self-sufficiency, non-bailout recovery options.Basel-aligned risk governance, limit tracking, independence.Applicable InstitutionsAll licensed RFIs (Banks, SDIs, FHCs).All licensed RFIs.All licensed RFIs.Banks, SDIs, FHCs, and Mortgage Finance.All licensed RFIs (applied on a group-wide basis).Key Quantitative MetricsFour Prudential Liquidity Ratios; Maturity gaps.30-day stressed HQLA coverage; Intraday throughput.$15\%$ EVE outlier threshold; NII sensitivity.Diverse capital, liquidity, and operational triggers.Operational limit breaches; CRO reporting metrics.Mandatory System ExpectationsPrescribed Excel templates submitted on strict monthly schedules.Demonstration of real-time intraday data aggregation to supervisors.Slotting of cash flows into 19 defined time bands.Real-time trigger tracking via advanced, integrated MIS.Front/back office segregation, audit trails, and real-time positions.Reporting Frequency to BoGMonthly (within 9 days after month-end).Quarterly Board LAS; Annual Stress Test disclosures.Quarterly submissions.Annual formal submission; real-time trigger tracking.Continuous regular MIS; 10-day limit breach window.Compliance & Operational MilestonesContinuous monthly reporting across 2026.Annual framework & CFP updates; annual stress test reviews.SF cash flow slotting across 19 buckets.Board approval and submission to BoG by Dec 31, 2026.Annual independent audit; annual Board declaration.
+Technical Solution Architecture  ·  BoG 2026 Prudential Reform Package
+
+Gigaflow Solutions  ·  Confidential	Page 1 of 2
+

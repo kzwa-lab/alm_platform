@@ -48,6 +48,30 @@
           <a href="../expected-credit-loss/ecl-engine.html" class="nav-item">ECL Engine</a>
           <a href="../expected-credit-loss/sicr-monitor.html" class="nav-item">SICR Monitor</a>
         </div>
+        <div class="nav-item has-submenu"><i data-lucide="activity" class="nav-icon"></i><span class="nav-label">Recovery Planning</span><i data-lucide="chevron-right" class="nav-chevron" style="width:14px;height:14px;"></i></div>
+        <div class="nav-submenu">
+          <a href="../recovery-planning/index.html" class="nav-item">Recovery Dashboard</a>
+        </div>
+        <div class="nav-item has-submenu"><i data-lucide="lock" class="nav-icon"></i><span class="nav-label">GRC & Risk Framework</span><i data-lucide="chevron-right" class="nav-chevron" style="width:14px;height:14px;"></i></div>
+        <div class="nav-submenu">
+          <a href="../grc-risk-framework/index.html" class="nav-item">Risk Framework</a>
+        </div>
+        <div class="nav-item has-submenu"><i data-lucide="file-text" class="nav-icon"></i><span class="nav-label">Regulatory Reporting</span><i data-lucide="chevron-right" class="nav-chevron" style="width:14px;height:14px;"></i></div>
+        <div class="nav-submenu">
+          <a href="../regulatory-reporting/index.html" class="nav-item">ORASS</a>
+        </div>
+        <div class="nav-item has-submenu"><i data-lucide="brain" class="nav-icon"></i><span class="nav-label">Behavioural Models</span><i data-lucide="chevron-right" class="nav-chevron" style="width:14px;height:14px;"></i></div>
+        <div class="nav-submenu">
+          <a href="../behavioural-models/index.html" class="nav-item">Model Dashboard</a>
+        </div>
+        <div class="nav-item has-submenu"><i data-lucide="shield-check" class="nav-icon"></i><span class="nav-label">Cyber Security</span><i data-lucide="chevron-right" class="nav-chevron" style="width:14px;height:14px;"></i></div>
+        <div class="nav-submenu">
+          <a href="../cyber-security/index.html" class="nav-item">Security Posture</a>
+        </div>
+        <div class="nav-item has-submenu"><i data-lucide="zap" class="nav-icon"></i><span class="nav-label">RTGS & Intraday Liquidity</span><i data-lucide="chevron-right" class="nav-chevron" style="width:14px;height:14px;"></i></div>
+        <div class="nav-submenu">
+          <a href="../rtgs-intraday-liquidity/index.html" class="nav-item">RTGS Monitor</a>
+        </div>
       </div>
       <div class="nav-section">
         <div class="nav-section-title">Pricing & Optimization</div>
@@ -70,8 +94,10 @@
       <div class="logo-area"><span style="font-weight:600;color:var(--text);">Asset &amp; Liability Management</span></div>
       <div class="header-actions">
         <button class="header-btn"><i data-lucide="calendar" style="width:14px;height:14px;"></i> 25 Jun 2026</button>
-        <button class="header-btn"><i data-lucide="building-2" style="width:14px;height:14px;"></i> Group Consolidated</button>
-        <div class="user-pill"><div class="avatar">JD</div><span>John Doe</span><i data-lucide="chevron-down" style="width:14px;height:14px;color:var(--text-muted);"></i></div>
+        <button class="header-btn"><i data-lucide="building-2" style="width:14px;height:14px;"></i> Ecobank Ghana PLC</button>
+        <button class="header-btn"><i data-lucide="banknote" style="width:14px;height:14px;"></i> GHS</button>
+        <button class="header-btn"><i data-lucide="percent" style="width:14px;height:14px;"></i> GRR 24.5%</button>
+        <div class="user-pill"><div class="avatar">DA</div><span>Daniel Addo (CRO)</span><i data-lucide="chevron-down" style="width:14px;height:14px;color:var(--text-muted);"></i></div>
       </div>
     </header>
 
@@ -83,7 +109,7 @@
         <div class="card">
           <div class="card-header"><h3>Loan Pricing Inputs</h3></div>
           <div class="card-body">
-            <div class="form-group"><label class="form-label">Loan Amount (EUR)</label><input type="number" class="form-input" id="loanAmount" value="5000000" step="100000"></div>
+            <div class="form-group"><label class="form-label">Loan Amount (GHS)</label><input type="number" class="form-input" id="loanAmount" value="5000000" step="100000"></div>
             <div class="form-group"><label class="form-label">Tenor (months)</label><input type="number" class="form-input" id="loanTenor" value="60" step="1"></div>
             <div class="form-group"><label class="form-label">Customer Segment</label>
               <select class="form-select" id="customerSegment">
@@ -120,9 +146,9 @@
                 <div class="text-center p-3 rounded border" style="border-color:var(--border);"><div class="text-sm text-muted">All-in Cost</div><div class="text-2xl font-bold" id="allInCost">5.65%</div></div>
                 <div class="text-center p-3 rounded border" style="border-color:var(--border);"><div class="text-sm text-muted">Suggested Rate</div><div class="text-2xl font-bold text-primary" id="suggestedRate">6.85%</div></div>
               </div>
-              <div class="flex justify-between mb-2"><span class="text-sm">Annual Revenue</span><span class="text-sm font-semibold" id="annualRev">EUR 342,500</span></div>
-              <div class="flex justify-between mb-2"><span class="text-sm">Annual Cost</span><span class="text-sm font-semibold" id="annualCost">EUR 282,500</span></div>
-              <div class="border-t mt-2 pt-2 flex justify-between"><span class="text-sm font-semibold">Annual Margin</span><span class="text-sm font-bold" id="annualMargin">EUR 60,000</span></div>
+              <div class="flex justify-between mb-2"><span class="text-sm">Annual Revenue</span><span class="text-sm font-semibold" id="annualRev">GHS 342,500</span></div>
+              <div class="flex justify-between mb-2"><span class="text-sm">Annual Cost</span><span class="text-sm font-semibold" id="annualCost">GHS 282,500</span></div>
+              <div class="border-t mt-2 pt-2 flex justify-between"><span class="text-sm font-semibold">Annual Margin</span><span class="text-sm font-bold" id="annualMargin">GHS 60,000</span></div>
               <div class="mt-4 text-center" id="recommendation"><span class="badge badge-success">RECOMMENDATION: ACCEPT</span></div>
             </div>
           </div>
@@ -158,9 +184,9 @@
 
       document.getElementById('allInCost').textContent = r.allInCost.toFixed(2) + '%';
       document.getElementById('suggestedRate').textContent = r.suggestedRate.toFixed(2) + '%';
-      document.getElementById('annualRev').textContent = 'EUR ' + formatNumber(r.annualRevenue);
-      document.getElementById('annualCost').textContent = 'EUR ' + formatNumber(r.annualCost);
-      document.getElementById('annualMargin').textContent = 'EUR ' + formatNumber(r.annualMargin);
+      document.getElementById('annualRev').textContent = 'GHS ' + formatNumber(r.annualRevenue);
+      document.getElementById('annualCost').textContent = 'GHS ' + formatNumber(r.annualCost);
+      document.getElementById('annualMargin').textContent = 'GHS ' + formatNumber(r.annualMargin);
 
       const recMap = { accept: '<span class="badge badge-success">RECOMMENDATION: ACCEPT</span>', review: '<span class="badge badge-warning">RECOMMENDATION: REVIEW</span>', reject: '<span class="badge badge-danger">RECOMMENDATION: REJECT</span>' };
       document.getElementById('recommendation').innerHTML = recMap[r.recommendation];

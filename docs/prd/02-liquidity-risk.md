@@ -1,27 +1,42 @@
-# PRD: Liquidity Risk Management (LCR/NSFR)
+# PRD: Liquidity Risk Management (LCR/NSFR / BoG LMTD / LRMD)
 
 ## 1. Overview
 
 ### 1.1 Purpose
 
-The Liquidity Risk Management module enables the bank to calculate, monitor, and stress-test its Liquidity Coverage Ratio (LCR) and Net Stable Funding Ratio (NSFR) in real time. It provides drill-down capabilities from headline ratios to individual balance sheet items, supports regulatory reporting, and includes a Contingency Funding Plan (CFP) trigger dashboard. This module ensures the bank meets its short-term and structural liquidity obligations under Basel III/CRR3.
+The Liquidity Risk Management module enables the bank to calculate, monitor, and stress-test its liquidity position under both the Basel III LCR/NSFR framework and the Bank of Ghana 2026 Liquidity Monitoring Tools Directive (LMTD) and Liquidity Risk Management Directive (LRMD). It provides:
+
+- **BoG LMTD compliance**: Four prudential liquidity ratios on Narrow and Broad liquid-asset bases (eight variants), with distinct commercial bank and SDI thresholds
+- **Basel LCR/NSFR**: Real-time Liquidity Coverage Ratio and Net Stable Funding Ratio
+- **Contractual maturity mismatch**: 13 prescribed time-band gap analysis with cumulative net mismatch
+- **Funding concentration**: Connected-counterparty grouping and concentration metrics
+- **Significant-currency LCR**: Per-currency LCR isolation for foreign currencies >5% of business
+- **Liquidity stress testing**: Idiosyncratic, market-wide, and combined scenarios
+- **Contingency Funding Plan (CFP)**: Trigger dashboard linked to stress-test outcomes
+- **ILAAP/LAS support**: Internal Liquidity Adequacy Assessment Process and quarterly Liquidity Adequacy Statements
+
+This module ensures the bank meets its short-term and structural liquidity obligations under both Basel III and the BoG 2026 prudential package.
 
 ### 1.2 Users & Roles
 
 | Role | Responsibilities |
 |------|---------------|
-| **Treasurer** | Monitors LCR/NSFR daily, reviews stress test results, triggers CFP actions |
-| **Liquidity Risk Manager** | Runs LCR/NSFR calculations, validates assumptions, produces regulatory reports |
-| **ALCO Member** | Reviews liquidity position at meetings, approves liquidity strategies |
-| **Compliance Officer** | Ensures regulatory reporting accuracy, submits reports to supervisors |
+| **Treasurer** | Monitors LCR/NSFR and BoG ratios daily, reviews stress test results, triggers CFP actions |
+| **Liquidity Risk Manager** | Runs all liquidity calculations, validates assumptions, produces regulatory reports |
+| **ALCO Member** | Reviews liquidity position at meetings, approves liquidity strategies and CFP |
+| **Compliance Officer** | Ensures regulatory reporting accuracy, submits BoG LMTD returns via ORASS, tracks ILAAP |
 | **Business Unit Head** | Reviews liquidity costs attributed to their unit via LTP |
+| **Board Secretary** | Coordinates quarterly Liquidity Adequacy Statements (LAS) for Board approval |
 
 ### 1.3 Dependencies
 
-- **Data Foundation**: GL balances, deposit classifications, securities inventory, contractual maturities
-- **Interest Rate Risk**: NMD behavioral assumptions affect LCR outflow rates and NSFR ASF factors
-- **FTP**: Liquidity Transfer Pricing (LTP) charges flow from LCR/NSFR metrics
-- **Capital Management**: HQLA holdings affect leverage ratio denominator
+- **Data Foundation** (`01-data-foundation.md`): GL balances, deposit classifications, securities inventory, contractual maturities, Ghana asset classification (Narrow/Broad), encumbrance register, 13 LMTD bucket engine, RTGS feed
+- **Interest Rate Risk** (`03-interest-rate-risk.md`): NMD behavioral assumptions affect LCR outflow rates and NSFR ASF factors
+- **Behavioural Model Library** (`11-behavioural-model-library.md`): TDRR assumptions for liquidity stress testing
+- **FTP** (`06-ftp.md`): Liquidity Transfer Pricing (LTP) charges flow from LCR/NSFR metrics
+- **Capital Management** (`04-capital-management.md`): HQLA holdings affect leverage ratio denominator; ILAAP integrated with ICAAP
+- **GRC Risk Framework** (`09-grc-risk-framework.md`): Board-approved risk appetite, limit framework, CRO independence
+- **Regulatory Reporting** (`10-regulatory-reporting-orass.md`): BoG LMTD monthly returns, LRMD quarterly LAS
 
 ---
 
@@ -30,12 +45,12 @@ The Liquidity Risk Management module enables the bank to calculate, monitor, and
 ### 2.1 Real-Time LCR Calculator
 
 #### Description
-An interactive calculator that computes the Liquidity Coverage Ratio (LCR = HQLA / Net Cash Outflows) with full drill-down from the headline ratio to individual HQLA items and outflow categories. Supports both standard (Pillar 1) and internal stress (Pillar 2) scenarios.
+An interactive calculator that computes the Liquidity Coverage Ratio (LCR = HQLA / Net Cash Outflows) with full drill-down from the headline ratio to individual HQLA items and outflow categories. Supports both standard (Pillar 1) and internal stress (Pillar 2) scenarios. Also displays the BoG LMTD prudential ratios for quick reference.
 
 #### User Stories
 - **As a Liquidity Risk Manager**, I want to see the current LCR and its components so that I can verify we are above the 100% minimum.
 - **As a Treasurer**, I want to simulate the impact of a large wholesale deposit withdrawal on LCR so that I can decide whether to pre-fund.
-- **As a Compliance Officer**, I want to export the LCR calculation workbook for submission to the EBA so that we meet regulatory deadlines.
+- **As a Compliance Officer**, I want to export the LCR calculation workbook and the BoG LMTD ratio summary for submission to the regulator so that we meet regulatory deadlines.
 
 #### Acceptance Criteria
 - [ ] LCR calculated automatically after daily data ingestion completes
@@ -45,6 +60,9 @@ An interactive calculator that computes the Liquidity Coverage Ratio (LCR = HQLA
 - [ ] Level 2 assets capped at 40% of total HQLA
 - [ ] Real-time recalculation when user adjusts inputs in "what-if" mode
 - [ ] Traffic light indicator: Green (≥120%), Amber (100-120%), Red (<100%)
+- [ ] BoG LMTD prudential ratios displayed alongside LCR: Narrow/Broad ratios for volatile liabilities, short-term liabilities, total assets, and total deposits
+- [ ] Bank vs. SDI threshold logic applied automatically based on tenant classification
+- [ ] E-money float accounts classified as volatile liabilities per LRMD
 
 #### Screen Layout Description
 
@@ -412,6 +430,108 @@ A real-time dashboard that monitors early warning indicators (EWIs) and triggers
 
 ---
 
+### 2.5 Liquidity Gap Report
+
+#### Description
+A time-bucketed liquidity gap analysis showing the mismatch between assets and liabilities across configurable maturity bands. Provides both a behavioral view (using assumed rollover/runoff behavior) and a contractual view (legal maturity), enabling ALCO to see both management-intent and worst-case liquidity exposure.
+
+#### User Stories
+- **As a Liquidity Risk Manager**, I want to see the behavioral liquidity gap by time bucket so that I can identify near-term funding mismatches.
+- **As a Treasurer**, I want to compare the behavioral gap to the contractual gap so that I can understand how much behavioral assumptions affect our liquidity position.
+- **As an ALCO Member**, I want to see cumulative surplus carried forward and net mismatch so that I can decide on funding actions.
+
+#### Acceptance Criteria
+- [ ] Time buckets configurable (default: Demand, 0–5 days, >5d–1m, >1–2m, >2–3m, >3–6m, >6–12m, >12m)
+- [ ] Dual view: Business as Usual (behavioral) and Contractual
+- [ ] Computes per bucket: liabilities, assets, mismatch, surplus carried forward, net mismatch, liquidity coefficient, liquidity gap
+- [ ] Includes secondary/statutory liquid assets separately
+- [ ] Live aggregation from projected cash flows rather than static JSON
+- [ ] Drill-down from bucket to individual instruments
+
+#### Data Inputs
+- Projected cash flows from the analytics engine (`cash_flows` table)
+- Instrument attributes (maturity, rollover, behavioral assumptions)
+- Time bucket definitions
+- HQLA / liquid asset classification
+
+#### Calculation Logic / Business Rules
+```
+BehavioralGap = BehavioralLiabilities - BehavioralAssets
+ContractualGap = ContractualLiabilities - ContractualAssets
+SurplusCarriedForward = sum of positive net mismatches in prior buckets
+NetMismatch = Mismatch + SurplusCarriedForward
+LiquidityGap = NetMismatch × LiquidityCoefficient
+```
+
+#### Validation Rules
+- Total assets must reconcile to total liabilities + equity in the contractual view
+- Behavioral assumptions must be approved and versioned
+- Any bucket with net mismatch > internal limit triggers amber/red alert
+
+#### Error Handling
+- Missing cashflow data → fallback to last successful run with stale badge
+- Bucket definition missing → apply default buckets
+- Behavioral assumption not approved → block behavioral view, show contractual only
+
+#### Audit & Compliance Requirements
+- Gap report stored per run with assumption-set version
+- Both behavioral and contractual views retained for 7 years
+- EBA liquidity reporting requirements supported
+
+---
+
+### 2.6 Bank-Run Stress Calculator
+
+#### Description
+A simple but powerful stress tool that simulates a continuous deposit outflow over a user-defined number of days, consuming liquid assets and showing the point at which liquidity coverage becomes critical.
+
+#### User Stories
+- **As a Treasurer**, I want to model a bank-run scenario so that I can estimate how many days our liquid assets would last.
+- **As a CRO**, I want to see the daily liquidity ratio under stress so that I can brief the Board.
+- **As a Liquidity Risk Manager**, I want to save bank-run assumptions as a stress scenario for quarterly reporting.
+
+#### Acceptance Criteria
+- [ ] Inputs: total deposits, liquid assets, daily outflow rate (%), number of days
+- [ ] Outputs per day: deposit outflow, remaining liquid assets, remaining deposits, liquidity ratio
+- [ ] Visual: line chart of remaining liquid assets and deposits over time
+- [ ] Breach day automatically flagged when liquid assets fall below policy threshold
+- [ ] Assumptions can be saved as a named stress scenario
+
+#### Data Inputs
+- Total deposits from GL/ deposit system
+- Liquid assets from HQLA inventory
+- User-defined daily outflow rate and horizon
+
+#### Calculation Logic / Business Rules
+```
+Day 0: deposits_0, liquid_assets_0
+For day t in 1..horizon:
+    outflow_t = deposits_{t-1} × daily_outflow_rate
+    deposits_t = deposits_{t-1} - outflow_t
+    liquid_assets_t = liquid_assets_{t-1} - outflow_t
+    liquidity_ratio_t = liquid_assets_t / deposits_t × 100
+```
+
+#### Validation Rules
+- Daily outflow rate must be > 0 and ≤ 100%
+- Horizon must be ≤ 365 days
+- Liquid assets must be ≥ 0 at start
+
+#### Error Handling
+- Liquid assets reach zero before horizon → stop calculation, flag breach day
+- Outflow rate results in deposit depletion → warn that model becomes invalid
+
+#### Audit & Compliance Requirements
+- Bank-run scenarios saved with user, timestamp, and inputs
+- Results included in quarterly liquidity stress test pack
+- BoG LMTD monthly returns retained for 7 years
+- LRMD quarterly LAS and annual ILAAP submissions retained for 7 years
+- CFP activation log subject to internal audit review
+- Board reviews CFP effectiveness annually
+- E-money float account treatment documented for supervisory review
+
+---
+
 ## 3. Data Model
 
 ### 3.1 Entities
@@ -424,10 +544,19 @@ A real-time dashboard that monitors early warning indicators (EWIs) and triggers
 | **NSFR_Calculation** | Daily NSFR result | calc_id, date, asf_total, rsf_total, nsfr_pct, status |
 | **ASF_Item** | Available stable funding component | item_id, calc_id, category, notional, factor, asf_amount |
 | **RSF_Item** | Required stable funding component | item_id, calc_id, category, notional, factor, rsf_amount |
+| **BoG_Ratio_Calculation** | Daily BoG prudential ratio result | calc_id, date, ratio_type, narrow_or_broad, bank_or_sdi, liquid_assets, denominator, ratio_pct, threshold, status |
+| **MaturityMismatch** | 13-band contractual maturity mismatch | mismatch_id, calc_id, band, cash_inflows, cash_outflows, mismatch, cumulative_mismatch, net_mismatch, currency |
+| **FundingConcentration** | Funding concentration by counterparty | concentration_id, calc_id, counterparty_group, product, currency, amount, pct_of_total, significance_flag |
+| **SignificantCurrencyLCR** | LCR by significant currency | sclcr_id, calc_id, currency, hqla, net_outflows, lcr_pct, threshold, status |
 | **Stress_Scenario** | Liquidity stress scenario | scenario_id, name, type, retail_runoff_mult, wholesale_runoff_mult, hqla_haircut_add, inflow_reduction, description |
 | **Stress_Result** | Stress test execution result | result_id, scenario_id, calc_id, base_lcr, stressed_lcr, base_nsfr, stressed_nsfr, survival_days, status |
 | **CFP_Phase** | CFP activation phase | phase_id, name, description, trigger_conditions, actions, escalation_contacts |
 | **EWI** | Early warning indicator | ewi_id, name, current_value, green_threshold, amber_threshold, red_threshold, status |
+| **LiquidityGap** | Time-bucketed gap result | gap_id, run_id, view_type (behavioral/contractual), bucket, liabilities, assets, mismatch, surplus_carried_forward, net_mismatch, liquidity_gap |
+| **BankRunScenario** | Bank-run stress inputs | scenario_id, name, total_deposits, liquid_assets, daily_outflow_rate, horizon_days, created_by, created_at |
+| **BankRunResult** | Bank-run daily output | result_id, scenario_id, day, outflow, remaining_deposits, remaining_liquid_assets, liquidity_ratio, breach_flag |
+| **ILAAP** | Internal Liquidity Adequacy Assessment | ilaap_id, year, assessment_date, board_approval_date, status, document_url |
+| **LAS** | Liquidity Adequacy Statement | las_id, quarter, board_approval_date, submission_date, status, document_url |
 
 ### 3.2 Key Attributes
 
@@ -444,6 +573,8 @@ NSFR_Calculation (1) ──► ASF_Item (N)
 NSFR_Calculation (1) ──► RSF_Item (N)
 Stress_Scenario (1) ──► Stress_Result (N)
 LCR_Calculation (1) ──► Stress_Result (N)
+Run (1) ──► LiquidityGap (N)
+BankRunScenario (1) ──► BankRunResult (N)
 EWI (N) ──► CFP_Phase (determines current phase)
 ```
 
@@ -460,6 +591,11 @@ EWI (N) ──► CFP_Phase (determines current phase)
 | `/api/liquidity/lcr/whatif` | POST | Run what-if LCR scenario |
 | `/api/liquidity/nsfr` | GET | Get current NSFR calculation |
 | `/api/liquidity/nsfr/projection` | POST | Run NSFR forward projection |
+| `/api/liquidity/bog-ratios` | GET | Get BoG prudential ratio calculations |
+| `/api/liquidity/bog-ratios/{id}` | GET | Get specific BoG ratio detail |
+| `/api/liquidity/maturity-mismatch` | GET | Get 13-band contractual maturity mismatch |
+| `/api/liquidity/funding-concentration` | GET | Get funding concentration report |
+| `/api/liquidity/significant-currency-lcr` | GET | Get LCR by significant currency |
 | `/api/liquidity/stress` | GET | List stress scenarios |
 | `/api/liquidity/stress` | POST | Run stress test |
 | `/api/liquidity/stress/{id}` | GET | Get stress test results |
@@ -468,6 +604,14 @@ EWI (N) ──► CFP_Phase (determines current phase)
 | `/api/liquidity/cfp/activate` | POST | Activate CFP phase |
 | `/api/liquidity/reports/lcr` | GET | Generate LCR regulatory report |
 | `/api/liquidity/reports/nsfr` | GET | Generate NSFR regulatory report |
+| `/api/liquidity/reports/bog-lmtd` | GET | Generate BoG LMTD monthly return |
+| `/api/liquidity/reports/las` | GET | Generate quarterly Liquidity Adequacy Statement |
+| `/api/liquidity/gap` | GET | Get liquidity gap report (behavioral/contractual) |
+| `/api/liquidity/gap/{run_id}` | GET | Get gap report for a specific run |
+| `/api/liquidity/bankrun` | POST | Run bank-run stress calculator |
+| `/api/liquidity/bankrun/scenarios` | GET | List saved bank-run scenarios |
+| `/api/liquidity/ilaap` | GET | Get ILAAP status |
+| `/api/liquidity/ilaap` | POST | Submit ILAAP for Board approval |
 
 ### 4.2 Request/Response Examples
 
@@ -526,12 +670,20 @@ Response: 200 OK
 | Report | Frequency | Format | Recipient |
 |--------|-----------|--------|-----------|
 | Daily LCR/NSFR Dashboard | Daily | Web UI | Treasurer, ALCO Members |
+| BoG LMTD Monthly Return | Monthly | Excel (BoG template) | Compliance → BoG/ORASS |
 | LCR Regulatory Report | Monthly | Excel (EBA template) | Compliance → EBA/National Supervisor |
 | NSFR Regulatory Report | Quarterly | Excel (EBA template) | Compliance → EBA/National Supervisor |
 | Liquidity Stress Test Report | Quarterly | PDF | ALCO → Board |
 | CFP Status Report | Weekly | Web UI + Email | Treasurer, CRO |
 | Funding Plan Report | Monthly | PDF | Treasurer → ALCO |
 | Intraday Liquidity Report | Daily | Web UI | Treasury Operations |
+| Liquidity Gap Report | Daily | Web UI + Excel | Treasurer, Risk Manager |
+| Bank-Run Stress Report | Quarterly | PDF | ALCO → Board |
+| Quarterly Liquidity Adequacy Statement (LAS) | Quarterly | PDF | Board → BoG |
+| ILAAP Pack | Annual | PDF | Board → BoG |
+| Available Unencumbered Assets Report | Daily | Web UI | Compliance, Risk Manager |
+| Funding Concentration Report | Monthly | PDF | Treasurer, Risk Manager |
+| Significant Currency LCR Report | Monthly | PDF | Treasurer, Compliance |
 
 ---
 

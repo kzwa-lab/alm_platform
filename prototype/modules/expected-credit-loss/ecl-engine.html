@@ -48,6 +48,30 @@
           <a href="ecl-engine.html" class="nav-item active">ECL Engine</a>
           <a href="sicr-monitor.html" class="nav-item">SICR Monitor</a>
         </div>
+        <div class="nav-item has-submenu"><i data-lucide="activity" class="nav-icon"></i><span class="nav-label">Recovery Planning</span><i data-lucide="chevron-right" class="nav-chevron" style="width:14px;height:14px;"></i></div>
+        <div class="nav-submenu">
+          <a href="../recovery-planning/index.html" class="nav-item">Recovery Dashboard</a>
+        </div>
+        <div class="nav-item has-submenu"><i data-lucide="lock" class="nav-icon"></i><span class="nav-label">GRC & Risk Framework</span><i data-lucide="chevron-right" class="nav-chevron" style="width:14px;height:14px;"></i></div>
+        <div class="nav-submenu">
+          <a href="../grc-risk-framework/index.html" class="nav-item">Risk Framework</a>
+        </div>
+        <div class="nav-item has-submenu"><i data-lucide="file-text" class="nav-icon"></i><span class="nav-label">Regulatory Reporting</span><i data-lucide="chevron-right" class="nav-chevron" style="width:14px;height:14px;"></i></div>
+        <div class="nav-submenu">
+          <a href="../regulatory-reporting/index.html" class="nav-item">ORASS</a>
+        </div>
+        <div class="nav-item has-submenu"><i data-lucide="brain" class="nav-icon"></i><span class="nav-label">Behavioural Models</span><i data-lucide="chevron-right" class="nav-chevron" style="width:14px;height:14px;"></i></div>
+        <div class="nav-submenu">
+          <a href="../behavioural-models/index.html" class="nav-item">Model Dashboard</a>
+        </div>
+        <div class="nav-item has-submenu"><i data-lucide="shield-check" class="nav-icon"></i><span class="nav-label">Cyber Security</span><i data-lucide="chevron-right" class="nav-chevron" style="width:14px;height:14px;"></i></div>
+        <div class="nav-submenu">
+          <a href="../cyber-security/index.html" class="nav-item">Security Posture</a>
+        </div>
+        <div class="nav-item has-submenu"><i data-lucide="zap" class="nav-icon"></i><span class="nav-label">RTGS & Intraday Liquidity</span><i data-lucide="chevron-right" class="nav-chevron" style="width:14px;height:14px;"></i></div>
+        <div class="nav-submenu">
+          <a href="../rtgs-intraday-liquidity/index.html" class="nav-item">RTGS Monitor</a>
+        </div>
       </div>
       <div class="nav-section">
         <div class="nav-section-title">Pricing & Optimization</div>
@@ -70,8 +94,10 @@
       <div class="logo-area"><span style="font-weight:600;color:var(--text);">Asset &amp; Liability Management</span></div>
       <div class="header-actions">
         <button class="header-btn"><i data-lucide="calendar" style="width:14px;height:14px;"></i> 25 Jun 2026</button>
-        <button class="header-btn"><i data-lucide="building-2" style="width:14px;height:14px;"></i> Group Consolidated</button>
-        <div class="user-pill"><div class="avatar">JD</div><span>John Doe</span><i data-lucide="chevron-down" style="width:14px;height:14px;color:var(--text-muted);"></i></div>
+        <button class="header-btn"><i data-lucide="building-2" style="width:14px;height:14px;"></i> Ecobank Ghana PLC</button>
+        <button class="header-btn"><i data-lucide="banknote" style="width:14px;height:14px;"></i> GHS</button>
+        <button class="header-btn"><i data-lucide="percent" style="width:14px;height:14px;"></i> GRR 24.5%</button>
+        <div class="user-pill"><div class="avatar">DA</div><span>Daniel Addo (CRO)</span><i data-lucide="chevron-down" style="width:14px;height:14px;color:var(--text-muted);"></i></div>
       </div>
     </header>
 
@@ -83,7 +109,7 @@
         <div class="card">
           <div class="card-header"><h3>Loan Parameters</h3></div>
           <div class="card-body">
-            <div class="form-group"><label class="form-label">EAD — Exposure at Default (EUR)</label><input type="number" class="form-input" id="ead" value="300000" step="1000"><div class="form-hint">Outstanding balance or committed amount</div></div>
+            <div class="form-group"><label class="form-label">EAD — Exposure at Default (GHS)</label><input type="number" class="form-input" id="ead" value="300000" step="1000"><div class="form-hint">Outstanding balance or committed amount</div></div>
             <div class="form-group"><label class="form-label">PD — Probability of Default</label><input type="number" class="form-input" id="pd" value="0.005" step="0.0001"><div class="form-hint">Annual PD (e.g., 0.005 = 50bps)</div></div>
             <div class="form-group"><label class="form-label">LGD — Loss Given Default</label><input type="number" class="form-input" id="lgd" value="0.20" step="0.01" max="1" min="0"><div class="form-hint">1 - Recovery Rate (e.g., 0.20 = 20% loss)</div></div>
             <div class="form-group"><label class="form-label">Stage</label>
@@ -109,7 +135,7 @@
           <div class="card mb-4">
             <div class="card-header"><h3>ECL Result</h3></div>
             <div class="card-body text-center">
-              <div style="font-size:2.5rem;font-weight:700;color:var(--primary);" id="eclValue">EUR 270</div>
+              <div style="font-size:2.5rem;font-weight:700;color:var(--primary);" id="eclValue">GHS 270</div>
               <div class="text-sm text-muted mb-3">Expected Credit Loss</div>
               <div class="grid grid-2">
                 <div class="p-3 rounded border" style="border-color:var(--border);">
@@ -152,7 +178,7 @@
         monthsRemaining: +document.getElementById('monthsRemaining').value
       };
       const r = calculateECL(inputs);
-      document.getElementById('eclValue').textContent = 'EUR ' + formatNumber(r.ecl);
+      document.getElementById('eclValue').textContent = 'GHS ' + formatNumber(r.ecl);
       document.getElementById('eclRatio').textContent = r.eclRatio.toFixed(3) + '%';
       document.getElementById('eclHorizon').textContent = r.horizon + '-month';
 
@@ -168,7 +194,7 @@
       if (scenarioChart) scenarioChart.destroy();
       scenarioChart = createBarChart('eclScenarioChart',
         scenarios.map(s => s.name),
-        [{ label: 'ECL (EUR)', data, backgroundColor: [ALM_COLORS.success, ALM_COLORS.primary, ALM_COLORS.warning, ALM_COLORS.danger], borderRadius: 4 }]
+        [{ label: 'ECL (GHS)', data, backgroundColor: [ALM_COLORS.success, ALM_COLORS.primary, ALM_COLORS.warning, ALM_COLORS.danger], borderRadius: 4 }]
       , { plugins: { legend: { display: false } } });
     }
 

@@ -48,6 +48,30 @@
           <a href="../expected-credit-loss/ecl-engine.html" class="nav-item">ECL Engine</a>
           <a href="../expected-credit-loss/sicr-monitor.html" class="nav-item">SICR Monitor</a>
         </div>
+        <div class="nav-item has-submenu"><i data-lucide="activity" class="nav-icon"></i><span class="nav-label">Recovery Planning</span><i data-lucide="chevron-right" class="nav-chevron" style="width:14px;height:14px;"></i></div>
+        <div class="nav-submenu">
+          <a href="../recovery-planning/index.html" class="nav-item">Recovery Dashboard</a>
+        </div>
+        <div class="nav-item has-submenu"><i data-lucide="lock" class="nav-icon"></i><span class="nav-label">GRC & Risk Framework</span><i data-lucide="chevron-right" class="nav-chevron" style="width:14px;height:14px;"></i></div>
+        <div class="nav-submenu">
+          <a href="../grc-risk-framework/index.html" class="nav-item">Risk Framework</a>
+        </div>
+        <div class="nav-item has-submenu"><i data-lucide="file-text" class="nav-icon"></i><span class="nav-label">Regulatory Reporting</span><i data-lucide="chevron-right" class="nav-chevron" style="width:14px;height:14px;"></i></div>
+        <div class="nav-submenu">
+          <a href="../regulatory-reporting/index.html" class="nav-item">ORASS</a>
+        </div>
+        <div class="nav-item has-submenu"><i data-lucide="brain" class="nav-icon"></i><span class="nav-label">Behavioural Models</span><i data-lucide="chevron-right" class="nav-chevron" style="width:14px;height:14px;"></i></div>
+        <div class="nav-submenu">
+          <a href="../behavioural-models/index.html" class="nav-item">Model Dashboard</a>
+        </div>
+        <div class="nav-item has-submenu"><i data-lucide="shield-check" class="nav-icon"></i><span class="nav-label">Cyber Security</span><i data-lucide="chevron-right" class="nav-chevron" style="width:14px;height:14px;"></i></div>
+        <div class="nav-submenu">
+          <a href="../cyber-security/index.html" class="nav-item">Security Posture</a>
+        </div>
+        <div class="nav-item has-submenu"><i data-lucide="zap" class="nav-icon"></i><span class="nav-label">RTGS & Intraday Liquidity</span><i data-lucide="chevron-right" class="nav-chevron" style="width:14px;height:14px;"></i></div>
+        <div class="nav-submenu">
+          <a href="../rtgs-intraday-liquidity/index.html" class="nav-item">RTGS Monitor</a>
+        </div>
       </div>
       <div class="nav-section">
         <div class="nav-section-title">Pricing & Optimization</div>
@@ -72,8 +96,10 @@
       </div>
       <div class="header-actions">
         <button class="header-btn"><i data-lucide="calendar" style="width:14px;height:14px;"></i> 25 Jun 2026</button>
-        <button class="header-btn"><i data-lucide="building-2" style="width:14px;height:14px;"></i> Group Consolidated</button>
-        <div class="user-pill"><div class="avatar">JD</div><span>John Doe</span><i data-lucide="chevron-down" style="width:14px;height:14px;color:var(--text-muted);"></i></div>
+        <button class="header-btn"><i data-lucide="building-2" style="width:14px;height:14px;"></i> Ecobank Ghana PLC</button>
+        <button class="header-btn"><i data-lucide="banknote" style="width:14px;height:14px;"></i> GHS</button>
+        <button class="header-btn"><i data-lucide="percent" style="width:14px;height:14px;"></i> GRR 24.5%</button>
+        <div class="user-pill"><div class="avatar">DA</div><span>Daniel Addo (CRO)</span><i data-lucide="chevron-down" style="width:14px;height:14px;color:var(--text-muted);"></i></div>
       </div>
     </header>
 
@@ -166,21 +192,21 @@
           <div class="tab-panel" data-panel="counterparties">
             <table class="data-table" id="cpTable">
               <thead>
-                <tr><th data-sort="0">CPTY ID</th><th data-sort="1">Name</th><th data-sort="2">Type</th><th data-sort="3">Rating</th><th data-sort="4">Exposure (EUR M)</th></tr>
+                <tr><th data-sort="0">CPTY ID</th><th data-sort="1">Name</th><th data-sort="2">Type</th><th data-sort="3">Rating</th><th data-sort="4">Exposure (GHS M)</th></tr>
               </thead>
               <tbody>
-                <tr><td>C-10001</td><td>Deutsche Industrie AG</td><td>Corporate</td><td>BBB</td><td>125.4</td></tr>
-                <tr><td>C-10002</td><td>Müller GmbH</td><td>SME</td><td>BB+</td><td>45.2</td></tr>
-                <tr><td>C-10003</td><td>Bundesrepublik Deutschland</td><td>Sovereign</td><td>AAA</td><td>890.0</td></tr>
-                <tr><td>C-10004</td><td>Schmidt Family</td><td>Retail</td><td>N/A</td><td>0.8</td></tr>
-                <tr><td>C-10005</td><td>European Investment Bank</td><td>MDB</td><td>AAA</td><td>340.5</td></tr>
+                <tr><td>C-10001</td><td>Golden Star Mining Ltd</td><td>Corporate</td><td>BBB</td><td>125.4</td></tr>
+                <tr><td>C-10002</td><td>Adom Foods Ltd</td><td>SME</td><td>BB+</td><td>45.2</td></tr>
+                <tr><td>C-10003</td><td>Government of Ghana</td><td>Sovereign</td><td>AAA</td><td>890.0</td></tr>
+                <tr><td>C-10004</td><td>Asante Family</td><td>Retail</td><td>N/A</td><td>0.8</td></tr>
+                <tr><td>C-10005</td><td>African Development Bank</td><td>MDB</td><td>AAA</td><td>340.5</td></tr>
               </tbody>
             </table>
           </div>
           <div class="tab-panel" data-panel="contracts">
             <table class="data-table" id="contractsTable">
               <thead>
-                <tr><th data-sort="0">Contract ID</th><th data-sort="1">Product</th><th data-sort="2">Notional (EUR M)</th><th data-sort="3">Maturity</th><th data-sort="4">Stage</th></tr>
+                <tr><th data-sort="0">Contract ID</th><th data-sort="1">Product</th><th data-sort="2">Notional (GHS M)</th><th data-sort="3">Maturity</th><th data-sort="4">Stage</th></tr>
               </thead>
               <tbody>
                 <tr><td>CTR-2024-001</td><td>Fixed-Rate Mortgage</td><td>0.32</td><td>15 Aug 2044</td><td><span class="badge badge-success">Stage 1</span></td></tr>
@@ -220,19 +246,19 @@
               <div style="display:flex;flex-direction:column;gap:10px;">
                 <div class="p-4 rounded-lg border" style="border-color:var(--border);border-left:3px solid var(--danger);">
                   <div class="font-medium">Update deposit beta assumptions post-rate cut</div>
-                  <div class="text-sm text-muted">Owner: T. Weber · Due: 28 Jun 2026</div>
+                  <div class="text-sm text-muted">Owner: T. Owusu · Due: 28 Jun 2026</div>
                 </div>
                 <div class="p-4 rounded-lg border" style="border-color:var(--border);border-left:3px solid var(--warning);">
-                  <div class="font-medium">Validate IRRBB model against EBA criteria</div>
-                  <div class="text-sm text-muted">Owner: M. Schmidt · Due: 15 Jul 2026</div>
+                  <div class="font-medium">Validate IRRBB model against BoG criteria</div>
+                  <div class="text-sm text-muted">Owner: D. Addo · Due: 15 Jul 2026</div>
                 </div>
                 <div class="p-4 rounded-lg border" style="border-color:var(--border);border-left:3px solid var(--warning);">
                   <div class="font-medium">Document operational deposit classification</div>
-                  <div class="text-sm text-muted">Owner: L. Fischer · Due: 05 Jul 2026</div>
+                  <div class="text-sm text-muted">Owner: L. Mensah · Due: 05 Jul 2026</div>
                 </div>
                 <div class="p-4 rounded-lg border" style="border-color:var(--border);border-left:3px solid var(--success);">
-                  <div class="font-medium">Complete CRR3 output floor parallel run</div>
-                  <div class="text-sm text-muted">Owner: K. Bauer · Due: 30 Jun 2026</div>
+                  <div class="font-medium">Complete BoG output floor parallel run</div>
+                  <div class="text-sm text-muted">Owner: K. Asante · Due: 30 Jun 2026</div>
                 </div>
               </div>
             </div>

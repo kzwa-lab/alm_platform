@@ -4,47 +4,97 @@
 
 ### 1.1 Purpose
 
-The ALM (Asset and Liability Management) Platform is a unified, web-based operational system for European banking groups to manage liquidity risk, interest rate risk, capital adequacy, expected credit losses, funds transfer pricing, and balance sheet optimization. It replaces fragmented spreadsheets and siloed reporting tools with a single source of truth, enabling real-time regulatory compliance, strategic decision-making, and ALCO (Asset and Liability Committee) workflow orchestration.
+The ALM (Asset and Liability Management) Platform is a unified, web-based operational system for Ghanaian banks and Specialised Deposit-Taking Institutions (SDIs) to comply with the Bank of Ghana (BoG) 2026 Prudential Reform Package. It replaces fragmented spreadsheets and siloed reporting tools with a single source of truth, enabling real-time regulatory compliance, strategic decision-making, and ALCO (Asset and Liability Committee) workflow orchestration.
+
+The platform is engineered as the technical backbone for five interlocking regulatory instruments:
+- **Liquidity Monitoring Tools Directive (LMTD)** — six mandated liquidity metrics and four prudential ratios
+- **Liquidity Risk Management Directive (LRMD)** — governance, stress testing, CFPs, intraday liquidity
+- **IRRBB Guideline** — standardised EVE and NII measurement, 19-bucket slotting, outlier test
+- **Recovery Planning Directive (RPD)** — recovery indicators, triggers, options menu, real-time MIS
+- **Risk Management Directive (RMD 2021)** — three lines of defence, CRO independence, audit trails, limits
 
 The platform serves as the nerve center for:
-- **Regulatory compliance**: LCR, NSFR, IRRBB, FRTB, IFRS 9 ECL, Basel III/IV capital ratios
+- **Regulatory compliance**: BoG LMTD ratios, LRMD governance, IRRBB SOT, recovery triggers, RMD controls
 - **Strategic planning**: NIM forecasting, capital allocation, FTP optimization, balance sheet growth
 - **Risk management**: Real-time risk metrics, stress testing, scenario analysis, hedge effectiveness
-- **Operational workflow**: ALCO meetings, action item tracking, model validation, audit trails
+- **Operational workflow**: ALCO meetings, action item tracking, model validation, audit trails, BoG submissions
 
-**Regulatory drivers**: BCBS Basel III finalization (CRR3/CRD6 in EU, effective Jan 2025), IFRS 9 Impairment (post-implementation review completed Jul 2024), BCBS IRRBB recalibrated shocks (effective Jan 2026), EBA Guidelines on IRRBB and CSRBB, EBA Fourth LCR/NSFR Monitoring Report (May 2025).
+**Regulatory drivers**: Bank of Ghana 2026 Prudential Reform Package (exposure drafts issued February 2026, effective 1 January 2027, systems alignment deadline 31 December 2026). The parallel Cyber & Information Security Directive (CISD 2026) mandates in-country hosting, ISO 27001 / NIST alignment, quarterly penetration testing, and board-level cyber reporting.
+
+**Configuration-over-code thesis**: Because the five instruments are exposure drafts open for comment until 30 June 2026, every threshold, time-bucket definition, behavioural assumption, shock factor, and report template is treated as versioned configuration data — not hard-coded logic. Finalisation of the drafts becomes a configuration change, not a rebuild.
 
 ### 1.2 Users & Roles
 
 | Role | Responsibilities | Primary Modules |
 |------|---------------|-----------------|
 | **ALCO Member** | Attend ALCO meetings, review dashboards, approve strategic decisions, vote on motions | All modules (read-only + approval actions) |
-| **Treasurer** | Manage liquidity position, execute funding strategy, monitor LCR/NSFR, run FTP curves, oversee yield curve management | Liquidity Risk, FTP, Interest Rate Risk, Balance Sheet Optimization |
+| **Treasurer** | Manage liquidity position, execute funding strategy, monitor BoG ratios, run FTP curves, oversee yield curve management | Liquidity Risk, FTP, Interest Rate Risk, Balance Sheet Optimization |
 | **Risk Manager** | Calculate and monitor risk metrics, run stress tests, validate models, produce regulatory reports | Liquidity Risk, Interest Rate Risk, Capital Management, ECL |
-| **Model Validator** | Independently validate risk models, sign off on model changes, track validation findings, coordinate with ECB/TRIM processes | ECL, Interest Rate Risk, Capital Management, Liquidity Risk (validation view) |
-| **Compliance Officer** | Ensure regulatory reporting accuracy, track CRR3/CRD6 compliance, manage audit trails, liaise with supervisors | All modules (compliance view), Data Foundation |
+| **Model Validator** | Independently validate risk models, sign off on model changes, track validation findings, coordinate with BoG model risk reviews | ECL, Interest Rate Risk, Capital Management, Liquidity Risk (validation view) |
+| **Compliance Officer** | Ensure regulatory reporting accuracy, track BoG directive compliance, manage audit trails, liaise with supervisors, coordinate ORASS submissions | All modules (compliance view), Data Foundation, Regulatory Reporting |
 | **Business Unit Head** | Review BU-level profitability, pricing guidance, deposit/loan pricing decisions, NIM attribution | FTP, Balance Sheet Optimization, ECL (portfolio view) |
-| **Finance/Accounting** | ECL provisioning, IFRS 9 disclosures, capital stack reporting, ICAAP support | ECL, Capital Management |
-| **Data Engineer** | Manage data pipelines, master data quality, ETL orchestration, feed monitoring | Data Foundation |
+| **Finance/Accounting** | ECL provisioning, IFRS 9 disclosures, capital stack reporting, ICAAP/ILAAP support | ECL, Capital Management |
+| **Data Engineer** | Manage data pipelines, master data quality, ETL orchestration, feed monitoring, RTGS integration | Data Foundation |
+| **CISO** | Own security control framework, lead incident response, manage pen-testing, report to Board | Cyber Security & Data Residency |
+| **CRO** | Independent risk oversight, no dual-hatting, direct Board reporting, limit framework governance | GRC Risk Framework |
 
-**Role-based access control (RBAC)**: Every screen, button, API endpoint, and data field is gated by role. Permissions are managed via a Supabase Row-Level Security (RLS) policy matrix.
+**Role-based access control (RBAC)**: Every screen, button, API endpoint, and data field is gated by role. Permissions are managed via a Supabase Row-Level Security (RLS) policy matrix. The RBAC model enforces the Three Lines of Defence required by RMD 2021, including CRO independence (no dual-hatting as CFO, COO, or Internal Audit) and front/back-office segregation. See `09-grc-risk-framework.md` for the detailed GRC RBAC specification.
 
 ### 1.3 Dependencies
 
 **External Systems**:
-- Core Banking System (GL, subledgers) — daily balance feeds
-- Loan Origination System — contract-level loan data
-- Deposit/Mortgage System — deposit balances, early redemption data
-- Market Data Provider (e.g., Bloomberg, Refinitiv) — yield curves, swap rates, credit spreads, equity prices
-- Collateral Management System — HQLA inventory, encumbrance status
+- Core Banking System (CBS, GL, subledgers) — daily balance feeds, account types, deposit/loan positions
+- Treasury / Dealing System — money-market placements, FX positions, sovereign debt securities, derivatives
+- RTGS / Settlement System — real-time intraday settlement balances and throughput (critical for LRMD)
+- Market Data Provider — yield curves (Ghana Reference Rate, GoG T-bills/bonds), FX rates, GSE equity prices, CDS spreads
+- Collateral Management System — HQLA inventory, encumbrance status, available unencumbered assets
 - Derivatives Trading System — IRS, caps, floors, swaption positions
-- HR/Org System — user provisioning, BU hierarchy
-- Regulatory Reporting Hub — ECB, national supervisor submission portals
+- HR/Org System — user provisioning, BU hierarchy, role assignments
+- General Ledger — capital tier structures, reserves, period-end financial ledger
+- Regulatory Reporting Hub (ORASS) — Bank of Ghana Online Regulatory and Analytical Surveillance Software submission portal
 
 **Internal Platform Dependencies**:
 - Data Foundation (`01-data-foundation.md`) is the prerequisite for all other modules
+- Cyber Security & Data Residency (`12-cyber-security-data-residency.md`) constrains all infrastructure and hosting decisions
+- GRC Risk Framework (`09-grc-risk-framework.md`) governs RBAC, segregation of duties, and audit trails
 - Calculation Engine (Python/FastAPI microservices) shared across Liquidity, IRRBB, Capital, ECL, FTP
-- Workflow Engine (Supabase triggers + Edge Functions) shared for ALCO, Model Validation, PMA approvals
+- Workflow Engine (Supabase triggers + Edge Functions) shared for ALCO, Model Validation, PMA approvals, Board approvals
+- Rules & Configuration Repository — versioned store for all thresholds, buckets, shock factors, behavioural scalars, and report templates
+
+### 1.4 Existing System Context & Upgrade Thesis
+
+The platform replaces a functionally rich, domain-heavy Angular ALM workbench (`kimiALM` legacy) that already covered the full ALM lifecycle: trial-balance ingestion, XTEL instrument feeds, per-deal cashflow projection, integrated three-statement reporting (balance sheet, income statement, cashflow statement), and regulatory metrics including LCR, NSFR, FTP, and liquidity stress testing.
+
+**Preserved legacy strengths**:
+- Per-deal cashflow projection engine with day-count conventions (365/364/360/1/12), repricing, rollover, and maturity handling.
+- Integrated BS / IS / CF generation from the same cashflow set, ensuring internal consistency.
+- Strategy × rate cross-join for scenario comparison (e.g., NewBusiness, MinTarget).
+- Multi-dimensional drag-and-drop reporting by Product Group, Business Unit, Currency, Balance Sheet Group, and ALM Code.
+- Trial-balance / XTEL reconciliation control tower with matched/unmatched reporting.
+- Configurable time buckets for gap and balance-sheet reports.
+- Tracker/checklist workflow for data-quality gates.
+
+**Upgrade thesis**:
+- Move the cashflow/runoff engine and aggregation logic from the frontend into a server-side analytics service.
+- Unify the data model around instrument-level positions, yield curves, assumption sets, and versioned runs.
+- Replace hard-coded reports with live, auditable calculations sourced from the engine.
+- Introduce a single Scenario & Assumption Manager for rate paths, behavioural assumptions (NMD decay, CPR, TDRR), and business strategies.
+- Keep the UI as a thin, persona-driven reporting and workflow layer.
+- Add a dedicated IRRBB / Duration Gap module with limit monitoring, audit trails, and RAG status.
+- Integrate with the BoG 2026 configuration-over-code rules repository so that draft changes are absorbed as configuration updates.
+- Add recovery planning, GRC risk framework, and regulatory reporting modules to satisfy the full BoG package.
+
+### 1.5 Module-to-Directive Mapping
+
+| BoG Directive | PRD Module(s) | Key Deliverables |
+|---------------|---------------|------------------|
+| LMTD (Liquidity Monitoring Tools) | `02-liquidity-risk.md`, `13-rtgs-intraday-liquidity.md` | Four prudential ratios (Narrow/Broad), 13-band maturity mismatch, funding concentration, significant-currency LCR, market-related tools, intraday monitor |
+| LRMD (Liquidity Risk Management) | `02-liquidity-risk.md`, `13-rtgs-intraday-liquidity.md`, `09-grc-risk-framework.md` | CFP, stress testing, ILAAP/LAS, board governance, intraday system capability |
+| IRRBB Guideline | `03-interest-rate-risk.md`, `11-behavioural-model-library.md` | 19-bucket standardised framework, EVE/NII, SOT, basis risk, yield-curve risk |
+| Recovery Planning Directive | `08-recovery-planning.md` | Recovery plan repository, indicators, triggers, options menu, real-time MIS |
+| RMD 2021 (Risk Management) | `09-grc-risk-framework.md`, `12-cyber-security-data-residency.md` | Digitised RMF, 3LoD, CRO independence, segregation, limits, audit trails, board declarations |
+| CISD 2026 (Cyber & Info Security) | `12-cyber-security-data-residency.md` | In-country hosting, ISO 27001/NIST, quarterly pen testing, board cyber reporting |
+| Reporting & Supervisory | `10-regulatory-reporting-orass.md` | BoG templates, ORASS integration, submission scheduler, public disclosures |
 
 ## 2. Features
 
@@ -95,10 +145,13 @@ The ALCO Cockpit is the landing page for all ALCO Members and the Treasurer. It 
 
 #### Data Inputs
 - LCR/NSFR calculated values (from Liquidity Risk module)
+- BoG prudential ratio calculated values (from Liquidity Risk module — Narrow/Broad ratios)
 - Capital ratio calculated values (from Capital Management module)
 - ECL provision totals (from ECL module)
 - NIM actuals and budget (from Balance Sheet Optimization module)
 - EVE shock results (from Interest Rate Risk module)
+- Recovery indicator status (from Recovery Planning module)
+- Intraday liquidity snapshot (from RTGS Intraday module)
 - ALCO action items (from Data Foundation workflow engine)
 - Data quality rule results (from Data Foundation validation engine)
 - User role metadata (from Supabase auth/roles table)
@@ -106,10 +159,13 @@ The ALCO Cockpit is the landing page for all ALCO Members and the Treasurer. It 
 #### Calculation Logic / Business Rules
 - LCR = HQLA / Net Cash Outflows × 100 (CRR Article 412)
 - NSFR = ASF / RSF × 100 (CRR Article 413)
+- BoG Narrow Liquid Assets / Volatile Liabilities ≥ 80% (banks) / ≥ 90% (SDIs)
+- BoG Broad Liquid Assets / Total Deposits ≥ 80% (banks) / ≥ 70% (SDIs)
 - CET1 Ratio = CET1 Capital / RWA × 100
 - NIM = (Interest Income - Interest Expense) / Average Earning Assets × 100
 - EVE impact: ΔEVE = ΔPV(Assets) - ΔPV(Liabilities) under each shock scenario
-- Traffic-light thresholds: LCR < 110% amber, < 100% red; NSFR < 110% amber, < 100% red; CET1 < 7% amber, < 4.5% red; EVE shock > 15% of Tier 1 capital red
+- Supervisory Outlier Test: ΔEVE decline > 15% of Tier 1 Capital → outlier alert
+- Traffic-light thresholds: LCR < 110% amber, < 100% red; NSFR < 110% amber, < 100% red; CET1 < 7% amber, < 4.5% red; EVE shock > 15% of Tier 1 capital red; BoG ratio breach red
 
 #### Validation Rules
 - All KPIs must have a data freshness indicator; stale data (> 48h for daily KPIs) triggers an amber warning on the card
@@ -125,15 +181,18 @@ The ALCO Cockpit is the landing page for all ALCO Members and the Treasurer. It 
 - Every dashboard view is logged: user ID, timestamp, role, IP address (for session correlation), which KPIs were clicked
 - KPI value snapshots are retained for 7 years (regulatory requirement for supervisory review)
 - Audit trail entries are immutable and written to a separate append-only Supabase table with RLS preventing modification
+- Recovery indicator snapshots retained for 7 years
+- Intraday liquidity snapshots retained for 1 year
 
 ### 2.2 User Management & RBAC
 
 #### Description
-Administrative interface for provisioning users, assigning roles, managing role permissions, and reviewing user activity. Only Compliance Officers and designated Platform Administrators have write access.
+Administrative interface for provisioning users, assigning roles, managing role permissions, and reviewing user activity. Only Compliance Officers and designated Platform Administrators have write access. The RBAC model enforces the Three Lines of Defence required by RMD 2021, including CRO independence (no dual-hatting as CFO, COO, or Internal Audit) and front/back-office segregation.
 
 #### User Stories
 - **As a Compliance Officer**, I want to add a new ALCO Member and assign them read-only access to Liquidity Risk and Interest Rate Risk modules, so that they can participate in ALCO meetings with appropriate data access.
 - **As a Platform Administrator**, I want to create a custom role "Liquidity Risk Analyst" with specific permissions (view LCR, edit stress scenarios, but not approve CFP triggers), so that I can implement the principle of least privilege.
+- **As a CISO**, I want the system to block any attempt to assign the CRO role to a user who already holds CFO, COO, or Internal Audit roles, so that RMD 2021 independence is enforced at the system level.
 
 #### Acceptance Criteria
 1. User creation form enforces email verification before first login
@@ -141,6 +200,10 @@ Administrative interface for provisioning users, assigning roles, managing role 
 3. Permission changes take effect within 60 seconds (Supabase RLS refresh)
 4. Deactivated users lose access immediately but their historical audit trail remains intact
 5. Bulk import from HR/Org system CSV is supported (max 100 users per batch)
+6. Segregation of Duties: the system blocks conflicting role pairs at the database level (e.g., CRO + CFO, Front Office + Back Office, Model Developer + Model Validator)
+7. CRO role cannot be assigned to any user holding CFO, COO, or Internal Audit roles (RMD 2021)
+8. Front-office users cannot be assigned back-office permissions (RMD 2021)
+9. Quarterly user access review report is auto-generated for Compliance Officer and CISO sign-off
 
 #### Screen Layout Description
 - **Left panel**: User directory tree (expandable by role, department, BU)
@@ -158,11 +221,18 @@ Administrative interface for provisioning users, assigning roles, managing role 
 - Supabase RLS policies are auto-generated from the permissions matrix and applied to every table
 - A user can have only one primary role but multiple secondary roles (e.g., "Risk Manager" + "Model Validator" requires explicit approval from Compliance Officer)
 - Segregation of Duties: a user cannot be both "Model Developer" and "Model Validator" for the same model family
+- RMD 2021 segregation rules enforced at the IdP/database level:
+  - CRO cannot hold CFO, COO, or Internal Audit roles
+  - Front-office users cannot have back-office permissions
+  - All conflicting role pairs are blocked at assignment time with an explanatory error message
+- Three Lines of Defence model: roles tagged as 1st Line (business), 2nd Line (risk/compliance), or 3rd Line (internal audit); cross-line assignments require Board Risk Committee approval
 
 #### Validation Rules
-- Email must be unique and within the bank's domain (e.g., `@bankname.eu`)
-- Role must be selected from the approved role catalog (no custom roles without Compliance Officer approval)
+- Email must be unique and within the bank's domain (e.g., `@bankname.com.gh`)
+- Role must be selected from the approved role catalog (no custom roles without Compliance Officer and CISO approval)
 - At least one module must be assigned per user
+- Conflicting role pair assignment must be rejected with a clear explanation and logged for audit
+- CRO role assignment requires Board Risk Committee approval and is logged as a high-priority audit event
 
 #### Error Handling
 - Duplicate email: Show error message with a link to the existing user record
@@ -171,16 +241,20 @@ Administrative interface for provisioning users, assigning roles, managing role 
 #### Audit & Compliance Requirements
 - All user provisioning, role changes, and deactivations are logged with before/after values
 - Segregation of Duties rules are enforced at the database level with a trigger that blocks conflicting role assignments
-- Quarterly user access review report is auto-generated for Compliance Officer sign-off
+- RMD 2021 CRO independence and front/back-office segregation violations are logged as critical audit events
+- Quarterly user access review report is auto-generated for Compliance Officer and CISO sign-off
+- Access review evidence retained for 7 years
 
 ### 2.3 System Administration & Configuration
 
 #### Description
-Platform-level configuration management: tenant settings (multi-bank group support), currency defaults, fiscal calendar, calculation engine parameters, notification settings, and integration endpoint management.
+Platform-level configuration management: tenant settings (multi-bank group support), currency defaults, fiscal calendar, calculation engine parameters, notification settings, and integration endpoint management. The configuration store is the central "rules repository" that implements the configuration-over-code design principle: every threshold, time-bucket definition, behavioural assumption, shock factor, and report template is versioned configuration, not code.
 
 #### User Stories
-- **As a Platform Administrator**, I want to configure the fiscal year end (e.g., 31 December) and the reporting currency (EUR), so that all reports use consistent date and currency conventions.
-- **As a Treasurer**, I want to set the LCR calculation frequency (daily vs. real-time) and the HQLA haircut rounding precision, so that the system matches our regulatory submission methodology.
+- **As a Platform Administrator**, I want to configure the fiscal year end (e.g., 31 December) and the reporting currency (GHS), so that all reports use consistent date and currency conventions.
+- **As a Treasurer**, I want to set the BoG prudential ratio calculation frequency and the Narrow/Broad liquid asset rounding precision, so that the system matches our regulatory submission methodology.
+- **As a Compliance Officer**, I want to update a BoG report template when the regulator revises the exposure draft, so that the change is a configuration update rather than a code release.
+- **As a Risk Manager**, I want to version-control all behavioural assumptions (NMD decay, CPR, TDRR) so that I can reproduce any historical calculation from the exact assumptions in force at that time.
 
 #### Acceptance Criteria
 1. Configuration changes require two-person approval (Maker-Checker) for critical parameters (e.g., calculation engine thresholds, regulatory rounding rules)
@@ -189,10 +263,12 @@ Platform-level configuration management: tenant settings (multi-bank group suppo
 4. Multi-tenancy: a single platform instance can serve multiple legal entities (e.g., banking group subsidiaries) with isolated data and shared group-level reporting
 
 #### Screen Layout Description
-- **Tabs**: General Settings, Fiscal Calendar, Calculation Parameters, Integration Endpoints, Notification Rules, Tenant Management
-- **General Settings**: Currency, language, date format, number format (thousands separator, decimal places), timezone
-- **Fiscal Calendar**: Month-end dates, quarter-end dates, year-end close date, holiday calendar for each jurisdiction (affects business day calculations for yield curves, cash flows)
-- **Calculation Parameters**: LCR/NSFR rounding precision, EVE shock calibration parameters, ECL staging thresholds, FTP curve interpolation method
+- **Tabs**: General Settings, Fiscal Calendar, Calculation Parameters, Integration Endpoints, Notification Rules, Tenant Management, Rules Repository, Report Templates
+- **General Settings**: Currency (GHS default), language, date format, number format (thousands separator, decimal places), timezone (Africa/Accra)
+- **Fiscal Calendar**: Month-end dates, quarter-end dates, year-end close date, holiday calendar for Ghana (affects business day calculations for yield curves, cash flows)
+- **Calculation Parameters**: BoG prudential ratio rounding precision, LCR/NSFR rounding, EVE shock calibration parameters (Ghana Reference Rate), ECL staging thresholds, FTP curve interpolation method, behavioural model caps (NMD core ratio, CPR, TDRR)
+- **Rules Repository**: Versioned list of all thresholds, time buckets, shock factors, behavioural scalars, and regulatory parameters; each rule has a version, effective date, and approval chain
+- **Report Templates**: BoG-prescribed Excel/XML templates for LMTD, LRMD, IRRBB, Recovery; versioned and mapped to template engine
 - **Integration Endpoints**: List of connected systems with status (green/amber/red), last sync timestamp, error log, "Test Connection" button, "Re-sync" button
 - **Notification Rules**: Channel configuration (email, in-app, Slack/Teams webhook) per alert type and role
 
@@ -209,13 +285,16 @@ Platform-level configuration management: tenant settings (multi-bank group suppo
 #### Validation Rules
 - Fiscal year end must be a valid date and must not change after the year has been closed (locked by accounting period)
 - Currency must be a valid ISO 4217 code
-- Calculation parameters must be within regulatory bounds (e.g., LCR rounding precision must be 0 or 1 decimal places per EBA guidance)
+- Calculation parameters must be within regulatory bounds (e.g., BoG prudential ratio rounding precision must be 0 or 1 decimal places per BoG guidance)
 - Integration endpoint URLs must be valid HTTPS URLs
+- Report template versions must be approved by Compliance Officer before activation
+- Rules repository changes must not conflict with currently active calculation runs
 
 #### Error Handling
-- Invalid parameter value: Inline validation error with a link to the regulatory reference explaining the valid range
+- Invalid parameter value: Inline validation error with a link to the BoG regulatory reference explaining the valid range
 - Rollback failure: If a rollback would conflict with newer dependent changes, show a warning and require manual resolution
 - Integration test failure: Display the HTTP error code and response body; provide a "Retry" button with exponential backoff
+- Report template version conflict: Block activation until the conflict is resolved by Compliance Officer
 
 #### Audit & Compliance Requirements
 - All configuration changes are logged with the full JSON diff (before/after)
@@ -258,6 +337,15 @@ Platform-level configuration management: tenant settings (multi-bank group suppo
 | `deal_pricing` | Deal-level profitability calculations | FTP |
 | `nim_attribution` | NIM decomposition data | Balance Sheet Optimization |
 | `what_if_scenarios` | User-defined scenario parameters | Balance Sheet Optimization |
+| `alm_bases` | ALM product buckets / codes (e.g., `CALL7D`, `LOANCAR`) | Data Foundation |
+| `alm_tb_maps` | Weighted mapping between ALM codes and GL/TB codes | Data Foundation |
+| `instruments` | Contract-level deal/position static data | Data Foundation |
+| `cash_flows` | Per-deal monthly projected cashflows | Analytics Engine |
+| `runs` | Versioned calculation runs (Draft → Submitted → Approved → Archived) | Analytics Engine |
+| `assumption_sets` | Versioned behavioral and rate assumptions | Interest Rate Risk / FTP |
+| `scenarios` | Rate-shock and business-growth scenarios | Interest Rate Risk / Balance Sheet Optimization |
+| `risk_limits` | Configurable risk-appetite limits with thresholds | Platform / All modules |
+| `time_bucket_definitions` | Configurable maturity bands for gap reports | Liquidity / IRRBB |
 
 ### 3.2 Key Attributes
 
@@ -316,6 +404,13 @@ Platform-level configuration management: tenant settings (multi-bank group suppo
 - `alco_action_items` → `users` (N:1, assignee)
 - `data_quality_results` → `data_quality_rules` (N:1)
 - `data_quality_results` → `tenants` (N:1)
+- `instruments` → `alm_bases` (N:1)
+- `cash_flows` → `instruments` (N:1)
+- `cash_flows` → `runs` (N:1)
+- `runs` → `assumption_sets` (N:1)
+- `runs` → `scenarios` (N:1)
+- `risk_limits` → `tenants` (N:1)
+- `time_bucket_definitions` → `tenants` (N:1)
 - All module-specific tables → `tenants` (N:1, for multi-tenancy)
 - All module-specific tables → `audit_logs` (1:N, via entity_type/entity_id polymorphic reference)
 
@@ -409,7 +504,7 @@ Platform-level configuration management: tenant settings (multi-bank group suppo
 **POST /api/v1/users** (Request):
 ```json
 {
-  "email": "jane.doe@bankname.eu",
+  "email": "jane.doe@bankname.com.gh",
   "full_name": "Jane Doe",
   "role_id": "role-alco-member-001",
   "tenant_id": "550e8400-e29b-41d4-a716-446655440000",
@@ -422,9 +517,9 @@ Platform-level configuration management: tenant settings (multi-bank group suppo
 ```json
 {
   "category": "calculation_parameters",
-  "key": "lcr_rounding_precision",
+  "key": "bog_narrow_ratio_rounding",
   "value": 1,
-  "reason": "EBA monitoring report requires 1 decimal place for LCR disclosure"
+  "reason": "BoG LMTD monitoring report requires 1 decimal place for prudential ratio disclosure"
 }
 ```
 
@@ -459,7 +554,7 @@ Platform-level configuration management: tenant settings (multi-bank group suppo
 - **Report generation**: < 30 seconds for standard reports (e.g., LCR daily report, ECL monthly report); < 5 minutes for complex reports (e.g., full ICAAP pack, comprehensive stress test)
 - **Concurrent users**: Support 50 concurrent users (ALCO + Treasury + Risk + Finance) with < 2s query response time
 - **Data ingestion**: Process daily balance sheet feed (100k rows) within 15 minutes; process market data feed (yield curves, 500 instruments) within 5 minutes
-- **Calculation engine**: LCR calculation for a mid-sized bank (€50bn balance sheet) in < 60 seconds; ECL batch for 100k loans in < 10 minutes
+- **Calculation engine**: LCR calculation for a mid-sized bank (GHS 50bn balance sheet) in < 60 seconds; ECL batch for 100k loans in < 10 minutes; BoG prudential ratio suite in < 30 seconds
 - **Database**: Supabase PostgreSQL with read replicas for reporting queries; pgBouncer for connection pooling
 - **Caching**: Redis for KPI caching (TTL: 1 hour for daily metrics, 5 minutes for real-time metrics); calculation result caching for 24 hours
 
@@ -471,16 +566,16 @@ Platform-level configuration management: tenant settings (multi-bank group suppo
 - **Audit**: Immutable audit log table (append-only, no UPDATE/DELETE); quarterly access review reports
 - **Network**: VPN or private VPC required for production access; API rate limiting (100 req/min per user, 1000 req/min per service account)
 - **Secrets**: API keys, database credentials, and integration passwords stored in a secrets manager (e.g., HashiCorp Vault or AWS Secrets Manager)
-- **Penetration testing**: Annual third-party penetration test; quarterly vulnerability scanning
-- **Compliance**: GDPR compliant (data subject access request workflow); data retention policies configurable per jurisdiction
+- **Penetration testing**: Quarterly third-party penetration test by BoG-approved firm; weekly vulnerability scanning; board cyber reporting quarterly
+- **Compliance**: CISD 2026 compliant (data residency, ISO 27001/NIST, quarterly pen testing, board cyber reporting); data retention policies configurable per jurisdiction; GDPR principles applied where relevant for international group entities
 
 ### 5.3 Availability
 
 - **Uptime target**: 99.9% (excluding scheduled maintenance windows)
-- **Scheduled maintenance**: Maximum 4 hours per month, announced 72 hours in advance, outside business hours (20:00–06:00 CET)
-- **Disaster recovery**: RPO < 1 hour, RTO < 4 hours; daily backups to geo-redundant storage; point-in-time recovery enabled (7-day retention)
-- **Monitoring**: Application performance monitoring (APM) with alerts for error rate > 1%, p95 latency > 5s, feed failure > 15 minutes
-- **Health checks**: `/api/v1/health` endpoint checks database connectivity, calculation engine status, and critical feed freshness
+- **Scheduled maintenance**: Maximum 4 hours per month, announced 72 hours in advance, outside business hours (20:00–06:00 GMT)
+- **Disaster recovery**: RPO < 1 hour, RTO < 4 hours; daily backups to geo-redundant storage within Ghana; point-in-time recovery enabled (7-day retention)
+- **Monitoring**: Application performance monitoring (APM) with alerts for error rate > 1%, p95 latency > 5s, feed failure > 15 minutes, security incident > 5 minutes
+- **Health checks**: `/api/v1/health` endpoint checks database connectivity, calculation engine status, critical feed freshness, and security control status
 - **Failover**: Hot standby for read replicas; calculation engine runs on Kubernetes with auto-scaling (min 2 pods, max 10 pods)
 
 ## 6. Reporting & Exports
@@ -492,33 +587,39 @@ Platform-level configuration management: tenant settings (multi-bank group suppo
 | ALCO Pack | Monthly | PDF (print-ready) + PowerPoint | ALCO Members, Board | All |
 | LCR Daily Report | Daily | PDF + Excel | Treasurer, Risk Manager, Compliance | Liquidity Risk |
 | NSFR Weekly Report | Weekly | PDF + Excel | Treasurer, Risk Manager | Liquidity Risk |
+| BoG LMTD Monthly Return | Monthly | Excel (BoG template) | Compliance → BoG/ORASS | Regulatory Reporting |
+| BoG IRRBB Quarterly Return | Quarterly | Excel (BoG template) | Compliance → BoG/ORASS | Regulatory Reporting |
+| Recovery Plan Annual Submission | Annual | PDF + Excel | Board → BoG | Recovery Planning |
 | ECL Monthly Report | Monthly | PDF + Excel + XBRL | Finance, Risk Manager, Compliance | ECL |
 | Capital Adequacy Report | Monthly | PDF + Excel | CFO, Risk Manager, Compliance | Capital Management |
 | IRRBB Regulatory Pack | Quarterly | PDF + Excel | Risk Manager, Compliance | Interest Rate Risk |
 | FTP Curve Change Notice | Ad-hoc (annual review + emergency) | PDF | Business Unit Heads, Treasurer | FTP |
 | Audit Trail Extract | Ad-hoc | CSV + PDF | Compliance Officer, Internal Audit | Platform |
+| Board Cyber Risk Report | Quarterly | PDF | Board Risk Committee | Cyber Security |
 
 ### 6.2 Export Capabilities
 
 - All tabular screens support CSV export (with UTF-8 BOM for Excel compatibility)
 - All charts support PNG/SVG export (high resolution for board presentations)
 - All reports support PDF generation (via headless Chromium/Puppeteer with Tailwind CSS print styles)
-- Regulatory reports support XBRL (e.g., EBA COREP/FINREP templates) where applicable
+- Regulatory reports support XBRL and BoG-prescribed Excel templates where applicable
 - Data extracts support date-range filtering, entity selection, and field selection (custom column sets)
 - Export size limit: 1M rows per CSV file; paginated extracts for larger datasets
 - All exports are logged in the audit trail with the filter criteria and row count
+- BoG template exports include metadata: version, assumption-set version, generation timestamp, and user ID
 
 ### 6.3 ALCO Pack Structure
 
 The monthly ALCO Pack is the flagship deliverable:
-1. **Executive Summary** (2 pages): KPI dashboard, traffic-light summary, key decisions required
-2. **Liquidity Risk** (4 pages): LCR/NSFR trends, stress test results, intraday liquidity snapshot, CFP status
-3. **Interest Rate Risk** (4 pages): EVE sensitivity, NII forecast, repricing gap, hedge portfolio summary
-4. **Capital Management** (3 pages): Capital ratios, RWA breakdown, output floor impact, capital plan
+1. **Executive Summary** (2 pages): KPI dashboard, traffic-light summary, key decisions required, recovery indicator status
+2. **Liquidity Risk** (4 pages): LCR/NSFR trends, BoG prudential ratios, stress test results, intraday liquidity snapshot, CFP status
+3. **Interest Rate Risk** (4 pages): EVE sensitivity, NII forecast, repricing gap (19 buckets), hedge portfolio summary, SOT status
+4. **Capital Management** (3 pages): Capital ratios, RWA breakdown, output floor impact, capital plan, ILAAP summary
 5. **ECL & Credit Risk** (3 pages): ECL by stage, SICR trends, PMA summary, backtesting results
-6. **FTP & Profitability** (3 pages): FTP curve, NIM attribution, deal-level profitability highlights
+6. **FTP & Profitability** (3 pages): FTP curve (Ghana Reference Rate), NIM attribution, deal-level profitability highlights
 7. **Balance Sheet Optimization** (3 pages): Structural hedging status, deposit pricing, loan origination guidance, what-if scenario results
-8. **ALCO Minutes & Actions** (2 pages): Last meeting minutes summary, open action items, upcoming agenda
-9. **Appendix** (variable): Detailed tables, sensitivity analysis, regulatory references
+8. **Recovery Planning** (2 pages): Recovery indicator dashboard, trigger status, options menu readiness
+9. **ALCO Minutes & Actions** (2 pages): Last meeting minutes summary, open action items, upcoming agenda
+10. **Appendix** (variable): Detailed tables, sensitivity analysis, regulatory references, BoG template mappings
 
-Total: 24+ pages, generated automatically from platform data with manual annotation fields for the Treasurer and Risk Manager.
+Total: 26+ pages, generated automatically from platform data with manual annotation fields for the Treasurer and Risk Manager.

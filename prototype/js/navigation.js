@@ -106,7 +106,13 @@ function generateBreadcrumbs() {
     'capital-management': 'Capital Management',
     'expected-credit-loss': 'Expected Credit Loss',
     'funds-transfer-pricing': 'Funds Transfer Pricing',
-    'balance-sheet-optimization': 'Balance Sheet Optimization'
+    'balance-sheet-optimization': 'Balance Sheet Optimization',
+    'recovery-planning': 'Recovery Planning',
+    'grc-risk-framework': 'GRC & Risk Framework',
+    'regulatory-reporting': 'Regulatory Reporting (ORASS)',
+    'behavioural-models': 'Behavioural Models',
+    'cyber-security': 'Cyber Security',
+    'rtgs-intraday-liquidity': 'RTGS & Intraday Liquidity'
   };
 
   const fileLabels = {
@@ -124,7 +130,13 @@ function generateBreadcrumbs() {
     'curve-builder.html': 'Curve Builder',
     'deal-pricer.html': 'Deal Pricer',
     'nim-dashboard.html': 'NIM Dashboard',
-    'hedging-tracker.html': 'Hedging Tracker'
+    'hedging-tracker.html': 'Hedging Tracker',
+    'recovery-plan.html': 'Recovery Plan',
+    'grc-framework.html': 'GRC Framework',
+    'orass-builder.html': 'ORASS Builder',
+    'behavioural-model.html': 'Behavioural Model',
+    'cyber-dashboard.html': 'Cyber Dashboard',
+    'rtgs-monitor.html': 'RTGS Monitor'
   };
 
   let html = `<a href="${getRelativePath('index.html')}">Home</a>`;

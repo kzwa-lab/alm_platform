@@ -48,6 +48,30 @@
           <a href="../expected-credit-loss/ecl-engine.html" class="nav-item">ECL Engine</a>
           <a href="../expected-credit-loss/sicr-monitor.html" class="nav-item">SICR Monitor</a>
         </div>
+        <div class="nav-item has-submenu"><i data-lucide="activity" class="nav-icon"></i><span class="nav-label">Recovery Planning</span><i data-lucide="chevron-right" class="nav-chevron" style="width:14px;height:14px;"></i></div>
+        <div class="nav-submenu">
+          <a href="../recovery-planning/index.html" class="nav-item">Recovery Dashboard</a>
+        </div>
+        <div class="nav-item has-submenu"><i data-lucide="lock" class="nav-icon"></i><span class="nav-label">GRC & Risk Framework</span><i data-lucide="chevron-right" class="nav-chevron" style="width:14px;height:14px;"></i></div>
+        <div class="nav-submenu">
+          <a href="../grc-risk-framework/index.html" class="nav-item">Risk Framework</a>
+        </div>
+        <div class="nav-item has-submenu"><i data-lucide="file-text" class="nav-icon"></i><span class="nav-label">Regulatory Reporting</span><i data-lucide="chevron-right" class="nav-chevron" style="width:14px;height:14px;"></i></div>
+        <div class="nav-submenu">
+          <a href="../regulatory-reporting/index.html" class="nav-item">ORASS</a>
+        </div>
+        <div class="nav-item has-submenu"><i data-lucide="brain" class="nav-icon"></i><span class="nav-label">Behavioural Models</span><i data-lucide="chevron-right" class="nav-chevron" style="width:14px;height:14px;"></i></div>
+        <div class="nav-submenu">
+          <a href="../behavioural-models/index.html" class="nav-item">Model Dashboard</a>
+        </div>
+        <div class="nav-item has-submenu"><i data-lucide="shield-check" class="nav-icon"></i><span class="nav-label">Cyber Security</span><i data-lucide="chevron-right" class="nav-chevron" style="width:14px;height:14px;"></i></div>
+        <div class="nav-submenu">
+          <a href="../cyber-security/index.html" class="nav-item">Security Posture</a>
+        </div>
+        <div class="nav-item has-submenu"><i data-lucide="zap" class="nav-icon"></i><span class="nav-label">RTGS & Intraday Liquidity</span><i data-lucide="chevron-right" class="nav-chevron" style="width:14px;height:14px;"></i></div>
+        <div class="nav-submenu">
+          <a href="../rtgs-intraday-liquidity/index.html" class="nav-item">RTGS Monitor</a>
+        </div>
       </div>
       <div class="nav-section">
         <div class="nav-section-title">Pricing & Optimization</div>
@@ -70,8 +94,10 @@
       <div class="logo-area"><span style="font-weight:600;color:var(--text);">Asset &amp; Liability Management</span></div>
       <div class="header-actions">
         <button class="header-btn"><i data-lucide="calendar" style="width:14px;height:14px;"></i> 25 Jun 2026</button>
-        <button class="header-btn"><i data-lucide="building-2" style="width:14px;height:14px;"></i> Group Consolidated</button>
-        <div class="user-pill"><div class="avatar">JD</div><span>John Doe</span><i data-lucide="chevron-down" style="width:14px;height:14px;color:var(--text-muted);"></i></div>
+        <button class="header-btn"><i data-lucide="building-2" style="width:14px;height:14px;"></i> Ecobank Ghana PLC</button>
+        <button class="header-btn"><i data-lucide="banknote" style="width:14px;height:14px;"></i> GHS</button>
+        <button class="header-btn"><i data-lucide="percent" style="width:14px;height:14px;"></i> GRR 24.5%</button>
+        <div class="user-pill"><div class="avatar">DA</div><span>Daniel Addo (CRO)</span><i data-lucide="chevron-down" style="width:14px;height:14px;color:var(--text-muted);"></i></div>
       </div>
     </header>
 
@@ -83,8 +109,8 @@
         <div class="card">
           <div class="card-header"><h3>Forecast Inputs</h3></div>
           <div class="card-body">
-            <div class="form-group"><label class="form-label">Total Earning Assets (EUR M)</label><input type="number" class="form-input" id="earningAssets" value="8000" step="100"></div>
-            <div class="form-group"><label class="form-label">Interest-Bearing Liabilities (EUR M)</label><input type="number" class="form-input" id="intLiabs" value="7500" step="100"></div>
+            <div class="form-group"><label class="form-label">Total Earning Assets (GHS M)</label><input type="number" class="form-input" id="earningAssets" value="8000" step="100"></div>
+            <div class="form-group"><label class="form-label">Interest-Bearing Liabilities (GHS M)</label><input type="number" class="form-input" id="intLiabs" value="7500" step="100"></div>
             <div class="form-group"><label class="form-label">Current Asset Yield (%)</label><input type="number" class="form-input" id="assetYield" value="4.20" step="0.01"></div>
             <div class="form-group"><label class="form-label">Current Liability Cost (%)</label><input type="number" class="form-input" id="liabCost" value="1.80" step="0.01"></div>
             <div class="form-group"><label class="form-label">Asset Beta (repricing speed)</label><input type="number" class="form-input" id="assetBeta" value="0.85" step="0.05" max="1" min="0"><div class="form-hint">0 = fixed, 1 = instant reprice</div></div>
@@ -114,9 +140,9 @@
         <div class="card-header"><h3>Forecast Summary</h3></div>
         <div class="card-body">
           <div class="grid grid-4">
-            <div class="text-center"><div class="text-sm text-muted">Current NII (Annual)</div><div class="text-2xl font-bold" id="currNII">EUR 201M</div></div>
+            <div class="text-center"><div class="text-sm text-muted">Current NII (Annual)</div><div class="text-2xl font-bold" id="currNII">GHS 201M</div></div>
             <div class="text-center"><div class="text-sm text-muted">Current NIM</div><div class="text-2xl font-bold" id="currNIM">2.51%</div></div>
-            <div class="text-center"><div class="text-sm text-muted">Forecast NII (Y1)</div><div class="text-2xl font-bold" id="forecastNII">EUR 198M</div></div>
+            <div class="text-center"><div class="text-sm text-muted">Forecast NII (Y1)</div><div class="text-2xl font-bold" id="forecastNII">GHS 198M</div></div>
             <div class="text-center"><div class="text-sm text-muted">Forecast NIM (Y1)</div><div class="text-2xl font-bold" id="forecastNIM">2.47%</div></div>
           </div>
         </div>
@@ -145,7 +171,7 @@
       const rc = +document.getElementById('rateChange').value;
 
       const curr = calculateNIM(ea, il, ay, lc);
-      document.getElementById('currNII').textContent = 'EUR ' + formatNumber(curr.nii) + 'M';
+      document.getElementById('currNII').textContent = 'GHS ' + formatNumber(curr.nii) + 'M';
       document.getElementById('currNIM').textContent = curr.nim.toFixed(2) + '%';
 
       const labels = Array.from({length:36}, (_,i) => 'M' + (i+1));
@@ -163,7 +189,7 @@
       const upSeries = makeSeries(100);
       const downSeries = makeSeries(-150);
 
-      document.getElementById('forecastNII').textContent = 'EUR ' + formatNumber(baseSeries[11]) + 'M';
+      document.getElementById('forecastNII').textContent = 'GHS ' + formatNumber(baseSeries[11]) + 'M';
       document.getElementById('forecastNIM').textContent = ((baseSeries[11]/ea)*100).toFixed(2) + '%';
 
       function renderChart(id, data, label, color) {

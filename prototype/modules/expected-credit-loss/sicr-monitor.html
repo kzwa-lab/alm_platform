@@ -48,6 +48,30 @@
           <a href="ecl-engine.html" class="nav-item">ECL Engine</a>
           <a href="sicr-monitor.html" class="nav-item active">SICR Monitor</a>
         </div>
+        <div class="nav-item has-submenu"><i data-lucide="activity" class="nav-icon"></i><span class="nav-label">Recovery Planning</span><i data-lucide="chevron-right" class="nav-chevron" style="width:14px;height:14px;"></i></div>
+        <div class="nav-submenu">
+          <a href="../recovery-planning/index.html" class="nav-item">Recovery Dashboard</a>
+        </div>
+        <div class="nav-item has-submenu"><i data-lucide="lock" class="nav-icon"></i><span class="nav-label">GRC & Risk Framework</span><i data-lucide="chevron-right" class="nav-chevron" style="width:14px;height:14px;"></i></div>
+        <div class="nav-submenu">
+          <a href="../grc-risk-framework/index.html" class="nav-item">Risk Framework</a>
+        </div>
+        <div class="nav-item has-submenu"><i data-lucide="file-text" class="nav-icon"></i><span class="nav-label">Regulatory Reporting</span><i data-lucide="chevron-right" class="nav-chevron" style="width:14px;height:14px;"></i></div>
+        <div class="nav-submenu">
+          <a href="../regulatory-reporting/index.html" class="nav-item">ORASS</a>
+        </div>
+        <div class="nav-item has-submenu"><i data-lucide="brain" class="nav-icon"></i><span class="nav-label">Behavioural Models</span><i data-lucide="chevron-right" class="nav-chevron" style="width:14px;height:14px;"></i></div>
+        <div class="nav-submenu">
+          <a href="../behavioural-models/index.html" class="nav-item">Model Dashboard</a>
+        </div>
+        <div class="nav-item has-submenu"><i data-lucide="shield-check" class="nav-icon"></i><span class="nav-label">Cyber Security</span><i data-lucide="chevron-right" class="nav-chevron" style="width:14px;height:14px;"></i></div>
+        <div class="nav-submenu">
+          <a href="../cyber-security/index.html" class="nav-item">Security Posture</a>
+        </div>
+        <div class="nav-item has-submenu"><i data-lucide="zap" class="nav-icon"></i><span class="nav-label">RTGS & Intraday Liquidity</span><i data-lucide="chevron-right" class="nav-chevron" style="width:14px;height:14px;"></i></div>
+        <div class="nav-submenu">
+          <a href="../rtgs-intraday-liquidity/index.html" class="nav-item">RTGS Monitor</a>
+        </div>
       </div>
       <div class="nav-section">
         <div class="nav-section-title">Pricing & Optimization</div>
@@ -70,8 +94,10 @@
       <div class="logo-area"><span style="font-weight:600;color:var(--text);">Asset &amp; Liability Management</span></div>
       <div class="header-actions">
         <button class="header-btn"><i data-lucide="calendar" style="width:14px;height:14px;"></i> 25 Jun 2026</button>
-        <button class="header-btn"><i data-lucide="building-2" style="width:14px;height:14px;"></i> Group Consolidated</button>
-        <div class="user-pill"><div class="avatar">JD</div><span>John Doe</span><i data-lucide="chevron-down" style="width:14px;height:14px;color:var(--text-muted);"></i></div>
+        <button class="header-btn"><i data-lucide="building-2" style="width:14px;height:14px;"></i> Ecobank Ghana PLC</button>
+        <button class="header-btn"><i data-lucide="banknote" style="width:14px;height:14px;"></i> GHS</button>
+        <button class="header-btn"><i data-lucide="percent" style="width:14px;height:14px;"></i> GRR 24.5%</button>
+        <div class="user-pill"><div class="avatar">DA</div><span>Daniel Addo (CRO)</span><i data-lucide="chevron-down" style="width:14px;height:14px;color:var(--text-muted);"></i></div>
       </div>
     </header>
 
@@ -84,19 +110,19 @@
           <div class="kpi-icon green"><i data-lucide="check-circle" style="width:20px;height:20px;"></i></div>
           <div class="kpi-label">Stage 1 Loans</div>
           <div class="kpi-value">92.4%</div>
-          <div class="text-sm text-muted">EUR 22.1bn exposure</div>
+          <div class="text-sm text-muted">GHS 22.1bn exposure</div>
         </div>
         <div class="kpi-card">
           <div class="kpi-icon amber"><i data-lucide="alert-triangle" style="width:20px;height:20px;"></i></div>
           <div class="kpi-label">Stage 2 Loans</div>
           <div class="kpi-value">6.1%</div>
-          <div class="text-sm text-muted">EUR 1.5bn exposure</div>
+          <div class="text-sm text-muted">GHS 1.5bn exposure</div>
         </div>
         <div class="kpi-card">
           <div class="kpi-icon red"><i data-lucide="x-circle" style="width:20px;height:20px;"></i></div>
           <div class="kpi-label">Stage 3 Loans</div>
           <div class="kpi-value">1.5%</div>
-          <div class="text-sm text-muted">EUR 0.4bn exposure</div>
+          <div class="text-sm text-muted">GHS 0.4bn exposure</div>
         </div>
         <div class="kpi-card">
           <div class="kpi-icon blue"><i data-lucide="arrow-up-right" style="width:20px;height:20px;"></i></div>
@@ -124,7 +150,7 @@
                   <th data-sort="1">Loan ID</th>
                   <th data-sort="2">Counterparty</th>
                   <th data-sort="3">Segment</th>
-                  <th data-sort="4" data-sort-type="number">Exposure (EUR M)</th>
+                  <th data-sort="4" data-sort-type="number">Exposure (GHS M)</th>
                   <th data-sort="5" data-sort-type="number">Origination PD</th>
                   <th data-sort="6" data-sort-type="number">Current PD</th>
                   <th data-sort="7">PD Trend</th>
@@ -133,13 +159,13 @@
                 </tr>
               </thead>
               <tbody>
-                <tr><td><input type="checkbox" class="row-check"></td><td>L-2024-001</td><td>Deutsche Industrie AG</td><td>Corporate</td><td>12.5</td><td>0.80%</td><td>0.85%</td><td><canvas class="sparkline" width="60" height="20"></canvas></td><td><span class="badge badge-success">Stage 1</span></td><td>No</td></tr>
-                <tr><td><input type="checkbox" class="row-check"></td><td>L-2024-002</td><td>Müller GmbH</td><td>SME</td><td>4.2</td><td>1.20%</td><td>2.50%</td><td><canvas class="sparkline" width="60" height="20"></canvas></td><td><span class="badge badge-warning">Stage 2</span></td><td><span class="text-warning font-semibold">Relative +108%</span></td></tr>
-                <tr><td><input type="checkbox" class="row-check"></td><td>L-2023-891</td><td>Schmidt Bau AG</td><td>Corporate</td><td>8.0</td><td>0.50%</td><td>0.48%</td><td><canvas class="sparkline" width="60" height="20"></canvas></td><td><span class="badge badge-success">Stage 1</span></td><td>No</td></tr>
-                <tr><td><input type="checkbox" class="row-check"></td><td>L-2023-445</td><td>Klein Retail KG</td><td>Retail</td><td>0.3</td><td>2.00%</td><td>5.50%</td><td><canvas class="sparkline" width="60" height="20"></canvas></td><td><span class="badge badge-danger">Stage 3</span></td><td><span class="text-danger font-semibold">Impaired (90 DPD)</span></td></tr>
-                <tr><td><input type="checkbox" class="row-check"></td><td>L-2024-105</td><td> Bauer Tech SE</td><td>Corporate</td><td>25.0</td><td>0.30%</td><td>0.55%</td><td><canvas class="sparkline" width="60" height="20"></canvas></td><td><span class="badge badge-warning">Stage 2</span></td><td><span class="text-warning font-semibold">Absolute +25bps</span></td></tr>
-                <tr><td><input type="checkbox" class="row-check"></td><td>L-2024-312</td><td>Huber Logistics</td><td>SME</td><td>2.1</td><td>1.50%</td><td>1.45%</td><td><canvas class="sparkline" width="60" height="20"></canvas></td><td><span class="badge badge-success">Stage 1</span></td><td>No</td></tr>
-                <tr><td><input type="checkbox" class="row-check"></td><td>L-2022-999</td><td>Fischer GmbH</td><td>SME</td><td>1.8</td><td>1.00%</td><td>3.20%</td><td><canvas class="sparkline" width="60" height="20"></canvas></td><td><span class="badge badge-warning">Stage 2</span></td><td><span class="text-warning font-semibold">Relative +220%</span></td></tr>
+                <tr><td><input type="checkbox" class="row-check"></td><td>L-2024-001</td><td>Golden Star Mining Ltd</td><td>Corporate</td><td>12.5</td><td>0.80%</td><td>0.85%</td><td><canvas class="sparkline" width="60" height="20"></canvas></td><td><span class="badge badge-success">Stage 1</span></td><td>No</td></tr>
+                <tr><td><input type="checkbox" class="row-check"></td><td>L-2024-002</td><td>Adom Foods Ltd</td><td>SME</td><td>4.2</td><td>1.20%</td><td>2.50%</td><td><canvas class="sparkline" width="60" height="20"></canvas></td><td><span class="badge badge-warning">Stage 2</span></td><td><span class="text-warning font-semibold">Relative +108%</span></td></tr>
+                <tr><td><input type="checkbox" class="row-check"></td><td>L-2023-891</td><td>Volta Construction Ltd</td><td>Corporate</td><td>8.0</td><td>0.50%</td><td>0.48%</td><td><canvas class="sparkline" width="60" height="20"></canvas></td><td><span class="badge badge-success">Stage 1</span></td><td>No</td></tr>
+                <tr><td><input type="checkbox" class="row-check"></td><td>L-2023-445</td><td>Kwame Retail Shop</td><td>Retail</td><td>0.3</td><td>2.00%</td><td>5.50%</td><td><canvas class="sparkline" width="60" height="20"></canvas></td><td><span class="badge badge-danger">Stage 3</span></td><td><span class="text-danger font-semibold">Impaired (90 DPD)</span></td></tr>
+                <tr><td><input type="checkbox" class="row-check"></td><td>L-2024-105</td><td>Accra Tech Ltd</td><td>Corporate</td><td>25.0</td><td>0.30%</td><td>0.55%</td><td><canvas class="sparkline" width="60" height="20"></canvas></td><td><span class="badge badge-warning">Stage 2</span></td><td><span class="text-warning font-semibold">Absolute +25bps</span></td></tr>
+                <tr><td><input type="checkbox" class="row-check"></td><td>L-2024-312</td><td>Tema Logistics Ltd</td><td>SME</td><td>2.1</td><td>1.50%</td><td>1.45%</td><td><canvas class="sparkline" width="60" height="20"></canvas></td><td><span class="badge badge-success">Stage 1</span></td><td>No</td></tr>
+                <tr><td><input type="checkbox" class="row-check"></td><td>L-2022-999</td><td>Fosu Enterprises</td><td>SME</td><td>1.8</td><td>1.00%</td><td>3.20%</td><td><canvas class="sparkline" width="60" height="20"></canvas></td><td><span class="badge badge-warning">Stage 2</span></td><td><span class="text-warning font-semibold">Relative +220%</span></td></tr>
               </tbody>
             </table>
           </div>

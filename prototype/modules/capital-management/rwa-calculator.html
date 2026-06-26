@@ -48,6 +48,30 @@
           <a href="../expected-credit-loss/ecl-engine.html" class="nav-item">ECL Engine</a>
           <a href="../expected-credit-loss/sicr-monitor.html" class="nav-item">SICR Monitor</a>
         </div>
+        <div class="nav-item has-submenu"><i data-lucide="activity" class="nav-icon"></i><span class="nav-label">Recovery Planning</span><i data-lucide="chevron-right" class="nav-chevron" style="width:14px;height:14px;"></i></div>
+        <div class="nav-submenu">
+          <a href="../recovery-planning/index.html" class="nav-item">Recovery Dashboard</a>
+        </div>
+        <div class="nav-item has-submenu"><i data-lucide="lock" class="nav-icon"></i><span class="nav-label">GRC & Risk Framework</span><i data-lucide="chevron-right" class="nav-chevron" style="width:14px;height:14px;"></i></div>
+        <div class="nav-submenu">
+          <a href="../grc-risk-framework/index.html" class="nav-item">Risk Framework</a>
+        </div>
+        <div class="nav-item has-submenu"><i data-lucide="file-text" class="nav-icon"></i><span class="nav-label">Regulatory Reporting</span><i data-lucide="chevron-right" class="nav-chevron" style="width:14px;height:14px;"></i></div>
+        <div class="nav-submenu">
+          <a href="../regulatory-reporting/index.html" class="nav-item">ORASS</a>
+        </div>
+        <div class="nav-item has-submenu"><i data-lucide="brain" class="nav-icon"></i><span class="nav-label">Behavioural Models</span><i data-lucide="chevron-right" class="nav-chevron" style="width:14px;height:14px;"></i></div>
+        <div class="nav-submenu">
+          <a href="../behavioural-models/index.html" class="nav-item">Model Dashboard</a>
+        </div>
+        <div class="nav-item has-submenu"><i data-lucide="shield-check" class="nav-icon"></i><span class="nav-label">Cyber Security</span><i data-lucide="chevron-right" class="nav-chevron" style="width:14px;height:14px;"></i></div>
+        <div class="nav-submenu">
+          <a href="../cyber-security/index.html" class="nav-item">Security Posture</a>
+        </div>
+        <div class="nav-item has-submenu"><i data-lucide="zap" class="nav-icon"></i><span class="nav-label">RTGS & Intraday Liquidity</span><i data-lucide="chevron-right" class="nav-chevron" style="width:14px;height:14px;"></i></div>
+        <div class="nav-submenu">
+          <a href="../rtgs-intraday-liquidity/index.html" class="nav-item">RTGS Monitor</a>
+        </div>
       </div>
       <div class="nav-section">
         <div class="nav-section-title">Pricing & Optimization</div>
@@ -70,8 +94,10 @@
       <div class="logo-area"><span style="font-weight:600;color:var(--text);">Asset &amp; Liability Management</span></div>
       <div class="header-actions">
         <button class="header-btn"><i data-lucide="calendar" style="width:14px;height:14px;"></i> 25 Jun 2026</button>
-        <button class="header-btn"><i data-lucide="building-2" style="width:14px;height:14px;"></i> Group Consolidated</button>
-        <div class="user-pill"><div class="avatar">JD</div><span>John Doe</span><i data-lucide="chevron-down" style="width:14px;height:14px;color:var(--text-muted);"></i></div>
+        <button class="header-btn"><i data-lucide="building-2" style="width:14px;height:14px;"></i> Ecobank Ghana PLC</button>
+        <button class="header-btn"><i data-lucide="banknote" style="width:14px;height:14px;"></i> GHS</button>
+        <button class="header-btn"><i data-lucide="percent" style="width:14px;height:14px;"></i> GRR 24.5%</button>
+        <div class="user-pill"><div class="avatar">DA</div><span>Daniel Addo (CRO)</span><i data-lucide="chevron-down" style="width:14px;height:14px;color:var(--text-muted);"></i></div>
       </div>
     </header>
 
@@ -81,12 +107,12 @@
 
       <div class="grid grid-2" style="grid-template-columns: 2fr 1fr;">
         <div class="card">
-          <div class="card-header"><h3>Asset Class Inputs (EUR M)</h3></div>
+          <div class="card-header"><h3>Asset Class Inputs (GHS M)</h3></div>
           <div class="card-body">
             <div class="table-container">
               <table class="data-table" id="rwaTable">
                 <thead>
-                  <tr><th>Asset Class</th><th>Exposure (EUR M)</th><th>Risk Weight</th><th>RWA (EUR M)</th></tr>
+                  <tr><th>Asset Class</th><th>Exposure (GHS M)</th><th>Risk Weight</th><th>RWA (GHS M)</th></tr>
                 </thead>
                 <tbody>
                   <tr><td>Sovereign / Central Banks</td><td><input type="number" class="form-input" style="width:120px;" value="2000" oninput="updateRWA()"></td><td><select class="form-select" style="width:100px;" onchange="updateRWA()"><option value="0">0%</option><option value="0.20">20%</option></select></td><td class="rwa-cell"></td></tr>
@@ -107,8 +133,8 @@
           <div class="card mb-4">
             <div class="card-header"><h3>Capital Ratios</h3></div>
             <div class="card-body text-center">
-              <div class="mb-3"><div class="text-sm text-muted">Total RWA (SA)</div><div class="text-2xl font-bold" id="totalRWA">EUR 9,505M</div></div>
-              <div class="mb-3"><div class="text-sm text-muted">CET1 Capital</div><div class="text-2xl font-bold">EUR 2,800M</div></div>
+              <div class="mb-3"><div class="text-sm text-muted">Total RWA (SA)</div><div class="text-2xl font-bold" id="totalRWA">GHS 9,505M</div></div>
+              <div class="mb-3"><div class="text-sm text-muted">CET1 Capital</div><div class="text-2xl font-bold">GHS 2,800M</div></div>
               <div class="mb-3"><div class="text-sm text-muted">CET1 Ratio</div><div class="text-3xl font-bold" style="color:var(--success);" id="cet1Ratio">14.73%</div></div>
               <div class="mb-3"><div class="text-sm text-muted">Total Capital Ratio</div><div class="text-2xl font-bold" style="color:var(--success);">19.15%</div></div>
               <div id="ratioStatus"><span class="badge badge-success">Well above minimum (4.5% CET1)</span></div>
@@ -147,12 +173,12 @@
       const rw = +cells[2].querySelector('select').value;
       const rwa = amount * rw;
       totalRWA += rwa;
-      cells[3].textContent = 'EUR ' + formatNumber(rwa) + 'M';
+      cells[3].textContent = 'GHS ' + formatNumber(rwa) + 'M';
       labels.push(name);
       data.push(rwa);
     });
 
-    document.getElementById('totalRWA').textContent = 'EUR ' + formatNumber(totalRWA) + 'M';
+    document.getElementById('totalRWA').textContent = 'GHS ' + formatNumber(totalRWA) + 'M';
     const cet1 = 2800;
     const ratio = (cet1 / totalRWA) * 100;
     document.getElementById('cet1Ratio').textContent = ratio.toFixed(2) + '%';
