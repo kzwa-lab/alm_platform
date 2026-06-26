@@ -7,6 +7,8 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
@@ -16,6 +18,14 @@
     pre { font-family: 'JetBrains Mono', monospace; }
     .sticky-header th { background-color: #F8FAFC; }
     .dark .sticky-header th { background-color: #1E293B; }
+    .nav-label { transition: opacity 0.15s, width 0.15s; white-space: nowrap; overflow: hidden; }
+    .sidebar-collapsed .nav-label { width: 0; opacity: 0; display: none; }
+    .sidebar-collapsed .nav-group-title { display: none; }
+    .sidebar-collapsed .nav-item { justify-content: center; padding-left: 0 !important; padding-right: 0 !important; }
+    .sidebar-collapsed .nav-item span:first-child { margin: 0; }
+    .sidebar-collapsed .hamburger span:nth-child(2) { opacity: 0; }
+    .sidebar-collapsed .hamburger span:nth-child(1) { transform: rotate(45deg) translate(3px, 3px); }
+    .sidebar-collapsed .hamburger span:nth-child(3) { transform: rotate(-45deg) translate(3px, -3px); }
   </style>
   <script>
     mermaid.initialize({ startOnLoad: false, theme: 'default', themeVariables: { fontSize: '12px' }, flowchart: { useMaxWidth: true, htmlLabels: true, curve: 'basis' } });
@@ -24,45 +34,104 @@
 </head>
 <body class="bg-neutral-50 dark:bg-neutral-900 transition-colors min-h-screen">
   <div class="flex min-h-screen">
-    <nav class="fixed inset-y-0 left-0 z-30 flex flex-col h-full w-64">
+    <nav id="sidebar" class="fixed inset-y-0 left-0 z-30 flex flex-col h-full w-64 transition-all duration-200">
       <div class="flex flex-col h-full bg-white dark:bg-neutral-800 border-r border-neutral-200 dark:border-neutral-700">
-        <div class="h-16 flex items-center justify-between px-4 border-b border-neutral-200 dark:border-neutral-700">
-          <span class="text-sm font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">BankOS</span>
+        <div class="h-16 flex items-center justify-between px-3 border-b border-neutral-200 dark:border-neutral-700">
+          <span class="text-sm font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider nav-label">BankOS</span>
+          <button id="sidebar-toggle" class="p-1.5 rounded hover:bg-neutral-100 dark:hover:bg-neutral-700 text-neutral-500 dark:text-neutral-400 transition-colors" title="Toggle sidebar">
+            <div class="hamburger flex flex-col gap-1">
+              <span class="block w-4 h-0.5 bg-current rounded transition-all duration-200"></span>
+              <span class="block w-4 h-0.5 bg-current rounded transition-all duration-200"></span>
+              <span class="block w-4 h-0.5 bg-current rounded transition-all duration-200"></span>
+            </div>
+          </button>
         </div>
-        <div class="flex-1 py-4 overflow-y-auto">
-          <a href="#" data-page="landing" class="nav-item flex items-center gap-3 px-4 py-3 text-neutral-600 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-700 border-l-4 border-transparent transition-colors cursor-pointer">
-            <span class="text-lg">🏠</span><span>Dashboard</span>
+        <div class="flex-1 py-2 overflow-y-auto">
+          <a href="#" data-page="landing" class="nav-item flex items-center gap-3 px-4 py-2.5 text-neutral-600 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-700 border-l-4 border-transparent transition-colors cursor-pointer text-sm">
+            <span class="text-base">🏠</span><span class="nav-label">Dashboard</span>
           </a>
-          <a href="#" data-page="liquidity" class="nav-item flex items-center gap-3 px-4 py-3 text-neutral-600 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-700 border-l-4 border-transparent transition-colors cursor-pointer">
-            <span class="text-lg">💧</span><span>Liquidity Risk</span>
-          </a>
-          <a href="#" data-page="capital" class="nav-item flex items-center gap-3 px-4 py-3 text-neutral-600 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-700 border-l-4 border-transparent transition-colors cursor-pointer">
-            <span class="text-lg">🛡</span><span>Capital Management</span>
-          </a>
-          <a href="#" data-page="irrbb" class="nav-item flex items-center gap-3 px-4 py-3 text-neutral-600 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-700 border-l-4 border-transparent transition-colors cursor-pointer">
-            <span class="text-lg">📈</span><span>IRRBB</span>
-          </a>
-          <a href="#" data-page="ecl" class="nav-item flex items-center gap-3 px-4 py-3 text-neutral-600 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-700 border-l-4 border-transparent transition-colors cursor-pointer">
-            <span class="text-lg">⚠</span><span>ECL / Credit Risk</span>
-          </a>
-          <a href="#" data-page="ftp" class="nav-item flex items-center gap-3 px-4 py-3 text-neutral-600 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-700 border-l-4 border-transparent transition-colors cursor-pointer">
-            <span class="text-lg">🔄</span><span>FTP & Pricing</span>
-          </a>
-          <a href="#" data-page="optimization" class="nav-item flex items-center gap-3 px-4 py-3 text-neutral-600 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-700 border-l-4 border-transparent transition-colors cursor-pointer">
-            <span class="text-lg">🎯</span><span>Optimization</span>
-          </a>
+          <div class="nav-group">
+            <div class="nav-group-title">Core ALM</div>
+            <a href="#" data-page="dataFoundation" class="nav-item flex items-center gap-3 px-4 py-2 pl-10 text-neutral-600 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-700 border-l-4 border-transparent transition-colors cursor-pointer text-sm">
+              <span class="text-base">🏗️</span><span class="nav-label">Data Foundation</span>
+            </a>
+            <a href="#" data-page="liquidity" class="nav-item flex items-center gap-3 px-4 py-2 pl-10 text-neutral-600 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-700 border-l-4 border-transparent transition-colors cursor-pointer text-sm">
+              <span class="text-base">💧</span><span class="nav-label">Liquidity Risk</span>
+            </a>
+            <a href="#" data-page="irrbb" class="nav-item flex items-center gap-3 px-4 py-2 pl-10 text-neutral-600 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-700 border-l-4 border-transparent transition-colors cursor-pointer text-sm">
+              <span class="text-base">📈</span><span class="nav-label">IRRBB</span>
+            </a>
+            <a href="#" data-page="ftp" class="nav-item flex items-center gap-3 px-4 py-2 pl-10 text-neutral-600 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-700 border-l-4 border-transparent transition-colors cursor-pointer text-sm">
+              <span class="text-base">🔄</span><span class="nav-label">FTP & Pricing</span>
+            </a>
+            <a href="#" data-page="behavioural" class="nav-item flex items-center gap-3 px-4 py-2 pl-10 text-neutral-600 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-700 border-l-4 border-transparent transition-colors cursor-pointer text-sm">
+              <span class="text-base">🧠</span><span class="nav-label">Behavioural Models</span>
+            </a>
+          </div>
+          <div class="nav-group">
+            <div class="nav-group-title">Risk & Capital</div>
+            <a href="#" data-page="capital" class="nav-item flex items-center gap-3 px-4 py-2 pl-10 text-neutral-600 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-700 border-l-4 border-transparent transition-colors cursor-pointer text-sm">
+              <span class="text-base">🛡️</span><span class="nav-label">Capital Management</span>
+            </a>
+            <a href="#" data-page="ecl" class="nav-item flex items-center gap-3 px-4 py-2 pl-10 text-neutral-600 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-700 border-l-4 border-transparent transition-colors cursor-pointer text-sm">
+              <span class="text-base">⚠️</span><span class="nav-label">ECL / Credit Risk</span>
+            </a>
+            <a href="#" data-page="optimization" class="nav-item flex items-center gap-3 px-4 py-2 pl-10 text-neutral-600 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-700 border-l-4 border-transparent transition-colors cursor-pointer text-sm">
+              <span class="text-base">🎯</span><span class="nav-label">Optimization</span>
+            </a>
+            <a href="#" data-page="recovery" class="nav-item flex items-center gap-3 px-4 py-2 pl-10 text-neutral-600 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-700 border-l-4 border-transparent transition-colors cursor-pointer text-sm">
+              <span class="text-base">🆘</span><span class="nav-label">Recovery Planning</span>
+            </a>
+          </div>
+          <div class="nav-group">
+            <div class="nav-group-title">Governance & Reporting</div>
+            <a href="#" data-page="grc" class="nav-item flex items-center gap-3 px-4 py-2 pl-10 text-neutral-600 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-700 border-l-4 border-transparent transition-colors cursor-pointer text-sm">
+              <span class="text-base">🔒</span><span class="nav-label">GRC Framework</span>
+            </a>
+            <a href="#" data-page="regulatory" class="nav-item flex items-center gap-3 px-4 py-2 pl-10 text-neutral-600 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-700 border-l-4 border-transparent transition-colors cursor-pointer text-sm">
+              <span class="text-base">📊</span><span class="nav-label">Regulatory Reporting</span>
+            </a>
+            <a href="#" data-page="cyber" class="nav-item flex items-center gap-3 px-4 py-2 pl-10 text-neutral-600 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-700 border-l-4 border-transparent transition-colors cursor-pointer text-sm">
+              <span class="text-base">🔐</span><span class="nav-label">Cyber Security</span>
+            </a>
+          </div>
         </div>
         <div class="border-t border-neutral-200 dark:border-neutral-700 p-4">
           <button id="theme-toggle" class="flex items-center gap-3 px-4 py-3 text-neutral-600 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-700 rounded-lg transition-colors w-full">
-            <span class="text-lg">🌙</span><span>Dark Mode</span>
+            <span class="text-lg">🌙</span><span class="nav-label">Dark Mode</span>
           </button>
         </div>
       </div>
     </nav>
-    <main class="flex-1 ml-64 transition-all duration-300 p-8">
+    <main id="main-content" class="flex-1 ml-64 transition-all duration-200 p-6">
       <div id="content" class="max-w-7xl mx-auto"></div>
     </main>
   </div>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const sidebar = document.getElementById('sidebar');
+    const toggle = document.getElementById('sidebar-toggle');
+    const main = document.getElementById('main-content');
+    const collapsed = localStorage.getItem('sidebar-collapsed') === 'true';
+
+    if (collapsed) {
+      sidebar.classList.add('sidebar-collapsed');
+      sidebar.classList.add('w-16');
+      sidebar.classList.remove('w-64');
+      main.classList.remove('ml-64');
+      main.classList.add('ml-16');
+    }
+
+    toggle.addEventListener('click', () => {
+      const isCollapsed = sidebar.classList.toggle('sidebar-collapsed');
+      sidebar.classList.toggle('w-16');
+      sidebar.classList.toggle('w-64');
+      main.classList.toggle('ml-64');
+      main.classList.toggle('ml-16');
+      localStorage.setItem('sidebar-collapsed', isCollapsed);
+    });
+  });
+</script>
 <script type="module" src="./app.js"></script>
 </body>
 </html>
