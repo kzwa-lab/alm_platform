@@ -1,1 +1,0 @@
-{"ast":null,"code":"export { TabBarComponent } from './tab-bar.component';\nexport { FeatureCardComponent, StatusBadgeComponent, GhanaRegulatoryDetailComponent } from './components';","map":null,"metadata":{},"sourceType":"module","externalDependencies":[]}

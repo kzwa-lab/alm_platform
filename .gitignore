@@ -1,6 +1,7 @@
 node_modules
 dist
 .cache
+.angular
 .env
 .env.local
 *.log
