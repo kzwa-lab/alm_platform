@@ -1,0 +1,1131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BankOS — Consolidated Workflows &amp; Data Relations</title>
+<style>
+  :root {
+    --bg: #0F172A; --bg2: #1E293B; --bg3: #334155;
+    --fg: #F1F5F9; --fg2: #94A3B8; --fg3: #64748B;
+    --primary: #3B82F6; --primary-dim: #1D4ED8;
+    --success: #10B981; --warning: #F59E0B; --alert: #EF4444;
+    --accent: #8B5CF6;
+    --border: #334155;
+    --font: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    --mono: 'JetBrains Mono', 'Fira Code', monospace;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: var(--font);
+    background: var(--bg);
+    color: var(--fg);
+    line-height: 1.6;
+    padding: 2rem;
+  }
+  .container { max-width: 1400px; margin: 0 auto; }
+  h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .subtitle {
+    color: var(--fg2);
+    font-size: 1rem;
+    margin-bottom: 2rem;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 1rem;
+  }
+  .section {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+  .section h2 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: var(--primary);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .section h2 .badge {
+    font-size: 0.65rem;
+    background: var(--bg3);
+    color: var(--fg2);
+    padding: 0.15rem 0.5rem;
+    border-radius: 999px;
+    font-weight: 500;
+  }
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    padding: 0.75rem;
+    background: var(--bg);
+    border-radius: 8px;
+    font-size: 0.8rem;
+    color: var(--fg2);
+  }
+  .legend-item { display: flex; align-items: center; gap: 0.4rem; }
+  .legend-swatch {
+    width: 14px; height: 14px; border-radius: 3px;
+    display: inline-block;
+  }
+  svg { display: block; max-width: 100%; height: auto; }
+  .toc { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 0.75rem; margin-bottom: 2rem; }
+  .toc a {
+    display: flex; align-items: center; gap: 0.6rem;
+    padding: 0.75rem 1rem;
+    background: var(--bg2); border: 1px solid var(--border); border-radius: 8px;
+    color: var(--fg); text-decoration: none; font-size: 0.875rem; transition: 0.15s;
+  }
+  .toc a:hover { border-color: var(--primary); background: rgba(59,130,246,0.08); }
+  .toc a .num {
+    width: 24px; height: 24px; border-radius: 6px;
+    background: var(--primary-dim); color: white;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.7rem; font-weight: 700; flex-shrink: 0;
+  }
+  .flow-legend { margin-bottom: 1rem; }
+  .tag {
+    display: inline-block; font-size: 0.7rem; padding: 0.1rem 0.4rem;
+    border-radius: 4px; font-weight: 500;
+  }
+  .tag-module { background: rgba(59,130,246,0.2); color: #60A5FA; }
+  .tag-data { background: rgba(16,185,129,0.2); color: #34D399; }
+  .tag-bog { background: rgba(245,158,11,0.2); color: #FBBF24; }
+  .tag-report { background: rgba(139,92,246,0.2); color: #A78BFA; }
+  .tag-entity { color: var(--fg2); font-family: var(--mono); font-size: 0.7rem; }
+  @media (max-width: 768px) { body { padding: 1rem; } .toc { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="container">
+
+<h1>BankOS — Consolidated Workflows &amp; Data Relations</h1>
+<p class="subtitle">Bank of Ghana 2026 Aligned ALM Platform &bull; 12 Modules &bull; 50 Feature Tabs &bull; 150+ Data Tables</p>
+
+<!-- Table of Contents -->
+<div class="toc">
+  <a href="#arch"><span class="num">1</span> Platform Architecture &amp; Data Flow</a>
+  <a href="#module-map"><span class="num">2</span> Module-to-Regulation Mapping</a>
+  <a href="#entity"><span class="num">3</span> Core Data Entities &amp; Relationships</a>
+  <a href="#control-tower"><span class="num">4</span> ALM Control Tower Pipeline</a>
+  <a href="#lcr"><span class="num">5</span> LCR / NSFR Calculation Flow</a>
+  <a href="#irrbb"><span class="num">6</span> IRRBB — EVE, NII &amp; SOT Flow</a>
+  <a href="#ecl"><span class="num">7</span> ECL / IFRS 9 Provisioning Flow</a>
+  <a href="#ftp"><span class="num">8</span> FTP Curve Construction &amp; Deal Pricing</a>
+  <a href="#capital"><span class="num">9</span> Capital Management &amp; ICAAP Flow</a>
+  <a href="#recovery"><span class="num">10</span> Recovery Planning &amp; CFP Flow</a>
+  <a href="#grc"><span class="num">11</span> GRC — 3LoD, RAS &amp; Breach Workflow</a>
+  <a href="#reporting"><span class="num">12</span> Regulatory Reporting &amp; ORASS Pipeline</a>
+  <a href="#roles"><span class="num">13</span> Users, Roles &amp; Module Access Matrix</a>
+</div>
+
+<!-- ============ SECTION 1: PLATFORM ARCHITECTURE ============ -->
+<section class="section" id="arch">
+<h2>1. Platform Architecture &amp; Data Flow</h2>
+<div class="legend">
+  <span class="legend-item"><span class="legend-swatch" style="background:var(--primary)"></span> Module</span>
+  <span class="legend-item"><span class="legend-swatch" style="background:var(--success)"></span> Data Store / Entity</span>
+  <span class="legend-item"><span class="legend-swatch" style="background:var(--warning)"></span> External System</span>
+  <span class="legend-item"><span class="legend-swatch" style="background:var(--accent)"></span> Regulatory Output</span>
+  <span class="legend-item">&#8594; Data Flow</span>
+  <span class="legend-item">&#8592;&#8594; Bidirectional</span>
+</div>
+
+<svg viewBox="0 0 1200 720" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;">
+  <defs>
+    <marker id="arrow" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#94A3B8"/></marker>
+    <marker id="arrow-blue" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#3B82F6"/></marker>
+    <marker id="arrow-green" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#10B981"/></marker>
+    <filter id="shadow"><feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#000" flood-opacity="0.3"/></filter>
+    <!-- Gradient for header bars -->
+    <linearGradient id="hdr-grad" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#1D4ED8"/><stop offset="100%" stop-color="#3B82F6"/></linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect x="0" y="0" width="1200" height="720" fill="none"/>
+
+  <!-- Row 0: External Data Sources -->
+  <text x="20" y="30" fill="#94A3B8" font-size="13" font-weight="600" font-family="Inter,sans-serif">EXTERNAL DATA SOURCES</text>
+  <!-- Source boxes -->
+  <rect x="40" y="42" width="150" height="44" rx="6" fill="#F59E0B" fill-opacity="0.15" stroke="#F59E0B" stroke-width="1.2"/>
+  <text x="115" y="60" fill="#FBBF24" font-size="11" font-weight="600" text-anchor="middle" font-family="Inter,sans-serif">Core Banking</text>
+  <text x="115" y="76" fill="#FBBF24" font-size="10" text-anchor="middle">CBS / GL</text>
+
+  <rect x="210" y="42" width="150" height="44" rx="6" fill="#F59E0B" fill-opacity="0.15" stroke="#F59E0B" stroke-width="1.2"/>
+  <text x="285" y="60" fill="#FBBF24" font-size="11" font-weight="600" text-anchor="middle" font-family="Inter,sans-serif">Market Data</text>
+  <text x="285" y="76" fill="#FBBF24" font-size="10" text-anchor="middle">GRR / T-Bills / FX</text>
+
+  <rect x="380" y="42" width="150" height="44" rx="6" fill="#F59E0B" fill-opacity="0.15" stroke="#F59E0B" stroke-width="1.2"/>
+  <text x="455" y="60" fill="#FBBF24" font-size="11" font-weight="600" text-anchor="middle" font-family="Inter,sans-serif">RTGS / GIPSS</text>
+  <text x="455" y="76" fill="#FBBF24" font-size="10" text-anchor="middle">Real-time Settlement</text>
+
+  <rect x="550" y="42" width="150" height="44" rx="6" fill="#F59E0B" fill-opacity="0.15" stroke="#F59E0B" stroke-width="1.2"/>
+  <text x="625" y="60" fill="#FBBF24" font-size="11" font-weight="600" text-anchor="middle" font-family="Inter,sans-serif">Treasury / Dealing</text>
+  <text x="625" y="76" fill="#FBBF24" font-size="10" text-anchor="middle">XTEL / Derivatives</text>
+
+  <rect x="720" y="42" width="150" height="44" rx="6" fill="#F59E0B" fill-opacity="0.15" stroke="#F59E0B" stroke-width="1.2"/>
+  <text x="795" y="60" fill="#FBBF24" font-size="11" font-weight="600" text-anchor="middle" font-family="Inter,sans-serif">Collateral Mgmt</text>
+  <text x="795" y="76" fill="#FBBF24" font-size="10" text-anchor="middle">HQLA / Encumbrance</text>
+
+  <!-- Arrows from sources to Data Foundation -->
+  <line x1="115" y1="86" x2="115" y2="118" stroke="#94A3B8" stroke-width="0.8" marker-end="url(#arrow)"/>
+  <line x1="285" y1="86" x2="285" y2="118" stroke="#94A3B8" stroke-width="0.8" marker-end="url(#arrow)"/>
+  <line x1="455" y1="86" x2="455" y2="118" stroke="#94A3B8" stroke-width="0.8" marker-end="url(#arrow)"/>
+  <line x1="625" y1="86" x2="625" y2="118" stroke="#94A3B8" stroke-width="0.8" marker-end="url(#arrow)"/>
+  <line x1="795" y1="86" x2="795" y2="118" stroke="#94A3B8" stroke-width="0.8" marker-end="url(#arrow)"/>
+
+  <!-- Row 1: Data Foundation (hub) -->
+  <rect x="40" y="120" width="1200" height="56" rx="8" fill="#1D4ED8" fill-opacity="0.2" stroke="#3B82F6" stroke-width="1.5" filter="url(#shadow)"/>
+  <rect x="40" y="120" width="1200" height="24" rx="8" fill="url(#hdr-grad)" opacity="0.4"/>
+  <text x="600" y="137" fill="#60A5FA" font-size="13" font-weight="700" text-anchor="middle" font-family="Inter,sans-serif">DATA FOUNDATION — Ingestion, MDM, Data Quality, ALCO Workflow, Audit Trail, Control Tower</text>
+  <text x="600" y="163" fill="#93C5FD" font-size="10" text-anchor="middle" font-family="Inter,sans-serif">ETL Pipelines &bull; Ghana Asset Classification &bull; ALM / TB Mapping &bull; Instrument Registry &bull; Encumbrance Register &bull; Rules Repository</text>
+
+  <!-- Row 2: Calculation Modules -->
+  <text x="20" y="206" fill="#94A3B8" font-size="13" font-weight="600" font-family="Inter,sans-serif">CALCULATION MODULES</text>
+
+  <!-- Module boxes row 1: 4 modules -->
+  <rect x="40" y="215" width="198" height="100" rx="8" fill="#3B82F6" fill-opacity="0.1" stroke="#3B82F6" stroke-width="1.2" filter="url(#shadow)"/>
+  <text x="139" y="238" fill="#60A5FA" font-size="11" font-weight="700" text-anchor="middle" font-family="Inter,sans-serif">LIQUIDITY RISK</text>
+  <text x="139" y="255" fill="#93C5FD" font-size="9" text-anchor="middle">LCR / NSFR / LMTD</text>
+  <text x="139" y="270" fill="#93C5FD" font-size="9" text-anchor="middle">Stress Testing / CFP</text>
+  <text x="139" y="285" fill="#93C5FD" font-size="9" text-anchor="middle">Gap Analysis / Bank-Run</text>
+  <text x="139" y="302" fill="#93C5FD" font-size="9" text-anchor="middle">RTGS Intraday Monitor</text>
+
+  <rect x="258" y="215" width="198" height="100" rx="8" fill="#3B82F6" fill-opacity="0.1" stroke="#3B82F6" stroke-width="1.2" filter="url(#shadow)"/>
+  <text x="357" y="238" fill="#60A5FA" font-size="11" font-weight="700" text-anchor="middle" font-family="Inter,sans-serif">CAPITAL MANAGEMENT</text>
+  <text x="357" y="255" fill="#93C5FD" font-size="9" text-anchor="middle">CET1 / T1 / TC / Leverage</text>
+  <text x="357" y="270" fill="#93C5FD" font-size="9" text-anchor="middle">RWA (SA Credit/Market/Ops)</text>
+  <text x="357" y="285" fill="#93C5FD" font-size="9" text-anchor="middle">ICAAP Pillar 2 Add-ons</text>
+  <text x="357" y="302" fill="#93C5FD" font-size="9" text-anchor="middle">Capital Instrument Tracker</text>
+
+  <rect x="476" y="215" width="198" height="100" rx="8" fill="#3B82F6" fill-opacity="0.1" stroke="#3B82F6" stroke-width="1.2" filter="url(#shadow)"/>
+  <text x="575" y="238" fill="#60A5FA" font-size="11" font-weight="700" text-anchor="middle" font-family="Inter,sans-serif">ECL / CREDIT RISK</text>
+  <text x="575" y="255" fill="#93C5FD" font-size="9" text-anchor="middle">IFRS 9 Three-Stage Model</text>
+  <text x="575" y="270" fill="#93C5FD" font-size="9" text-anchor="middle">Ghana Macro Scenarios</text>
+  <text x="575" y="285" fill="#93C5FD" font-size="9" text-anchor="middle">SICR Triggers / Migration</text>
+  <text x="575" y="302" fill="#93C5FD" font-size="9" text-anchor="middle">Overlay Governance (PMA)</text>
+
+  <rect x="694" y="215" width="198" height="100" rx="8" fill="#3B82F6" fill-opacity="0.1" stroke="#3B82F6" stroke-width="1.2" filter="url(#shadow)"/>
+  <text x="793" y="238" fill="#60A5FA" font-size="11" font-weight="700" text-anchor="middle" font-family="Inter,sans-serif">IRRBB</text>
+  <text x="793" y="255" fill="#93C5FD" font-size="9" text-anchor="middle">EVE Sensitivity (6 Shocks)</text>
+  <text x="793" y="270" fill="#93C5FD" font-size="9" text-anchor="middle">NII Forecast (12-36m)</text>
+  <text x="793" y="285" fill="#93C5FD" font-size="9" text-anchor="middle">19-Bucket Repricing Gap</text>
+  <text x="793" y="302" fill="#93C5FD" font-size="9" text-anchor="middle">DGAP / Duration Analysis</text>
+
+  <!-- Row 3: Module boxes row 2 -->
+  <rect x="40" y="330" width="198" height="100" rx="8" fill="#3B82F6" fill-opacity="0.1" stroke="#3B82F6" stroke-width="1.2" filter="url(#shadow)"/>
+  <text x="139" y="353" fill="#60A5FA" font-size="11" font-weight="700" text-anchor="middle" font-family="Inter,sans-serif">FTP &amp; PRICING</text>
+  <text x="139" y="370" fill="#93C5FD" font-size="9" text-anchor="middle">GRR / T-Bill Curve</text>
+  <text x="139" y="385" fill="#93C5FD" font-size="9" text-anchor="middle">Deal-Level Pricing</text>
+  <text x="139" y="400" fill="#93C5FD" font-size="9" text-anchor="middle">NMD Behavioural Model</text>
+  <text x="139" y="417" fill="#93C5FD" font-size="9" text-anchor="middle">ITP / LTP / CTP Attribution</text>
+
+  <rect x="258" y="330" width="198" height="100" rx="8" fill="#3B82F6" fill-opacity="0.1" stroke="#3B82F6" stroke-width="1.2" filter="url(#shadow)"/>
+  <text x="357" y="353" fill="#60A5FA" font-size="11" font-weight="700" text-anchor="middle" font-family="Inter,sans-serif">OPTIMIZATION</text>
+  <text x="357" y="370" fill="#93C5FD" font-size="9" text-anchor="middle">Balance Sheet Simulator</text>
+  <text x="357" y="385" fill="#93C5FD" font-size="9" text-anchor="middle">NIM Attribution</text>
+  <text x="357" y="400" fill="#93C5FD" font-size="9" text-anchor="middle">What-If Hedging</text>
+  <text x="357" y="417" fill="#93C5FD" font-size="9" text-anchor="middle">Recovery Option Simulation</text>
+
+  <rect x="476" y="330" width="198" height="100" rx="8" fill="#3B82F6" fill-opacity="0.1" stroke="#3B82F6" stroke-width="1.2" filter="url(#shadow)"/>
+  <text x="575" y="353" fill="#60A5FA" font-size="11" font-weight="700" text-anchor="middle" font-family="Inter,sans-serif">RECOVERY PLANNING</text>
+  <text x="575" y="370" fill="#93C5FD" font-size="9" text-anchor="middle">Plan Repository</text>
+  <text x="575" y="385" fill="#93C5FD" font-size="9" text-anchor="middle">Recovery Options Menu</text>
+  <text x="575" y="400" fill="#93C5FD" font-size="9" text-anchor="middle">Trigger Matrix</text>
+  <text x="575" y="417" fill="#93C5FD" font-size="9" text-anchor="middle">MIS Dashboard</text>
+
+  <rect x="694" y="330" width="198" height="100" rx="8" fill="#3B82F6" fill-opacity="0.1" stroke="#3B82F6" stroke-width="1.2" filter="url(#shadow)"/>
+  <text x="793" y="353" fill="#60A5FA" font-size="11" font-weight="700" text-anchor="middle" font-family="Inter,sans-serif">GRC RISK FRAMEWORK</text>
+  <text x="793" y="370" fill="#93C5FD" font-size="9" text-anchor="middle">Digitised RMF (RMD 2021)</text>
+  <text x="793" y="385" fill="#93C5FD" font-size="9" text-anchor="middle">Risk Universe / RAS</text>
+  <text x="793" y="400" fill="#93C5FD" font-size="9" text-anchor="middle">3LoD RBAC Enforcement</text>
+  <text x="793" y="417" fill="#93C5FD" font-size="9" text-anchor="middle">Limit Breach Workflow</text>
+
+  <!-- Shared services row -->
+  <rect x="912" y="215" width="270" height="215" rx="8" fill="#8B5CF6" fill-opacity="0.08" stroke="#8B5CF6" stroke-width="1.2" stroke-dasharray="4,3"/>
+  <text x="1047" y="238" fill="#A78BFA" font-size="11" font-weight="700" text-anchor="middle" font-family="Inter,sans-serif">SHARED SERVICES</text>
+  <text x="1047" y="258" fill="#C4B5FD" font-size="9" text-anchor="middle">Behavioural Model Library</text>
+  <text x="1047" y="275" fill="#C4B5FD" font-size="9" text-anchor="middle">NMD / CPR / TDRR</text>
+  <line x1="912" y1="285" x2="1182" y2="285" stroke="#8B5CF6" stroke-opacity="0.2" stroke-width="0.5"/>
+  <text x="1047" y="300" fill="#C4B5FD" font-size="9" text-anchor="middle">Calculation Engine</text>
+  <text x="1047" y="317" fill="#C4B5FD" font-size="9" text-anchor="middle">(Python/FastAPI Microservices)</text>
+  <line x1="912" y1="327" x2="1182" y2="327" stroke="#8B5CF6" stroke-opacity="0.2" stroke-width="0.5"/>
+  <text x="1047" y="342" fill="#C4B5FD" font-size="9" text-anchor="middle">Workflow Engine</text>
+  <text x="1047" y="359" fill="#C4B5FD" font-size="9" text-anchor="middle">(Supabase + Edge Functions)</text>
+  <line x1="912" y1="369" x2="1182" y2="369" stroke="#8B5CF6" stroke-opacity="0.2" stroke-width="0.5"/>
+  <text x="1047" y="384" fill="#C4B5FD" font-size="9" text-anchor="middle">Rules &amp; Config Repository</text>
+  <text x="1047" y="401" fill="#C4B5FD" font-size="9" text-anchor="middle">(Versioned Thresholds)</text>
+
+  <!-- Arrows from Data Foundation to modules -->
+  <line x1="139" y1="176" x2="139" y2="213" stroke="#3B82F6" stroke-width="0.8" marker-end="url(#arrow-blue)"/>
+  <line x1="357" y1="176" x2="357" y2="213" stroke="#3B82F6" stroke-width="0.8" marker-end="url(#arrow-blue)"/>
+  <line x1="575" y1="176" x2="575" y2="213" stroke="#3B82F6" stroke-width="0.8" marker-end="url(#arrow-blue)"/>
+  <line x1="793" y1="176" x2="793" y2="213" stroke="#3B82F6" stroke-width="0.8" marker-end="url(#arrow-blue)"/>
+  <line x1="139" y1="315" x2="139" y2="328" stroke="#3B82F6" stroke-width="0.8" marker-end="url(#arrow-blue)"/>
+  <line x1="357" y1="315" x2="357" y2="328" stroke="#3B82F6" stroke-width="0.8" marker-end="url(#arrow-blue)"/>
+  <line x1="575" y1="315" x2="575" y2="328" stroke="#3B82F6" stroke-width="0.8" marker-end="url(#arrow-blue)"/>
+  <line x1="793" y1="315" x2="793" y2="328" stroke="#3B82F6" stroke-width="0.8" marker-end="url(#arrow-blue)"/>
+
+  <!-- Bidirectional arrows between modules and shared services -->
+  <line x1="892" y1="265" x2="910" y2="265" stroke="#8B5CF6" stroke-width="0.8" marker-end="url(#arrow)"/>
+  <line x1="892" y1="380" x2="910" y2="380" stroke="#8B5CF6" stroke-width="0.8" marker-end="url(#arrow)"/>
+
+  <!-- Row 3: Regulatory Reporting -->
+  <rect x="40" y="448" width="1142" height="56" rx="8" fill="#8B5CF6" fill-opacity="0.12" stroke="#8B5CF6" stroke-width="1.2" filter="url(#shadow)"/>
+  <text x="600" y="468" fill="#A78BFA" font-size="13" font-weight="700" text-anchor="middle" font-family="Inter,sans-serif">REGULATORY REPORTING &amp; ORASS INTEGRATION</text>
+  <text x="600" y="492" fill="#C4B5FD" font-size="10" text-anchor="middle">BoG Template Catalogue &bull; Submission Scheduler &bull; ORASS API Client &bull; Public Disclosures (Pillar 3) &bull; Audit Evidence Pack</text>
+
+  <!-- Arrows from modules to regulatory reporting -->
+  <line x1="139" y1="430" x2="139" y2="446" stroke="#8B5CF6" stroke-width="0.8" marker-end="url(#arrow)"/>
+  <line x1="357" y1="430" x2="357" y2="446" stroke="#8B5CF6" stroke-width="0.8" marker-end="url(#arrow)"/>
+  <line x1="575" y1="430" x2="575" y2="446" stroke="#8B5CF6" stroke-width="0.8" marker-end="url(#arrow)"/>
+  <line x1="793" y1="430" x2="793" y2="446" stroke="#8B5CF6" stroke-width="0.8" marker-end="url(#arrow)"/>
+  <line x1="139" y1="430" x2="139" y2="446" stroke="#8B5CF6" stroke-width="0.8" marker-end="url(#arrow)"/>
+  <line x1="357" y1="430" x2="357" y2="446" stroke="#8B5CF6" stroke-width="0.8" marker-end="url(#arrow)"/>
+  <line x1="575" y1="430" x2="575" y2="446" stroke="#8B5CF6" stroke-width="0.8" marker-end="url(#arrow)"/>
+  <line x1="793" y1="430" x2="793" y2="446" stroke="#8B5CF6" stroke-width="0.8" marker-end="url(#arrow)"/>
+
+  <!-- Row 4: BoG / External -->
+  <rect x="40" y="520" width="1142" height="44" rx="8" fill="#10B981" fill-opacity="0.08" stroke="#10B981" stroke-width="1.2" stroke-dasharray="6,3"/>
+  <text x="600" y="539" fill="#34D399" font-size="12" font-weight="700" text-anchor="middle" font-family="Inter,sans-serif">BANK OF GHANA — ORASS Submission Portal &bull; BoG Examination &bull; Regulatory Feedback</text>
+  <text x="600" y="555" fill="#34D399" font-size="10" text-anchor="middle">Monthly Returns (9 days) &bull; Quarterly (LMTD, LRMD, IRRBB, Capital) &bull; Annual (ICAAP, Recovery, Pillar 3)</text>
+
+  <line x1="600" y1="504" x2="600" y2="518" stroke="#10B981" stroke-width="0.8" marker-end="url(#arrow-green)"/>
+
+  <!-- Legend bottom -->
+  <text x="20" y="620" fill="#64748B" font-size="11" font-family="Inter,sans-serif">&#8593; Data flows upward from external sources through Data Foundation into calculation modules, then to regulatory reporting and BoG submission.</text>
+</svg>
+</section>
+
+<!-- ============ SECTION 2: MODULE-TO-REGULATION ============ -->
+<section class="section" id="module-map">
+<h2>2. Module-to-Regulation Mapping</h2>
+<p style="color:var(--fg2);font-size:0.9rem;margin-bottom:1rem">Each Bank of Ghana 2026 directive maps to one or more platform modules. All regulatory thresholds, bucket definitions, and behavioural assumptions are versioned configuration, not hard-coded.</p>
+
+<svg viewBox="0 0 1200 560" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;">
+  <defs>
+    <filter id="sh"><feDropShadow dx="0" dy="1" stdDeviation="2" flood-color="#000" flood-opacity="0.2"/></filter>
+  </defs>
+
+  <!-- BoG Directives column -->
+  <text x="20" y="25" fill="#FBBF24" font-size="13" font-weight="700" font-family="Inter,sans-serif">BoG 2026 DIRECTIVES</text>
+
+  <rect x="20" y="38" width="220" height="40" rx="6" fill="#F59E0B" fill-opacity="0.12" stroke="#F59E0B" stroke-width="1" filter="url(#sh)"/>
+  <text x="130" y="62" fill="#FBBF24" font-size="11" font-weight="600" text-anchor="middle" font-family="Inter,sans-serif">LMTD — Liquidity Monitoring</text>
+
+  <rect x="20" y="88" width="220" height="40" rx="6" fill="#F59E0B" fill-opacity="0.12" stroke="#F59E0B" stroke-width="1" filter="url(#sh)"/>
+  <text x="130" y="112" fill="#FBBF24" font-size="11" font-weight="600" text-anchor="middle" font-family="Inter,sans-serif">LRMD — Liquidity Risk Mgmt</text>
+
+  <rect x="20" y="138" width="220" height="40" rx="6" fill="#F59E0B" fill-opacity="0.12" stroke="#F59E0B" stroke-width="1" filter="url(#sh)"/>
+  <text x="130" y="162" fill="#FBBF24" font-size="11" font-weight="600" text-anchor="middle" font-family="Inter,sans-serif">IRRBB Guideline</text>
+
+  <rect x="20" y="188" width="220" height="40" rx="6" fill="#F59E0B" fill-opacity="0.12" stroke="#F59E0B" stroke-width="1" filter="url(#sh)"/>
+  <text x="130" y="212" fill="#FBBF24" font-size="11" font-weight="600" text-anchor="middle" font-family="Inter,sans-serif">Recovery Planning Directive</text>
+
+  <rect x="20" y="238" width="220" height="40" rx="6" fill="#F59E0B" fill-opacity="0.12" stroke="#F59E0B" stroke-width="1" filter="url(#sh)"/>
+  <text x="130" y="262" fill="#FBBF24" font-size="11" font-weight="600" text-anchor="middle" font-family="Inter,sans-serif">RMD 2021 — Risk Mgmt</text>
+
+  <rect x="20" y="288" width="220" height="40" rx="6" fill="#F59E0B" fill-opacity="0.12" stroke="#F59E0B" stroke-width="1" filter="url(#sh)"/>
+  <text x="130" y="312" fill="#FBBF24" font-size="11" font-weight="600" text-anchor="middle" font-family="Inter,sans-serif">CISD 2026 — Cyber Security</text>
+
+  <rect x="20" y="338" width="220" height="40" rx="6" fill="#F59E0B" fill-opacity="0.12" stroke="#F59E0B" stroke-width="1" filter="url(#sh)"/>
+  <text x="130" y="362" fill="#FBBF24" font-size="11" font-weight="600" text-anchor="middle" font-family="Inter,sans-serif">ORASS — Regulatory Reporting</text>
+
+  <rect x="20" y="388" width="220" height="40" rx="6" fill="#F59E0B" fill-opacity="0.12" stroke="#F59E0B" stroke-width="1" filter="url(#sh)"/>
+  <text x="130" y="412" fill="#FBBF24" font-size="11" font-weight="600" text-anchor="middle" font-family="Inter,sans-serif">Capital Adequacy Framework</text>
+
+  <!-- Arrow column -->
+  <line x1="240" y1="58" x2="275" y2="58" stroke="#FBBF24" stroke-width="1" marker-end="url(#arrow)"/>
+  <line x1="240" y1="108" x2="275" y2="108" stroke="#FBBF24" stroke-width="1" marker-end="url(#arrow)"/>
+  <line x1="240" y1="158" x2="275" y2="158" stroke="#FBBF24" stroke-width="1" marker-end="url(#arrow)"/>
+  <line x1="240" y1="208" x2="275" y2="208" stroke="#FBBF24" stroke-width="1" marker-end="url(#arrow)"/>
+  <line x1="240" y1="258" x2="275" y2="258" stroke="#FBBF24" stroke-width="1" marker-end="url(#arrow)"/>
+  <line x1="240" y1="308" x2="275" y2="308" stroke="#FBBF24" stroke-width="1" marker-end="url(#arrow)"/>
+  <line x1="240" y1="358" x2="275" y2="358" stroke="#FBBF24" stroke-width="1" marker-end="url(#arrow)"/>
+  <line x1="240" y1="408" x2="275" y2="408" stroke="#FBBF24" stroke-width="1" marker-end="url(#arrow)"/>
+
+  <!-- Modules column -->
+  <text x="290" y="25" fill="#60A5FA" font-size="13" font-weight="700" font-family="Inter,sans-serif">PRD MODULES</text>
+
+  <rect x="280" y="38" width="250" height="40" rx="6" fill="#3B82F6" fill-opacity="0.1" stroke="#3B82F6" stroke-width="1" filter="url(#sh)"/>
+  <text x="405" y="55" fill="#93C5FD" font-size="10" font-weight="600" text-anchor="middle" font-family="Inter,sans-serif">02 — Liquidity Risk</text>
+  <text x="405" y="70" fill="#93C5FD" font-size="9" text-anchor="middle">13 — RTGS Intraday Liquidity</text>
+
+  <rect x="280" y="88" width="250" height="40" rx="6" fill="#3B82F6" fill-opacity="0.1" stroke="#3B82F6" stroke-width="1" filter="url(#sh)"/>
+  <text x="405" y="105" fill="#93C5FD" font-size="10" font-weight="600" text-anchor="middle" font-family="Inter,sans-serif">02 — Liquidity Risk</text>
+  <text x="405" y="120" fill="#93C5FD" font-size="9" text-anchor="middle">13 — RTGS &bull; 09 — GRC</text>
+
+  <rect x="280" y="138" width="250" height="40" rx="6" fill="#3B82F6" fill-opacity="0.1" stroke="#3B82F6" stroke-width="1" filter="url(#sh)"/>
+  <text x="405" y="155" fill="#93C5FD" font-size="10" font-weight="600" text-anchor="middle" font-family="Inter,sans-serif">03 — Interest Rate Risk</text>
+  <text x="405" y="170" fill="#93C5FD" font-size="9" text-anchor="middle">11 — Behavioural Model Library</text>
+
+  <rect x="280" y="188" width="250" height="40" rx="6" fill="#3B82F6" fill-opacity="0.1" stroke="#3B82F6" stroke-width="1" filter="url(#sh)"/>
+  <text x="405" y="205" fill="#93C5FD" font-size="10" font-weight="600" text-anchor="middle" font-family="Inter,sans-serif">08 — Recovery Planning</text>
+  <text x="405" y="220" fill="#93C5FD" font-size="9" text-anchor="middle">07 — Balance Sheet Optimization</text>
+
+  <rect x="280" y="238" width="250" height="40" rx="6" fill="#3B82F6" fill-opacity="0.1" stroke="#3B82F6" stroke-width="1" filter="url(#sh)"/>
+  <text x="405" y="255" fill="#93C5FD" font-size="10" font-weight="600" text-anchor="middle" font-family="Inter,sans-serif">09 — GRC Risk Framework</text>
+  <text x="405" y="270" fill="#93C5FD" font-size="9" text-anchor="middle">12 — Cyber Security</text>
+
+  <rect x="280" y="288" width="250" height="40" rx="6" fill="#3B82F6" fill-opacity="0.1" stroke="#3B82F6" stroke-width="1" filter="url(#sh)"/>
+  <text x="405" y="305" fill="#93C5FD" font-size="10" font-weight="600" text-anchor="middle" font-family="Inter,sans-serif">12 — Cyber Security &amp; Data Residency</text>
+  <text x="405" y="320" fill="#93C5FD" font-size="9" text-anchor="middle">All modules (security constraints)</text>
+
+  <rect x="280" y="338" width="250" height="40" rx="6" fill="#3B82F6" fill-opacity="0.1" stroke="#3B82F6" stroke-width="1" filter="url(#sh)"/>
+  <text x="405" y="355" fill="#93C5FD" font-size="10" font-weight="600" text-anchor="middle" font-family="Inter,sans-serif">10 — Regulatory Reporting</text>
+  <text x="405" y="370" fill="#93C5FD" font-size="9" text-anchor="middle">All modules (data inputs)</text>
+
+  <rect x="280" y="388" width="250" height="40" rx="6" fill="#3B82F6" fill-opacity="0.1" stroke="#3B82F6" stroke-width="1" filter="url(#sh)"/>
+  <text x="405" y="405" fill="#93C5FD" font-size="10" font-weight="600" text-anchor="middle" font-family="Inter,sans-serif">04 — Capital Management</text>
+  <text x="405" y="420" fill="#93C5FD" font-size="9" text-anchor="middle">05 — ECL &bull; 07 — Optimization</text>
+
+  <!-- Key Deliverables column -->
+  <text x="560" y="25" fill="#34D399" font-size="13" font-weight="700" font-family="Inter,sans-serif">KEY DELIVERABLES</text>
+
+  <rect x="550" y="38" width="300" height="40" rx="6" fill="#10B981" fill-opacity="0.06" stroke="#10B981" stroke-width="0.8"/>
+  <text x="700" y="55" fill="#34D399" font-size="9.5" text-anchor="middle" font-family="Inter,sans-serif">4 Prudential Ratios (Narrow/Broad)</text>
+  <text x="700" y="70" fill="#34D399" font-size="9.5" text-anchor="middle">13-Band Maturity Mismatch</text>
+
+  <rect x="550" y="88" width="300" height="40" rx="6" fill="#10B981" fill-opacity="0.06" stroke="#10B981" stroke-width="0.8"/>
+  <text x="700" y="105" fill="#34D399" font-size="9.5" text-anchor="middle">CFP &bull; Stress Testing</text>
+  <text x="700" y="120" fill="#34D399" font-size="9.5" text-anchor="middle">ILAAP / LAS &bull; Board Governance</text>
+
+  <rect x="550" y="138" width="300" height="40" rx="6" fill="#10B981" fill-opacity="0.06" stroke="#10B981" stroke-width="0.8"/>
+  <text x="700" y="155" fill="#34D399" font-size="9.5" text-anchor="middle">19-Bucket SF &bull; EVE / NII</text>
+  <text x="700" y="170" fill="#34D399" font-size="9.5" text-anchor="middle">SOT &bull; Basis Risk &bull; Yield-Curve Risk</text>
+
+  <rect x="550" y="188" width="300" height="40" rx="6" fill="#10B981" fill-opacity="0.06" stroke="#10B981" stroke-width="0.8"/>
+  <text x="700" y="205" fill="#34D399" font-size="9.5" text-anchor="middle">Plan Repository &bull; Options Menu</text>
+  <text x="700" y="220" fill="#34D399" font-size="9.5" text-anchor="middle">Triggers &bull; Real-Time MIS</text>
+
+  <rect x="550" y="238" width="300" height="40" rx="6" fill="#10B981" fill-opacity="0.06" stroke="#10B981" stroke-width="0.8"/>
+  <text x="700" y="255" fill="#34D399" font-size="9.5" text-anchor="middle">Digitised RMF &bull; 3LoD</text>
+  <text x="700" y="270" fill="#34D399" font-size="9.5" text-anchor="middle">CRO Independence &bull; Audit Trails</text>
+
+  <rect x="550" y="288" width="300" height="40" rx="6" fill="#10B981" fill-opacity="0.06" stroke="#10B981" stroke-width="0.8"/>
+  <text x="700" y="305" fill="#34D399" font-size="9.5" text-anchor="middle">In-Country Hosting &bull; ISO 27001</text>
+  <text x="700" y="320" fill="#34D399" font-size="9.5" text-anchor="middle">Quarterly Pen Testing</text>
+
+  <rect x="550" y="338" width="300" height="40" rx="6" fill="#10B981" fill-opacity="0.06" stroke="#10B981" stroke-width="0.8"/>
+  <text x="700" y="355" fill="#34D399" font-size="9.5" text-anchor="middle">BoG Templates &bull; ORASS API</text>
+  <text x="700" y="370" fill="#34D399" font-size="9.5" text-anchor="middle">Submission Scheduler</text>
+
+  <rect x="550" y="388" width="300" height="40" rx="6" fill="#10B981" fill-opacity="0.06" stroke="#10B981" stroke-width="0.8"/>
+  <text x="700" y="405" fill="#34D399" font-size="9.5" text-anchor="middle">CET1 / T1 / TC / Leverage</text>
+  <text x="700" y="420" fill="#34D399" font-size="9.5" text-anchor="middle">ICAAP &bull; Pillar 3 Disclosures</text>
+
+  <!-- BoG Limits summary at bottom -->
+  <rect x="20" y="450" width="1160" height="100" rx="8" fill="#F59E0B" fill-opacity="0.06" stroke="#F59E0B" stroke-width="0.8" stroke-dasharray="4,3"/>
+  <text x="600" y="472" fill="#FBBF24" font-size="12" font-weight="700" text-anchor="middle" font-family="Inter,sans-serif">GHANA-SPECIFIC REGULATORY LIMITS ENFORCED ACROSS ALL MODULES</text>
+  <text x="600" y="492" fill="#FBBF24" font-size="10" text-anchor="middle" font-family="Inter,sans-serif">LCR &ge; 100% (int. 120%) &bull; NSFR &ge; 100% (int. 110%) &bull; Narrow/Volatile &ge; 80% (bank) / 90% (SDI) &bull; Broad/Deposits &ge; 80% (bank) / 70% (SDI)</text>
+  <text x="600" y="508" fill="#FBBF24" font-size="10" text-anchor="middle" font-family="Inter,sans-serif">CET1 &ge; 4.5% &bull; T1 &ge; 6.0% &bull; TC &ge; 8.0% &bull; Leverage &ge; 3.0% &bull; CCB 2.5% &bull; EVE SOT &lt; 15% of T1 &bull; NMD Core Cap 70% (retail) / 50% (SME)</text>
+  <text x="600" y="524" fill="#FBBF24" font-size="10" text-anchor="middle" font-family="Inter,sans-serif">Deposit Beta 0.2–0.8 &bull; NMD Avg Maturity Cap: 4yr (retail) / 2yr (SME) &bull; E-money float = volatile liability &bull; Breach notification to BoG within 10 days</text>
+</svg>
+</section>
+
+<!-- ============ SECTION 3: CORE DATA ENTITIES ============ -->
+<section class="section" id="entity">
+<h2>3. Core Data Entities &amp; Relationships</h2>
+<p style="color:var(--fg2);font-size:0.9rem;margin-bottom:1rem">The ALM data model spans 35+ entities across all modules. Key relationships are shown below. All production data retained 7 years; all entities tenant-scoped for multi-bank groups.</p>
+
+<svg viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;">
+  <defs><filter id="sd"><feDropShadow dx="0" dy="1" stdDeviation="2" flood-color="#000" flood-opacity="0.25"/></filter></defs>
+
+  <!-- Legend -->
+  <rect x="20" y="5" width="180" height="70" rx="6" fill="#1E293B" stroke="#334155" stroke-width="1"/>
+  <text x="30" y="22" fill="#94A3B8" font-size="9" font-weight="600" font-family="Inter,sans-serif">ENTITIES BY MODULE</text>
+  <rect x="30" y="30" width="10" height="10" rx="2" fill="#3B82F6" fill-opacity="0.4"/>
+  <text x="46" y="39" fill="#94A3B8" font-size="9" font-family="Inter,sans-serif">Platform / Data Foundation</text>
+  <rect x="30" y="46" width="10" height="10" rx="2" fill="#10B981" fill-opacity="0.4"/>
+  <text x="46" y="55" fill="#94A3B8" font-size="9" font-family="Inter,sans-serif">Calculation Modules</text>
+  <rect x="30" y="62" width="10" height="10" rx="2" fill="#8B5CF6" fill-opacity="0.4"/>
+  <text x="46" y="71" fill="#94A3B8" font-size="9" font-family="Inter,sans-serif">Shared / Analytics Engine</text>
+
+  <!-- Tenants (root) -->
+  <rect x="510" y="18" width="180" height="36" rx="6" fill="#3B82F6" fill-opacity="0.15" stroke="#3B82F6" stroke-width="1" filter="url(#sd)"/>
+  <text x="600" y="34" fill="#60A5FA" font-size="10" font-weight="700" text-anchor="middle" font-family="Inter,sans-serif">tenants</text>
+  <text x="600" y="47" fill="#93C5FD" font-size="8" text-anchor="middle" font-family="monospace">legal entity / banking group</text>
+
+  <!-- users & roles -->
+  <rect x="100" y="75" width="150" height="36" rx="6" fill="#3B82F6" fill-opacity="0.12" stroke="#3B82F6" stroke-width="0.8" filter="url(#sd)"/>
+  <text x="175" y="91" fill="#60A5FA" font-size="10" font-weight="700" text-anchor="middle" font-family="Inter,sans-serif">users</text>
+  <text x="175" y="104" fill="#93C5FD" font-size="8" text-anchor="middle" font-family="monospace">role_id &#8594; roles</text>
+
+  <rect x="290" y="75" width="150" height="36" rx="6" fill="#3B82F6" fill-opacity="0.12" stroke="#3B82F6" stroke-width="0.8" filter="url(#sd)"/>
+  <text x="365" y="91" fill="#60A5FA" font-size="10" font-weight="700" text-anchor="middle" font-family="Inter,sans-serif">roles</text>
+  <text x="365" y="104" fill="#93C5FD" font-size="8" text-anchor="middle" font-family="monospace">JSONB permissions matrix</text>
+
+  <rect x="480" y="75" width="150" height="36" rx="6" fill="#3B82F6" fill-opacity="0.12" stroke="#3B82F6" stroke-width="0.8" filter="url(#sd)"/>
+  <text x="555" y="91" fill="#60A5FA" font-size="10" font-weight="700" text-anchor="middle" font-family="Inter,sans-serif">configurations</text>
+  <text x="555" y="104" fill="#93C5FD" font-size="8" text-anchor="middle" font-family="monospace">versioned settings</text>
+
+  <rect x="670" y="75" width="180" height="36" rx="6" fill="#3B82F6" fill-opacity="0.12" stroke="#3B82F6" stroke-width="0.8" filter="url(#sd)"/>
+  <text x="760" y="91" fill="#60A5FA" font-size="10" font-weight="700" text-anchor="middle" font-family="Inter,sans-serif">audit_logs</text>
+  <text x="760" y="104" fill="#93C5FD" font-size="8" text-anchor="middle" font-family="monospace">immutable append-only</text>
+
+  <line x1="600" y1="54" x2="175" y2="73" stroke="#3B82F6" stroke-width="0.5" marker-end="url(#arrow)"/>
+  <line x1="600" y1="54" x2="555" y2="73" stroke="#3B82F6" stroke-width="0.5" marker-end="url(#arrow)"/>
+  <line x1="600" y1="54" x2="760" y2="73" stroke="#3B82F6" stroke-width="0.5" marker-end="url(#arrow)"/>
+
+  <!-- Data Foundation entities -->
+  <text x="20" y="140" fill="#64748B" font-size="10" font-weight="600" font-family="Inter,sans-serif">DATA FOUNDATION</text>
+
+  <rect x="20" y="150" width="140" height="32" rx="5" fill="#3B82F6" fill-opacity="0.1" stroke="#3B82F6" stroke-width="0.8"/>
+  <text x="90" y="163" fill="#93C5FD" font-size="9" font-weight="600" text-anchor="middle" font-family="Inter,sans-serif">data_feeds</text>
+  <text x="90" y="176" fill="#93C5FD" font-size="7" text-anchor="middle" font-family="monospace">ETL pipeline status</text>
+
+  <rect x="180" y="150" width="140" height="32" rx="5" fill="#3B82F6" fill-opacity="0.1" stroke="#3B82F6" stroke-width="0.8"/>
+  <text x="250" y="163" fill="#93C5FD" font-size="9" font-weight="600" text-anchor="middle" font-family="Inter,sans-serif">alm_bases</text>
+  <text x="250" y="176" fill="#93C5FD" font-size="7" text-anchor="middle" font-family="monospace">product buckets</text>
+
+  <rect x="340" y="150" width="140" height="32" rx="5" fill="#3B82F6" fill-opacity="0.1" stroke="#3B82F6" stroke-width="0.8"/>
+  <text x="410" y="163" fill="#93C5FD" font-size="9" font-weight="600" text-anchor="middle" font-family="Inter,sans-serif">alm_tb_maps</text>
+  <text x="410" y="176" fill="#93C5FD" font-size="7" text-anchor="middle" font-family="monospace">GL code mapping</text>
+
+  <rect x="500" y="150" width="140" height="32" rx="5" fill="#3B82F6" fill-opacity="0.1" stroke="#3B82F6" stroke-width="0.8"/>
+  <text x="570" y="163" fill="#93C5FD" font-size="9" font-weight="600" text-anchor="middle" font-family="Inter,sans-serif">instruments</text>
+  <text x="570" y="176" fill="#93C5FD" font-size="7" text-anchor="middle" font-family="monospace">contract-level deals</text>
+
+  <rect x="660" y="150" width="150" height="32" rx="5" fill="#3B82F6" fill-opacity="0.1" stroke="#3B82F6" stroke-width="0.8"/>
+  <text x="735" y="163" fill="#93C5FD" font-size="9" font-weight="600" text-anchor="middle" font-family="Inter,sans-serif">alco_meetings</text>
+  <text x="735" y="176" fill="#93C5FD" font-size="7" text-anchor="middle" font-family="monospace">agenda / minutes</text>
+
+  <rect x="830" y="150" width="150" height="32" rx="5" fill="#3B82F6" fill-opacity="0.1" stroke="#3B82F6" stroke-width="0.8"/>
+  <text x="905" y="163" fill="#93C5FD" font-size="9" font-weight="600" text-anchor="middle" font-family="Inter,sans-serif">alco_action_items</text>
+  <text x="905" y="176" fill="#93C5FD" font-size="7" text-anchor="middle" font-family="monospace">assignee &#8594; users</text>
+
+  <!-- Analytics Engine -->
+  <text x="20" y="210" fill="#64748B" font-size="10" font-weight="600" font-family="Inter,sans-serif">ANALYTICS ENGINE (Shared)</text>
+
+  <rect x="20" y="220" width="160" height="32" rx="5" fill="#8B5CF6" fill-opacity="0.1" stroke="#8B5CF6" stroke-width="0.8"/>
+  <text x="100" y="233" fill="#A78BFA" font-size="9" font-weight="600" text-anchor="middle" font-family="Inter,sans-serif">cash_flows</text>
+  <text x="100" y="246" fill="#A78BFA" font-size="7" text-anchor="middle" font-family="monospace">per-deal monthly CF</text>
+
+  <rect x="200" y="220" width="160" height="32" rx="5" fill="#8B5CF6" fill-opacity="0.1" stroke="#8B5CF6" stroke-width="0.8"/>
+  <text x="280" y="233" fill="#A78BFA" font-size="9" font-weight="600" text-anchor="middle" font-family="Inter,sans-serif">runs</text>
+  <text x="280" y="246" fill="#A78BFA" font-size="7" text-anchor="middle" font-family="monospace">versioned calc runs</text>
+
+  <rect x="380" y="220" width="160" height="32" rx="5" fill="#8B5CF6" fill-opacity="0.1" stroke="#8B5CF6" stroke-width="0.8"/>
+  <text x="460" y="233" fill="#A78BFA" font-size="9" font-weight="600" text-anchor="middle" font-family="Inter,sans-serif">assumption_sets</text>
+  <text x="460" y="246" fill="#A78BFA" font-size="7" text-anchor="middle" font-family="monospace">NMD / CPR / TDRR</text>
+
+  <rect x="560" y="220" width="160" height="32" rx="5" fill="#8B5CF6" fill-opacity="0.1" stroke="#8B5CF6" stroke-width="0.8"/>
+  <text x="640" y="233" fill="#A78BFA" font-size="9" font-weight="600" text-anchor="middle" font-family="Inter,sans-serif">scenarios</text>
+  <text x="640" y="246" fill="#A78BFA" font-size="7" text-anchor="middle" font-family="monospace">rate / growth paths</text>
+
+  <rect x="740" y="220" width="180" height="32" rx="5" fill="#8B5CF6" fill-opacity="0.1" stroke="#8B5CF6" stroke-width="0.8"/>
+  <text x="830" y="233" fill="#A78BFA" font-size="9" font-weight="600" text-anchor="middle" font-family="Inter,sans-serif">risk_limits</text>
+  <text x="830" y="246" fill="#A78BFA" font-size="7" text-anchor="middle" font-family="monospace">configurable thresholds</text>
+
+  <!-- Calculation module entities -->
+  <text x="20" y="282" fill="#64748B" font-size="10" font-weight="600" font-family="Inter,sans-serif">LIQUIDITY RISK</text>
+  <rect x="20" y="292" width="130" height="28" rx="4" fill="#10B981" fill-opacity="0.08" stroke="#10B981" stroke-width="0.8"/>
+  <text x="85" y="306" fill="#34D399" font-size="9" font-weight="600" text-anchor="middle" font-family="monospace">lcr_calculation</text>
+  <text x="85" y="317" fill="#34D399" font-size="7" text-anchor="middle">daily LCR</text>
+
+  <rect x="165" y="292" width="130" height="28" rx="4" fill="#10B981" fill-opacity="0.08" stroke="#10B981" stroke-width="0.8"/>
+  <text x="230" y="306" fill="#34D399" font-size="9" font-weight="600" text-anchor="middle" font-family="monospace">nsfr_calculation</text>
+  <text x="230" y="317" fill="#34D399" font-size="7" text-anchor="middle">daily NSFR</text>
+
+  <rect x="310" y="292" width="130" height="28" rx="4" fill="#10B981" fill-opacity="0.08" stroke="#10B981" stroke-width="0.8"/>
+  <text x="375" y="306" fill="#34D399" font-size="9" font-weight="600" text-anchor="middle" font-family="monospace">hqla_inventory</text>
+  <text x="375" y="317" fill="#34D399" font-size="7" text-anchor="middle">L1 / L2A / L2B</text>
+
+  <rect x="455" y="292" width="150" height="28" rx="4" fill="#10B981" fill-opacity="0.08" stroke="#10B981" stroke-width="0.8"/>
+  <text x="530" y="306" fill="#34D399" font-size="9" font-weight="600" text-anchor="middle" font-family="monospace">liquidity_stress_scenarios</text>
+  <text x="530" y="317" fill="#34D399" font-size="7" text-anchor="middle">Mild / Moderate / Severe</text>
+
+  <text x="20" y="348" fill="#64748B" font-size="10" font-weight="600" font-family="Inter,sans-serif">IRRBB</text>
+  <rect x="20" y="358" width="140" height="28" rx="4" fill="#10B981" fill-opacity="0.08" stroke="#10B981" stroke-width="0.8"/>
+  <text x="90" y="372" fill="#34D399" font-size="9" font-weight="600" text-anchor="middle" font-family="monospace">eve_shock_results</text>
+  <rect x="175" y="358" width="140" height="28" rx="4" fill="#10B981" fill-opacity="0.08" stroke="#10B981" stroke-width="0.8"/>
+  <text x="245" y="372" fill="#34D399" font-size="9" font-weight="600" text-anchor="middle" font-family="monospace">nii_forecasts</text>
+  <rect x="330" y="358" width="140" height="28" rx="4" fill="#10B981" fill-opacity="0.08" stroke="#10B981" stroke-width="0.8"/>
+  <text x="400" y="372" fill="#34D399" font-size="9" font-weight="600" text-anchor="middle" font-family="monospace">repricing_gap</text>
+  <rect x="485" y="358" width="140" height="28" rx="4" fill="#10B981" fill-opacity="0.08" stroke="#10B981" stroke-width="0.8"/>
+  <text x="555" y="372" fill="#34D399" font-size="9" font-weight="600" text-anchor="middle" font-family="monospace">yield_curves</text>
+
+  <text x="20" y="414" fill="#64748B" font-size="10" font-weight="600" font-family="Inter,sans-serif">CAPITAL / ECL / FTP</text>
+  <rect x="20" y="424" width="140" height="28" rx="4" fill="#10B981" fill-opacity="0.08" stroke="#10B981" stroke-width="0.8"/>
+  <text x="90" y="438" fill="#34D399" font-size="9" font-weight="600" text-anchor="middle" font-family="monospace">rwa_calculations</text>
+  <rect x="175" y="424" width="140" height="28" rx="4" fill="#10B981" fill-opacity="0.08" stroke="#10B981" stroke-width="0.8"/>
+  <text x="245" y="438" fill="#34D399" font-size="9" font-weight="600" text-anchor="middle" font-family="monospace">capital_stack</text>
+  <rect x="330" y="424" width="140" height="28" rx="4" fill="#10B981" fill-opacity="0.08" stroke="#10B981" stroke-width="0.8"/>
+  <text x="400" y="438" fill="#34D399" font-size="9" font-weight="600" text-anchor="middle" font-family="monospace">ecl_provisions</text>
+  <rect x="485" y="424" width="140" height="28" rx="4" fill="#10B981" fill-opacity="0.08" stroke="#10B981" stroke-width="0.8"/>
+  <text x="555" y="438" fill="#34D399" font-size="9" font-weight="600" text-anchor="middle" font-family="monospace">ftp_curves</text>
+  <rect x="640" y="424" width="140" height="28" rx="4" fill="#10B981" fill-opacity="0.08" stroke="#10B981" stroke-width="0.8"/>
+  <text x="710" y="438" fill="#34D399" font-size="9" font-weight="600" text-anchor="middle" font-family="monospace">sicr_triggers</text>
+
+  <!-- Key relationships -->
+  <line x1="100" y1="186" x2="100" y2="218" stroke="#8B5CF6" stroke-width="0.5" marker-end="url(#arrow)"/>
+  <line x1="570" y1="186" x2="100" y2="218" stroke="#8B5CF6" stroke-width="0.5" marker-end="url(#arrow)"/>
+  <line x1="280" y1="252" x2="90" y2="290" stroke="#8B5CF6" stroke-width="0.5" marker-end="url(#arrow)"/>
+  <line x1="460" y1="252" x2="245" y2="356" stroke="#8B5CF6" stroke-width="0.5" marker-end="url(#arrow)"/>
+
+  <!-- Key relationships text -->
+  <text x="120" y="770" fill="#64748B" font-size="10" font-family="Inter,sans-serif">
+    <tspan x="20" dy="-20">Key: instruments &#8594; cash_flows &#8594; runs (N:1 each). runs &#8594; assumption_sets + scenarios.</tspan>
+    <tspan x="20" dy="16">All module tables &#8594; tenants (N:1). All tables &#8594; audit_logs via polymorphic entity_type/entity_id.</tspan>
+    <tspan x="20" dy="16">users &#8594; roles (N:1). roles have JSONB permissions matrix for column-level RBAC.</tspan>
+  </text>
+</svg>
+</section>
+
+<!-- ============ SECTION 4: ALM CONTROL TOWER ============ -->
+<section class="section" id="control-tower">
+<h2>4. ALM Control Tower Pipeline</h2>
+<p style="color:var(--fg2);font-size:0.9rem;margin-bottom:1rem">The production cycle from system configuration through trial balance, XTEL feeds, reconciliation, and run launch to reporting. Reconciliation variance &le; 0.1% for automatic match; override requires dual approval.</p>
+
+<svg viewBox="0 0 1100 340" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;">
+  <!-- Step 1: Config -->
+  <rect x="40" y="60" width="160" height="70" rx="8" fill="#3B82F6" fill-opacity="0.12" stroke="#3B82F6" stroke-width="1.2"/>
+  <text x="120" y="85" fill="#60A5FA" font-size="11" font-weight="700" text-anchor="middle" font-family="Inter,sans-serif">System Config</text>
+  <text x="120" y="100" fill="#93C5FD" font-size="9" text-anchor="middle">Period / Base Date</text>
+  <text x="120" y="114" text-anchor="middle"><tspan fill="#64748B" font-size="8">Step 1</tspan></text>
+
+  <!-- Step 2: TB -->
+  <rect x="260" y="60" width="160" height="70" rx="8" fill="#3B82F6" fill-opacity="0.12" stroke="#3B82F6" stroke-width="1.2"/>
+  <text x="340" y="85" fill="#60A5FA" font-size="11" font-weight="700" text-anchor="middle" font-family="Inter,sans-serif">Trial Balance</text>
+  <text x="340" y="100" fill="#93C5FD" font-size="9" text-anchor="middle">GL by ALM Code</text>
+  <text x="340" y="114" text-anchor="middle"><tspan fill="#64748B" font-size="8">Step 2</tspan></text>
+
+  <!-- Step 3: XTEL -->
+  <rect x="480" y="60" width="160" height="70" rx="8" fill="#3B82F6" fill-opacity="0.12" stroke="#3B82F6" stroke-width="1.2"/>
+  <text x="560" y="85" fill="#60A5FA" font-size="11" font-weight="700" text-anchor="middle" font-family="Inter,sans-serif">XTEL Feeds</text>
+  <text x="560" y="100" fill="#93C5FD" font-size="9" text-anchor="middle">10 instrument types</text>
+  <text x="560" y="114" text-anchor="middle"><tspan fill="#64748B" font-size="8">Step 3: Product Validation</tspan></text>
+
+  <!-- Step 4: Reconcile -->
+  <rect x="700" y="60" width="180" height="70" rx="8" fill="#F59E0B" fill-opacity="0.12" stroke="#F59E0B" stroke-width="1.2"/>
+  <text x="790" y="85" fill="#FBBF24" font-size="11" font-weight="700" text-anchor="middle" font-family="Inter,sans-serif">3-Way Reconciliation</text>
+  <text x="790" y="100" fill="#FBBF24" font-size="9" text-anchor="middle">TB vs XTEL vs ALM</text>
+  <text x="790" y="114" text-anchor="middle"><tspan fill="#64748B" font-size="8">Variance &le; 0.1%?</tspan></text>
+
+  <!-- Step 5: Run -->
+  <rect x="930" y="60" width="150" height="70" rx="8" fill="#10B981" fill-opacity="0.12" stroke="#10B981" stroke-width="1.2"/>
+  <text x="1005" y="85" fill="#34D399" font-size="11" font-weight="700" text-anchor="middle" font-family="Inter,sans-serif">Run Launcher</text>
+  <text x="1005" y="100" fill="#34D399" font-size="9" text-anchor="middle">Versioned Run</text>
+  <text x="1005" y="114" text-anchor="middle"><tspan fill="#64748B" font-size="8">Step 5: Link Rates</tspan></text>
+
+  <!-- Arrows -->
+  <line x1="200" y1="95" x2="258" y2="95" stroke="#94A3B8" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="420" y1="95" x2="478" y2="95" stroke="#94A3B8" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="640" y1="95" x2="698" y2="95" stroke="#94A3B8" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="880" y1="95" x2="928" y2="95" stroke="#94A3B8" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- Reconciliation detail -->
+  <rect x="40" y="165" width="1040" height="80" rx="8" fill="#1E293B" stroke="#334155" stroke-width="1"/>
+  <text x="560" y="185" fill="#94A3B8" font-size="10" font-weight="700" text-anchor="middle" font-family="Inter,sans-serif">RECONCILIATION ENGINE</text>
+  <text x="180" y="205" fill="#64748B" font-size="9" text-anchor="middle">Matched ALM (TB = XTEL)</text>
+  <line x1="100" y1="215" x2="260" y2="215" stroke="#334155" stroke-width="0.5"/>
+  <text x="180" y="230" fill="#64748B" font-size="9" text-anchor="middle">Variance = |TB - XTEL| / max(TB, XTEL) &times; 100</text>
+
+  <text x="460" y="205" fill="#FBBF24" font-size="9" text-anchor="middle">Unmapped ALM Codes</text>
+  <line x1="340" y1="215" x2="580" y2="215" stroke="#334155" stroke-width="0.5"/>
+  <text x="460" y="230" fill="#FBBF24" font-size="9" text-anchor="middle">ALM code with no GL mapping</text>
+
+  <text x="740" y="205" fill="#EF4444" font-size="9" text-anchor="middle">Unmapped TB / XTEL</text>
+  <line x1="620" y1="215" x2="860" y2="215" stroke="#334155" stroke-width="0.5"/>
+  <text x="740" y="230" fill="#EF4444" font-size="9" text-anchor="middle">GL or instrument with no ALM code</text>
+
+  <!-- Output -->
+  <rect x="40" y="265" width="1040" height="55" rx="8" fill="#8B5CF6" fill-opacity="0.08" stroke="#8B5CF6" stroke-width="1" stroke-dasharray="4,3"/>
+  <text x="560" y="285" fill="#A78BFA" font-size="11" font-weight="600" text-anchor="middle" font-family="Inter,sans-serif">OUTPUT: Versioned Run Entity — Cashflow Projections + Balance Sheet + P&amp;L by ALM Code + Currency</text>
+  <text x="560" y="305" fill="#C4B5FD" font-size="9" text-anchor="middle">Strategy &times; Rate Cross-Join &bull; Scenario Comparison &bull; Multi-Dimensional Reports (Product / BU / Currency / BS Group / ALM Code)</text>
+</svg>
+</section>
+
+<!-- ============ SECTION 5: LCR/NSFR ============ -->
+<section class="section" id="lcr">
+<h2>5. LCR / NSFR Calculation Flow</h2>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem">
+<div>
+<h3 style="color:var(--fg2);font-size:0.85rem;font-weight:600;margin-bottom:0.75rem;font-family:var(--mono)">LCR = HQLA / Net Cash Outflows &times; 100</h3>
+<table style="width:100%;border-collapse:collapse;font-size:0.8rem">
+  <thead><tr style="border-bottom:1px solid var(--border)">
+    <th style="text-align:left;padding:0.4rem;color:var(--fg2)">Component</th>
+    <th style="text-align:right;padding:0.4rem;color:var(--fg2)">Rule</th>
+  </tr></thead>
+  <tbody>
+    <tr><td style="padding:0.35rem;color:var(--fg)">HQLA Level 1</td><td style="padding:0.35rem;text-align:right;font-family:var(--mono);color:var(--success)">100% (unrestricted)</td></tr>
+    <tr><td style="padding:0.35rem;color:var(--fg)">HQLA Level 2A</td><td style="padding:0.35rem;text-align:right;font-family:var(--mono);color:var(--warning)">85% haircut</td></tr>
+    <tr><td style="padding:0.35rem;color:var(--fg)">HQLA Level 2B</td><td style="padding:0.35rem;text-align:right;font-family:var(--mono);color:var(--alert)">50% haircut</td></tr>
+    <tr><td style="padding:0.35rem;color:var(--fg)">Level 2 Cap</td><td style="padding:0.35rem;text-align:right;font-family:var(--mono);color:var(--warning)">L1 &times; 0.4/0.6 (max L2 contribution)</td></tr>
+    <tr><td style="padding:0.35rem;color:var(--fg)">Retail Stable Outflow</td><td style="padding:0.35rem;text-align:right;font-family:var(--mono)">5% of deposits</td></tr>
+    <tr><td style="padding:0.35rem;color:var(--fg)">Retail Non-Stable</td><td style="padding:0.35rem;text-align:right;font-family:var(--mono)">10%</td></tr>
+    <tr><td style="padding:0.35rem;color:var(--fg)">Operational</td><td style="padding:0.35rem;text-align:right;font-family:var(--mono)">25%</td></tr>
+    <tr><td style="padding:0.35rem;color:var(--fg)">Wholesale Unsecured</td><td style="padding:0.35rem;text-align:right;font-family:var(--mono)">100%</td></tr>
+    <tr><td style="padding:0.35rem;color:var(--fg)">Inflow Cap</td><td style="padding:0.35rem;text-align:right;font-family:var(--mono)">min(Inflows, Outflows &times; 0.75)</td></tr>
+    <tr style="border-top:1px solid var(--border)"><td style="padding:0.35rem;color:var(--primary);font-weight:600">BoG LMTD Narrow Ratio</td><td style="padding:0.35rem;text-align:right;font-family:var(--mono);color:var(--primary);font-weight:600">Narrow Assets / Volatile Liabilities &ge; 80%</td></tr>
+    <tr><td style="padding:0.35rem;color:var(--primary);font-weight:600">BoG LMTD Broad Ratio</td><td style="padding:0.35rem;text-align:right;font-family:var(--mono);color:var(--primary);font-weight:600">Broad Assets / Total Deposits &ge; 80%</td></tr>
+  </tbody>
+</table>
+</div>
+
+<div>
+<h3 style="color:var(--fg2);font-size:0.85rem;font-weight:600;margin-bottom:0.75rem;font-family:var(--mono)">NSFR = ASF / RSF &times; 100</h3>
+<table style="width:100%;border-collapse:collapse;font-size:0.8rem">
+  <thead><tr style="border-bottom:1px solid var(--border)">
+    <th style="text-align:left;padding:0.4rem;color:var(--fg2)">ASF Factor</th>
+    <th style="text-align:right;padding:0.4rem;color:var(--fg2)">RSF Factor</th>
+  </tr></thead>
+  <tbody>
+    <tr><td style="padding:0.35rem;color:var(--fg)">CET1 &times; 100%</td><td style="padding:0.35rem;text-align:right;font-family:var(--mono);color:var(--fg)">Cash &times; 0%</td></tr>
+    <tr><td style="padding:0.35rem;color:var(--fg)">Preferred &times; 100%</td><td style="padding:0.35rem;text-align:right;font-family:var(--mono)">L1 Unencumbered &times; 5%</td></tr>
+    <tr><td style="padding:0.35rem;color:var(--fg)">Stable Retail &times; 95%</td><td style="padding:0.35rem;text-align:right;font-family:var(--mono)">L2 Unencumbered &times; 15%</td></tr>
+    <tr><td style="padding:0.35rem;color:var(--fg)">Less Stable Retail &times; 90%</td><td style="padding:0.35rem;text-align:right;font-family:var(--mono)">Residential Loans &times; 65%</td></tr>
+    <tr><td style="padding:0.35rem;color:var(--fg)">Wholesale &times; 50%</td><td style="padding:0.35rem;text-align:right;font-family:var(--mono)">Corporate Loans &times; 85%</td></tr>
+    <tr><td style="padding:0.35rem;color:var(--fg)">Operational &times; 50%</td><td style="padding:0.35rem;text-align:right;font-family:var(--mono)">Fin Inst Loans &times; 100%</td></tr>
+  </tbody>
+</table>
+
+<h3 style="color:var(--fg2);font-size:0.85rem;font-weight:600;margin:1rem 0 0.5rem">Stress Testing &amp; CFP Flow</h3>
+<div style="background:var(--bg);padding:0.75rem;border-radius:6px;font-size:0.8rem;color:var(--fg2)">
+  <div><span class="tag tag-bog">Idiosyncratic</span> Rating downgrade &bull; Large depositor withdrawal &bull; Counterparty default</div>
+  <div style="margin-top:0.3rem"><span class="tag tag-bog">Market-wide</span> Systemic freeze &bull; Sovereign crisis &bull; Repo disruption</div>
+  <div style="margin-top:0.3rem"><span class="tag tag-bog">Combined</span> Both idiosyncratic + market-wide simultaneously</div>
+  <div style="margin-top:0.5rem;border-top:1px solid var(--border);padding-top:0.4rem">
+    <span class="tag tag-module">CFP Phases</span> Phase 1 (Monitor) &rarr; Phase 2 (Restricted) &rarr; Phase 3 (Emergency) &rarr; Phase 4 (Recovery)
+  </div>
+  <div style="margin-top:0.3rem"><span class="tag tag-module">EWIs</span> LCR trend &bull; Wholesale concentration &bull; Deposit outflows &bull; Credit rating &bull; Collateral &bull; CDS spread</div>
+</div>
+</div>
+</div>
+</section>
+
+<!-- ============ SECTION 6: IRRBB ============ -->
+<section class="section" id="irrbb">
+<h2>6. IRRBB — EVE, NII &amp; SOT Flow</h2>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem">
+<div>
+<h3 style="color:var(--fg2);font-size:0.85rem;font-weight:600;margin-bottom:0.5rem">Six Standardised Shock Scenarios</h3>
+<table style="width:100%;border-collapse:collapse;font-size:0.8rem">
+  <tr style="border-bottom:1px solid var(--border)"><th style="text-align:left;padding:0.35rem;color:var(--fg2)">Shock</th><th style="text-align:left;padding:0.35rem;color:var(--fg2)">Type</th></tr>
+  <tr><td style="padding:0.3rem;color:var(--fg)">Parallel Up</td><td style="padding:0.3rem;color:var(--fg)">+200bps across all tenors</td></tr>
+  <tr><td style="padding:0.3rem;color:var(--fg)">Parallel Down</td><td style="padding:0.3rem;color:var(--fg)">-200bps across all tenors</td></tr>
+  <tr><td style="padding:0.3rem;color:var(--fg)">Steepener</td><td style="padding:0.3rem;color:var(--fg)">Short rates &darr; / Long rates &uarr;</td></tr>
+  <tr><td style="padding:0.3rem;color:var(--fg)">Flattener</td><td style="padding:0.3rem;color:var(--fg)">Short rates &uarr; / Long rates &darr;</td></tr>
+  <tr><td style="padding:0.3rem;color:var(--fg)">Short Rate Up</td><td style="padding:0.3rem;color:var(--fg)">Up to 5Y tenor</td></tr>
+  <tr><td style="padding:0.3rem;color:var(--fg)">Short Rate Down</td><td style="padding:0.3rem;color:var(--fg)">Down to 5Y tenor</td></tr>
+</table>
+
+<h3 style="color:var(--fg2);font-size:0.85rem;font-weight:600;margin:1rem 0 0.5rem">19 Standardised Buckets (BoG SF)</h3>
+<div style="font-size:0.75rem;color:var(--fg2);font-family:var(--mono);line-height:1.8">
+  O/N &vert; 1M &vert; 2M &vert; 3M &vert; 4-6M &vert; 7-9M &vert; 10-12M
+  <br>1Y &vert; 1.5Y &vert; 2Y &vert; 2.5Y &vert; 3Y &vert; 3.5Y &vert; 4Y &vert; 4.5Y
+  <br>5Y &vert; 6-7Y &vert; 8-10Y &vert; &gt;10Y
+</div>
+</div>
+
+<div>
+<h3 style="color:var(--fg2);font-size:0.85rem;font-weight:600;margin-bottom:0.5rem">Calculation Formulas</h3>
+<div style="background:var(--bg);padding:0.75rem;border-radius:6px;font-size:0.78rem;font-family:var(--mono);color:var(--fg2);line-height:1.7">
+  EVE = PV(Assets) &minus; PV(Liabilities)
+  <br>PV = &Sigma; CF<sub>t</sub> / (1 + shocked_rate<sub>t</sub>)<sup>t</sup>
+  <br>&Delta;EVE = EVE<sub>shocked</sub> &minus; EVE<sub>base</sub>
+  <br>%T1 = |&Delta;EVE| / Tier1_Capital &times; 100
+  <br><span style="color:var(--alert)">SOT Breach: &Delta;EVE &gt; 15% of T1</span>
+  <br><br>DGAP = D<sub>A</sub> &minus; k &middot; D<sub>L</sub>
+  <br>&Delta;EVE = &minus;DGAP &middot; MV<sub>A</sub> &middot; (&Delta;y/(1+y))
+  <br>&Delta;P/P = &minus;D<sub>mod</sub>&middot;&Delta;y + &frac12;&middot;Convexity&middot;&Delta;y<sup>2</sup>
+  <br><br>NII<sub>t</sub> = Avg_Assets &times; Yield<sub>t</sub> &minus; Avg_Liabs &times; Cost<sub>t</sub> + Hedge_PnL<sub>t</sub>
+  <br>Deposit Beta (&beta;) : 0.2 &le; &beta; &le; 0.8 (BoG range)
+</div>
+
+<h3 style="color:var(--fg2);font-size:0.85rem;font-weight:600;margin:1rem 0 0.5rem">Derivative Hedge Effectiveness</h3>
+<div style="background:var(--bg);padding:0.5rem 0.75rem;border-radius:6px;font-size:0.78rem;font-family:var(--mono);color:var(--fg2)">
+  Dollar Offset: |1 &minus; |Hedge_PnL &minus; Hedged_PnL| / |Hedged_PnL||
+  <br>Effectiveness &ge; 80% required for hedge accounting
+</div>
+</div>
+</div>
+</section>
+
+<!-- ============ SECTION 7: ECL ============ -->
+<section class="section" id="ecl">
+<h2>7. ECL / IFRS 9 Provisioning Flow</h2>
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem">
+
+<div>
+<h3 style="color:var(--fg2);font-size:0.85rem;font-weight:600;margin-bottom:0.5rem">Stage Classification</h3>
+<svg viewBox="0 0 280 240" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;">
+  <rect x="70" y="10" width="140" height="40" rx="6" fill="#10B981" fill-opacity="0.15" stroke="#10B981" stroke-width="1.2"/>
+  <text x="140" y="35" fill="#34D399" font-size="11" font-weight="700" text-anchor="middle" font-family="Inter,sans-serif">Stage 1</text>
+  <text x="140" y="48" fill="#34D399" font-size="8" text-anchor="middle">12-month ECL</text>
+  <line x1="140" y1="50" x2="140" y2="75" stroke="#94A3B8" stroke-width="1" marker-end="url(#arrow)"/>
+  <text x="140" y="70" fill="#64748B" font-size="7" text-anchor="middle">SICR detected</text>
+  <rect x="70" y="80" width="140" height="40" rx="6" fill="#F59E0B" fill-opacity="0.15" stroke="#F59E0B" stroke-width="1.2"/>
+  <text x="140" y="105" fill="#FBBF24" font-size="11" font-weight="700" text-anchor="middle" font-family="Inter,sans-serif">Stage 2</text>
+  <text x="140" y="118" fill="#FBBF24" font-size="8" text-anchor="middle">Lifetime ECL</text>
+  <line x1="140" y1="120" x2="140" y2="145" stroke="#94A3B8" stroke-width="1" marker-end="url(#arrow)"/>
+  <text x="140" y="140" fill="#64748B" font-size="7" text-anchor="middle">Credit impaired</text>
+  <rect x="70" y="150" width="140" height="40" rx="6" fill="#EF4444" fill-opacity="0.15" stroke="#EF4444" stroke-width="1.2"/>
+  <text x="140" y="175" fill="#F87171" font-size="11" font-weight="700" text-anchor="middle" font-family="Inter,sans-serif">Stage 3</text>
+  <text x="140" y="188" fill="#F87171" font-size="8" text-anchor="middle">Lifetime ECL + Individual</text>
+  <text x="140" y="225" fill="#64748B" font-size="8" text-anchor="middle">POCI: separate category</text>
+</svg>
+</div>
+
+<div>
+<h3 style="color:var(--fg2);font-size:0.85rem;font-weight:600;margin-bottom:0.5rem">SICR Triggers</h3>
+<div style="background:var(--bg);padding:0.65rem;border-radius:6px;font-size:0.8rem">
+  <div style="margin-bottom:0.4rem"><span class="tag tag-data">PD &times;3</span> PD at reporting &gt; 3&times; PD at origination</div>
+  <div style="margin-bottom:0.4rem"><span class="tag tag-data">DPD &ge;30</span> Days past due &ge; 30</div>
+  <div style="margin-bottom:0.4rem"><span class="tag tag-data">Forbearance</span> Active forbearance status</div>
+  <div style="margin-bottom:0.4rem"><span class="tag tag-data">Watch List</span> Classified on watch list</div>
+  <div style="margin-bottom:0.4rem"><span class="tag tag-data">Rating &darr;</span> Internal rating downgrade &ge; 3 notches</div>
+  <div style="margin-top:0.5rem;border-top:1px solid var(--border);padding-top:0.4rem">
+    <span class="tag tag-bog">Ghana Sectoral Adjustments</span>
+  </div>
+  <div style="margin-top:0.3rem;font-size:0.75rem;color:var(--fg2)">Agriculture: +drought risk factor &bull; Mining: +commodity volatility &bull; Trade: +GHS/USD volatility</div>
+</div>
+</div>
+
+<div>
+<h3 style="color:var(--fg2);font-size:0.85rem;font-weight:600;margin-bottom:0.5rem">Macro Scenario Weights</h3>
+<table style="width:100%;border-collapse:collapse;font-size:0.8rem">
+  <tr style="border-bottom:1px solid var(--border)"><th style="text-align:left;padding:0.3rem;color:var(--fg2)">Scenario</th><th style="text-align:right;padding:0.3rem;color:var(--fg2)">Weight</th></tr>
+  <tr><td style="padding:0.25rem;color:var(--success)">Base</td><td style="padding:0.25rem;text-align:right;font-family:var(--mono)">50%</td></tr>
+  <tr><td style="padding:0.25rem;color:var(--success)">Upside</td><td style="padding:0.25rem;text-align:right;font-family:var(--mono)">20%</td></tr>
+  <tr><td style="padding:0.25rem;color:var(--warning)">Downside</td><td style="padding:0.25rem;text-align:right;font-family:var(--mono)">20%</td></tr>
+  <tr><td style="padding:0.25rem;color:var(--alert)">Severe</td><td style="padding:0.25rem;text-align:right;font-family:var(--mono)">10%</td></tr>
+</table>
+<h3 style="color:var(--fg2);font-size:0.85rem;font-weight:600;margin:0.75rem 0 0.3rem">Ghana-Specific Variables</h3>
+<div style="font-size:0.75rem;color:var(--fg2);font-family:var(--mono);line-height:1.6">
+  GDP Growth &bull; Inflation (CPI) &bull; BoG Policy Rate
+  <br>GHS/USD &bull; GoT-Bill Yield
+  <br>Cocoa Price &bull; Gold Price &bull; Oil Price
+</div>
+</div>
+</div>
+<div style="margin-top:1rem;background:var(--bg);padding:0.75rem;border-radius:6px;font-size:0.8rem;color:var(--fg2);font-family:var(--mono)">
+  ECL = &Sigma; PD<sub>t</sub> &times; LGD &times; EAD / (1 + EIR)<sup>t</sup> &nbsp;|&nbsp; ECL<sub>weighted</sub> = 0.5 &times; Base + 0.2 &times; Upside + 0.2 &times; Downside + 0.1 &times; Severe
+</div>
+</section>
+
+<!-- ============ SECTION 8: FTP ============ -->
+<section class="section" id="ftp">
+<h2>8. FTP Curve Construction &amp; Deal Pricing</h2>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem">
+
+<div>
+<h3 style="color:var(--fg2);font-size:0.85rem;font-weight:600;margin-bottom:0.5rem">GHS FTP Curve Formula</h3>
+<div style="background:var(--bg);padding:0.75rem;border-radius:6px;font-size:0.85rem;font-family:var(--mono);color:var(--fg2)">
+  FTP(tenor) = GRR + TenorPremium(tenor) + BankSpread + LiquidityPremium(tenor)
+</div>
+<table style="width:100%;border-collapse:collapse;font-size:0.78rem;margin-top:0.5rem">
+  <thead><tr style="border-bottom:1px solid var(--border)">
+    <th style="text-align:left;padding:0.3rem;color:var(--fg2)">Reference Rate</th><th style="text-align:right;padding:0.3rem;color:var(--fg2)">Current</th>
+  </tr></thead>
+  <tbody>
+    <tr><td style="padding:0.25rem">Ghana Reference Rate (GRR)</td><td style="padding:0.25rem;text-align:right;font-family:var(--mono)">25.50%</td></tr>
+    <tr><td style="padding:0.25rem">BoG Policy Rate</td><td style="padding:0.25rem;text-align:right;font-family:var(--mono)">26.00%</td></tr>
+    <tr><td style="padding:0.25rem">91-Day T-Bill</td><td style="padding:0.25rem;text-align:right;font-family:var(--mono)">24.80%</td></tr>
+    <tr><td style="padding:0.25rem">1-Year T-Bill</td><td style="padding:0.25rem;text-align:right;font-family:var(--mono)">25.40%</td></tr>
+  </tbody>
+</table>
+
+<h3 style="color:var(--fg2);font-size:0.85rem;font-weight:600;margin:1rem 0 0.5rem">NMD Behavioural Model (BoG Capped)</h3>
+<div style="background:var(--bg);padding:0.65rem;border-radius:6px;font-size:0.78rem">
+  <div style="margin-bottom:0.3rem"><span class="tag tag-bog">Core Ratio Caps</span> Retail &le; 70% &bull; SME &le; 50% &bull; Corporate &le; 30%</div>
+  <div style="margin-bottom:0.3rem"><span class="tag tag-bog">Maturity Caps</span> Retail avg &le; 4Y &bull; SME avg &le; 2Y</div>
+  <div style="margin-bottom:0.3rem"><span class="tag tag-data">Backtesting</span> MAPE &lt; 10% over 12 months</div>
+</div>
+</div>
+
+<div>
+<h3 style="color:var(--fg2);font-size:0.85rem;font-weight:600;margin-bottom:0.5rem">Deal-Level Pricing Decomposition</h3>
+<svg viewBox="0 0 380 200" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;">
+  <rect x="20" y="10" width="340" height="28" rx="4" fill="#10B981" fill-opacity="0.12" stroke="#10B981" stroke-width="0.8"/>
+  <text x="190" y="28" fill="#34D399" font-size="10" font-weight="600" text-anchor="middle" font-family="Inter,sans-serif">Customer Rate: 30.00%</text>
+  <line x1="190" y1="38" x2="190" y2="48" stroke="#94A3B8" stroke-width="0.8"/>
+  <rect x="20" y="52" width="340" height="28" rx="4" fill="#EF4444" fill-opacity="0.1" stroke="#EF4444" stroke-width="0.8"/>
+  <text x="190" y="70" fill="#F87171" font-size="10" font-weight="600" text-anchor="middle" font-family="Inter,sans-serif">&minus; FTP Rate (5Y GHS): 29.00% (GRR 25.5% + 3.5%)</text>
+  <line x1="190" y1="80" x2="190" y2="88" stroke="#94A3B8" stroke-width="0.5"/>
+  <rect x="20" y="92" width="340" height="24" rx="4" fill="#EF4444" fill-opacity="0.07" stroke="#EF4444" stroke-width="0.6"/>
+  <text x="190" y="108" fill="#FCA5A5" font-size="9" text-anchor="middle" font-family="Inter,sans-serif">&minus; Credit Margin: 1.50% &bull; Op Cost: 0.50% &bull; Reg Cost: 0.30%</text>
+  <line x1="190" y1="116" x2="190" y2="124" stroke="#94A3B8" stroke-width="0.5"/>
+  <rect x="90" y="128" width="200" height="28" rx="4" fill="#F59E0B" fill-opacity="0.15" stroke="#F59E0B" stroke-width="1"/>
+  <text x="190" y="146" fill="#FBBF24" font-size="10" font-weight="700" text-anchor="middle" font-family="Inter,sans-serif">Net Margin: &minus;1.30% (LOSS)</text>
+  <line x1="190" y1="156" x2="190" y2="164" stroke="#94A3B8" stroke-width="0.5"/>
+  <text x="190" y="180" fill="#64748B" font-size="9" text-anchor="middle" font-family="Inter,sans-serif">ROE: &minus;5.2% &bull; RAROC: &minus;3.8%</text>
+</svg>
+<div style="margin-top:0.75rem;background:var(--bg);padding:0.5rem;border-radius:6px;font-size:0.75rem;color:var(--fg2)">
+  <span class="tag tag-module">Multi-Currency</span> GHS (GRR-based) &bull; USD (SOFR + cross-currency + Ghana risk premium) &bull; EUR (EURIBOR) &bull; GBP (SONIA)
+</div>
+</div>
+</div>
+</section>
+
+<!-- ============ SECTION 9: CAPITAL ============ -->
+<section class="section" id="capital">
+<h2>9. Capital Management &amp; ICAAP Flow</h2>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem">
+
+<div>
+<h3 style="color:var(--fg2);font-size:0.85rem;font-weight:600;margin-bottom:0.5rem">Capital Ratios</h3>
+<table style="width:100%;border-collapse:collapse;font-size:0.8rem">
+  <thead><tr style="border-bottom:1px solid var(--border)">
+    <th style="text-align:left;padding:0.3rem;color:var(--fg2)">Ratio</th><th style="text-align:right;padding:0.3rem;color:var(--fg2)">Formula</th><th style="text-align:right;padding:0.3rem;color:var(--fg2)">BoG Min</th>
+  </tr></thead>
+  <tbody>
+    <tr><td style="padding:0.25rem">CET1</td><td style="padding:0.25rem;text-align:right;font-family:var(--mono);font-size:0.75rem">CET1 / RWA</td><td style="padding:0.25rem;text-align:right;font-family:var(--mono)">4.5%</td></tr>
+    <tr><td style="padding:0.25rem">Tier 1</td><td style="padding:0.25rem;text-align:right;font-family:var(--mono);font-size:0.75rem">(CET1+AT1) / RWA</td><td style="padding:0.25rem;text-align:right;font-family:var(--mono)">6.0%</td></tr>
+    <tr><td style="padding:0.25rem">Total Capital</td><td style="padding:0.25rem;text-align:right;font-family:var(--mono);font-size:0.75rem">(CET1+AT1+T2) / RWA</td><td style="padding:0.25rem;text-align:right;font-family:var(--mono)">8.0%</td></tr>
+    <tr><td style="padding:0.25rem">Leverage</td><td style="padding:0.25rem;text-align:right;font-family:var(--mono);font-size:0.75rem">T1 / Exposure</td><td style="padding:0.25rem;text-align:right;font-family:var(--mono)">3.0%</td></tr>
+  </tbody>
+</table>
+
+<h3 style="color:var(--fg2);font-size:0.85rem;font-weight:600;margin:1rem 0 0.5rem">Buffer Stack</h3>
+<div style="background:var(--bg);padding:0.5rem 0.75rem;border-radius:6px;font-size:0.78rem;font-family:var(--mono);color:var(--fg2)">
+  <div>Capital Conservation: 2.50%</div>
+  <div>D-SIB Surcharge: 0.50% &ndash; 2.00%</div>
+  <div>Countercyclical (CCyB): 0% &ndash; 2.50% (set by BoG)</div>
+  <div>Pillar 2A (BoG SREP): bank-specific</div>
+  <div>Pillar 2B (Internal): IRRBB &bull; Concentration &bull; Liquidity &bull; Operational &bull; Strategic</div>
+</div>
+</div>
+
+<div>
+<h3 style="color:var(--fg2);font-size:0.85rem;font-weight:600;margin-bottom:0.5rem">Standardised Approach RWA</h3>
+<table style="width:100%;border-collapse:collapse;font-size:0.8rem">
+  <thead><tr style="border-bottom:1px solid var(--border)">
+    <th style="text-align:left;padding:0.3rem;color:var(--fg2)">Exposure Class</th><th style="text-align:right;padding:0.3rem;color:var(--fg2)">BoG Risk Weight</th>
+  </tr></thead>
+  <tbody>
+    <tr><td style="padding:0.25rem">GoG Sovereign (GHS)</td><td style="padding:0.25rem;text-align:right;font-family:var(--mono)">0%</td></tr>
+    <tr><td style="padding:0.25rem">GoG Sovereign (FX)</td><td style="padding:0.25rem;text-align:right;font-family:var(--mono)">20%</td></tr>
+    <tr><td style="padding:0.25rem">Domestic Banks</td><td style="padding:0.25rem;text-align:right;font-family:var(--mono)">20&ndash;50%</td></tr>
+    <tr><td style="padding:0.25rem">Corporates</td><td style="padding:0.25rem;text-align:right;font-family:var(--mono)">20&ndash;150%</td></tr>
+    <tr><td style="padding:0.25rem">Retail</td><td style="padding:0.25rem;text-align:right;font-family:var(--mono)">75%</td></tr>
+    <tr><td style="padding:0.25rem">SME</td><td style="padding:0.25rem;text-align:right;font-family:var(--mono)">75%</td></tr>
+    <tr><td style="padding:0.25rem">Past Due (&lt;20% provisions)</td><td style="padding:0.25rem;text-align:right;font-family:var(--mono)">150%</td></tr>
+    <tr><td style="padding:0.25rem">Residential Mortgage (LTV &lt;80%)</td><td style="padding:0.25rem;text-align:right;font-family:var(--mono)">35%</td></tr>
+  </tbody>
+</table>
+
+<h3 style="color:var(--fg2);font-size:0.85rem;font-weight:600;margin:1rem 0 0.5rem">ICAAP Stress Scenarios (Ghana-Specific)</h3>
+<div style="background:var(--bg);padding:0.5rem 0.75rem;border-radius:6px;font-size:0.78rem;color:var(--fg2)">
+  <div><span class="tag tag-bog">Sovereign Default</span> GoG debt restructuring</div>
+  <div style="margin-top:0.3rem"><span class="tag tag-bog">Currency Crisis</span> GHS/USD devaluation &gt; 30%</div>
+  <div style="margin-top:0.3rem"><span class="tag tag-bog">Commodity Shock</span> Cocoa/gold price collapse</div>
+  <div style="margin-top:0.3rem"><span class="tag tag-bog">Banking Stress</span> Systemic deposit run</div>
+  <div style="margin-top:0.5rem;border-top:1px solid var(--border);padding-top:0.3rem">Recovery period after stress: &lt; 24 months; ICAAP submitted within 4 months of FYE</div>
+</div>
+</div>
+</div>
+</section>
+
+<!-- ============ SECTION 10: RECOVERY ============ -->
+<section class="section" id="recovery">
+<h2>10. Recovery Planning &amp; CFP Flow</h2>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem">
+<div>
+<h3 style="color:var(--fg2);font-size:0.85rem;font-weight:600;margin-bottom:0.5rem">Recovery Trigger Matrix</h3>
+<table style="width:100%;border-collapse:collapse;font-size:0.8rem">
+  <tr style="border-bottom:1px solid var(--border)"><th style="text-align:left;padding:0.3rem;color:var(--fg2)">Trigger</th><th style="text-align:right;padding:0.3rem;color:var(--fg2)">Threshold</th></tr>
+  <tr><td style="padding:0.25rem">CET1 Ratio</td><td style="padding:0.25rem;text-align:right;font-family:var(--mono);color:var(--alert)">&lt; 7.0%</td></tr>
+  <tr><td style="padding:0.25rem">LCR</td><td style="padding:0.25rem;text-align:right;font-family:var(--mono);color:var(--alert)">&lt; 100%</td></tr>
+  <tr><td style="padding:0.25rem">NSFR</td><td style="padding:0.25rem;text-align:right;font-family:var(--mono);color:var(--alert)">&lt; 100%</td></tr>
+  <tr><td style="padding:0.25rem">Leverage Ratio</td><td style="padding:0.25rem;text-align:right;font-family:var(--mono);color:var(--alert)">&lt; 3.0%</td></tr>
+  <tr><td style="padding:0.25rem">NIM</td><td style="padding:0.25rem;text-align:right;font-family:var(--mono);color:var(--warning)">&lt; 1.0%</td></tr>
+  <tr><td style="padding:0.25rem">Wholesale Funding Conc.</td><td style="padding:0.25rem;text-align:right;font-family:var(--mono);color:var(--warning)">&gt; 35%</td></tr>
+</table>
+</div>
+<div>
+<h3 style="color:var(--fg2);font-size:0.85rem;font-weight:600;margin-bottom:0.5rem">Recovery Options Menu</h3>
+<div style="background:var(--bg);padding:0.65rem;border-radius:6px;font-size:0.78rem">
+  <div style="margin-bottom:0.4rem"><span class="tag tag-module">Dividend Cut</span> Reduce/eliminate dividend payout</div>
+  <div style="margin-bottom:0.4rem"><span class="tag tag-module">Asset Sales</span> Sell non-core assets, securities</div>
+  <div style="margin-bottom:0.4rem"><span class="tag tag-module">Capital Issuance</span> AT1 / T2 issuance</div>
+  <div style="margin-bottom:0.4rem"><span class="tag tag-module">Deposit Rate Increase</span> Attract retail deposits</div>
+  <div style="margin-bottom:0.4rem"><span class="tag tag-module">Balance Sheet Contraction</span> Reduce loan book</div>
+  <div style="margin-bottom:0.4rem"><span class="tag tag-module">Central Bank Borrowing</span> BoG standing facilities</div>
+</div>
+<h3 style="color:var(--fg2);font-size:0.85rem;font-weight:600;margin:0.75rem 0 0.3rem">Annual Submission Cycle</h3>
+<div style="background:var(--bg);padding:0.5rem 0.75rem;border-radius:6px;font-size:0.78rem;color:var(--fg2)">
+  Draft &rarr; Board Risk Committee Review &rarr; Board Approval &rarr; BoG Submission (by Dec 31) &rarr; BoG Acknowledgment &rarr; Annual Self-Assessment
+</div>
+</div>
+</div>
+</section>
+
+<!-- ============ SECTION 11: GRC ============ -->
+<section class="section" id="grc">
+<h2>11. GRC — 3LoD, RAS &amp; Breach Workflow</h2>
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem">
+
+<div>
+<h3 style="color:var(--fg2);font-size:0.85rem;font-weight:600;margin-bottom:0.5rem">Three Lines of Defence (RMD 2021)</h3>
+<svg viewBox="0 0 240 200" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;">
+  <rect x="40" y="10" width="160" height="40" rx="8" fill="#3B82F6" fill-opacity="0.12" stroke="#3B82F6" stroke-width="1.2"/>
+  <text x="120" y="33" fill="#60A5FA" font-size="10" font-weight="700" text-anchor="middle" font-family="Inter,sans-serif">1st Line</text>
+  <text x="120" y="47" fill="#93C5FD" font-size="8" text-anchor="middle">Business Units</text>
+  <line x1="120" y1="50" x2="120" y2="65" stroke="#94A3B8" stroke-width="1" marker-end="url(#arrow)"/>
+  <rect x="40" y="70" width="160" height="40" rx="8" fill="#F59E0B" fill-opacity="0.12" stroke="#F59E0B" stroke-width="1.2"/>
+  <text x="120" y="93" fill="#FBBF24" font-size="10" font-weight="700" text-anchor="middle" font-family="Inter,sans-serif">2nd Line</text>
+  <text x="120" y="107" fill="#FBBF24" font-size="8" text-anchor="middle">Risk / Compliance</text>
+  <line x1="120" y1="110" x2="120" y2="125" stroke="#94A3B8" stroke-width="1" marker-end="url(#arrow)"/>
+  <rect x="40" y="130" width="160" height="40" rx="8" fill="#EF4444" fill-opacity="0.12" stroke="#EF4444" stroke-width="1.2"/>
+  <text x="120" y="153" fill="#F87171" font-size="10" font-weight="700" text-anchor="middle" font-family="Inter,sans-serif">3rd Line</text>
+  <text x="120" y="167" fill="#F87171" font-size="8" text-anchor="middle">Internal Audit</text>
+  <text x="120" y="192" fill="#FBBF24" font-size="8" font-weight="600" text-anchor="middle">CRO: No dual-hatting!</text>
+</svg>
+</div>
+
+<div>
+<h3 style="color:var(--fg2);font-size:0.85rem;font-weight:600;margin-bottom:0.5rem">Breach Notification Workflow</h3>
+<div style="background:var(--bg);padding:0.65rem;border-radius:6px;font-size:0.78rem">
+  <div style="margin-bottom:0.4rem"><span class="tag tag-success">Limit Breach</span> Detected by any module</div>
+  <div style="margin-bottom:0.4rem"><span class="tag tag-bog">Amber Alert</span> &rarr; Included in ALCO agenda</div>
+  <div style="margin-bottom:0.4rem"><span class="tag tag-alert">Red Alert</span> &rarr; Immediate escalation to CRO</div>
+  <div style="margin-bottom:0.4rem"><span class="tag tag-bog">BoG Notification</span> Within 10 days (RMD 2021)</div>
+  <div style="margin-bottom:0.4rem"><span class="tag tag-data">Audit Evidence</span> Full trail retained 7 years</div>
+  <div style="margin-top:0.5rem;border-top:1px solid var(--border);padding-top:0.4rem">
+    <span class="tag tag-module">RBAC Enforcement</span> CRO cannot hold CFO/COO/IA &bull; Front/back-office segregated &bull; 3LoD cross-line assignments require Board approval
+  </div>
+</div>
+</div>
+
+<div>
+<h3 style="color:var(--fg2);font-size:0.85rem;font-weight:600;margin-bottom:0.5rem">CISD 2026 Requirements</h3>
+<div style="background:var(--bg);padding:0.65rem;border-radius:6px;font-size:0.78rem">
+  <div style="margin-bottom:0.3rem"><span class="tag tag-bog">In-Country Hosting</span> All core systems in Ghana</div>
+  <div style="margin-bottom:0.3rem"><span class="tag tag-bog">ISO 27001 / NIST</span> Control framework alignment</div>
+  <div style="margin-bottom:0.3rem"><span class="tag tag-bog">Quarterly Pen Testing</span> Reported to Board</div>
+  <div style="margin-bottom:0.3rem"><span class="tag tag-bog">Board Cyber Reporting</span> Institutionalised</div>
+  <div style="margin-bottom:0.3rem"><span class="tag tag-bog">TLS 1.3 + AES-256</span> Data in transit and at rest</div>
+  <div style="margin-top:0.5rem;border-top:1px solid var(--border);padding-top:0.3rem;font-family:var(--mono);font-size:0.7rem;color:var(--fg3)">
+    Data Residency Dashboard: automatic daily compliance scan, out-of-region auto-quarantine within 1 hour
+  </div>
+</div>
+</div>
+</div>
+</section>
+
+<!-- ============ SECTION 12: REGULATORY REPORTING ============ -->
+<section class="section" id="reporting">
+<h2>12. Regulatory Reporting &amp; ORASS Pipeline</h2>
+<p style="color:var(--fg2);font-size:0.9rem;margin-bottom:1rem">All BoG-prescribed templates are versioned configuration data, not hard-coded — enabling draft changes to be absorbed as config updates rather than code releases.</p>
+
+<svg viewBox="0 0 1100 320" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;">
+  <text x="20" y="25" fill="#94A3B8" font-size="11" font-weight="600" font-family="Inter,sans-serif">SUBMISSION CALENDAR</text>
+
+  <!-- Monthly -->
+  <rect x="20" y="38" width="200" height="44" rx="6" fill="#F59E0B" fill-opacity="0.1" stroke="#F59E0B" stroke-width="1"/>
+  <text x="120" y="55" fill="#FBBF24" font-size="10" font-weight="700" text-anchor="middle" font-family="Inter,sans-serif">Monthly (9 days)</text>
+  <text x="120" y="72" fill="#FBBF24" font-size="8" text-anchor="middle">LMTD Return &bull; LCR Detail</text>
+
+  <!-- Quarterly -->
+  <rect x="240" y="38" width="200" height="44" rx="6" fill="#F59E0B" fill-opacity="0.1" stroke="#F59E0B" stroke-width="1"/>
+  <text x="340" y="55" fill="#FBBF24" font-size="10" font-weight="700" text-anchor="middle" font-family="Inter,sans-serif">Quarterly</text>
+  <text x="340" y="72" fill="#FBBF24" font-size="8" text-anchor="middle">LRMD &bull; IRRBB &bull; Capital</text>
+
+  <!-- Annual -->
+  <rect x="460" y="38" width="220" height="44" rx="6" fill="#10B981" fill-opacity="0.1" stroke="#10B981" stroke-width="1"/>
+  <text x="570" y="55" fill="#34D399" font-size="10" font-weight="700" text-anchor="middle" font-family="Inter,sans-serif">Annual</text>
+  <text x="570" y="72" fill="#34D399" font-size="8" text-anchor="middle">ICAAP (4m post-FYE)</text>
+
+  <!-- Annual -->
+  <rect x="700" y="38" width="200" height="44" rx="6" fill="#10B981" fill-opacity="0.1" stroke="#10B981" stroke-width="1"/>
+  <text x="800" y="55" fill="#34D399" font-size="10" font-weight="700" text-anchor="middle" font-family="Inter,sans-serif">Annual (Dec 31)</text>
+  <text x="800" y="72" fill="#34D399" font-size="8" text-anchor="middle">Recovery Plan &bull; Pillar 3</text>
+
+  <!-- Pipeline flow -->
+  <rect x="20" y="110" width="1060" height="50" rx="8" fill="#1E293B" stroke="#334155" stroke-width="1"/>
+  <text x="550" y="130" fill="#94A3B8" font-size="10" font-weight="700" text-anchor="middle" font-family="Inter,sans-serif">TEMPLATE POPULATION PIPELINE</text>
+  <text x="120" y="148" fill="#64748B" font-size="9" text-anchor="middle">Data pulled from</text>
+  <text x="120" y="158" fill="#64748B" font-size="9" text-anchor="middle">module calculations</text>
+  <text x="320" y="148" fill="#64748B" font-size="9" text-anchor="middle">Auto-populate</text>
+  <text x="320" y="158" fill="#64748B" font-size="9" text-anchor="middle">BoG template fields</text>
+  <text x="530" y="148" fill="#64748B" font-size="9" text-anchor="middle">Validate &amp;</text>
+  <text x="530" y="158" fill="#64748B" font-size="9" text-anchor="middle">dual-approve</text>
+  <text x="730" y="148" fill="#64748B" font-size="9" text-anchor="middle">Submit via</text>
+  <text x="730" y="158" fill="#64748B" font-size="9" text-anchor="middle">ORASS API client</text>
+  <text x="930" y="148" fill="#64748B" font-size="9" text-anchor="middle">Track acknowledgment</text>
+  <text x="930" y="158" fill="#64748B" font-size="9" text-anchor="middle">&amp; resubmission</text>
+
+  <!-- Template types -->
+  <rect x="20" y="185" width="1060" height="115" rx="8" fill="#8B5CF6" fill-opacity="0.05" stroke="#8B5CF6" stroke-width="0.8" stroke-dasharray="4,3"/>
+  <text x="550" y="205" fill="#A78BFA" font-size="11" font-weight="600" text-anchor="middle" font-family="Inter,sans-serif">TEMPLATE CATALOGUE (Versioned — Config-Over-Code)</text>
+  <text x="120" y="228" fill="#C4B5FD" font-size="9" text-anchor="middle">LMTD Return (Excel)</text>
+  <text x="120" y="245" fill="#C4B5FD" font-size="9" text-anchor="middle">LRMD Return (Excel)</text>
+  <text x="120" y="262" fill="#C4B5FD" font-size="9" text-anchor="middle">LCR Detail (Excel)</text>
+  <text x="120" y="279" fill="#C4B5FD" font-size="9" text-anchor="middle">NSFR Detail (Excel)</text>
+
+  <text x="380" y="228" fill="#C4B5FD" font-size="9" text-anchor="middle">IRRBB Return (XML)</text>
+  <text x="380" y="245" fill="#C4B5FD" font-size="9" text-anchor="middle">Capital Adequacy (XML)</text>
+  <text x="380" y="262" fill="#C4B5FD" font-size="9" text-anchor="middle">ICAAP (PDF)</text>
+  <text x="380" y="279" fill="#C4B5FD" font-size="9" text-anchor="middle">Recovery Plan (PDF)</text>
+
+  <text x="640" y="228" fill="#C4B5FD" font-size="9" text-anchor="middle">Pillar 3 Disclosure (XBRL)</text>
+  <text x="640" y="245" fill="#C4B5FD" font-size="9" text-anchor="middle">Leverage Ratio (XML)</text>
+  <text x="640" y="262" fill="#C4B5FD" font-size="9" text-anchor="middle">LMTD Narrow/Broad (Excel)</text>
+  <text x="640" y="279" fill="#C4B5FD" font-size="9" text-anchor="middle">Public Disclosure (PDF)</text>
+</svg>
+</section>
+
+<!-- ============ SECTION 13: USER ROLES ============ -->
+<section class="section" id="roles">
+<h2>13. Users, Roles &amp; Module Access Matrix</h2>
+<p style="color:var(--fg2);font-size:0.9rem;margin-bottom:1rem">Role-based access control (RBAC) gated by Supabase Row-Level Security. Three Lines of Defence enforced at database level: CRO independence (no dual-hatting), front/back-office segregation, cross-line assignments require Board Risk Committee approval.</p>
+
+<div style="overflow-x:auto">
+<table style="width:100%;border-collapse:collapse;font-size:0.78rem">
+  <thead>
+    <tr style="border-bottom:2px solid var(--primary)">
+      <th style="text-align:left;padding:0.5rem;color:var(--primary)">Role</th>
+      <th style="text-align:center;padding:0.5rem;color:var(--fg2)">Data Foundation</th>
+      <th style="text-align:center;padding:0.5rem;color:var(--fg2)">Liquidity</th>
+      <th style="text-align:center;padding:0.5rem;color:var(--fg2)">Capital</th>
+      <th style="text-align:center;padding:0.5rem;color:var(--fg2)">IRRBB</th>
+      <th style="text-align:center;padding:0.5rem;color:var(--fg2)">ECL</th>
+      <th style="text-align:center;padding:0.5rem;color:var(--fg2)">FTP</th>
+      <th style="text-align:center;padding:0.5rem;color:var(--fg2)">Optimization</th>
+      <th style="text-align:center;padding:0.5rem;color:var(--fg2)">Recovery</th>
+      <th style="text-align:center;padding:0.5rem;color:var(--fg2)">GRC</th>
+      <th style="text-align:center;padding:0.5rem;color:var(--fg2)">Reporting</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr style="border-bottom:1px solid var(--border)"><td style="padding:0.4rem;font-weight:600">ALCO Member</td><td style="text-align:center;color:var(--fg3)">R</td><td style="text-align:center;color:var(--fg3)">R</td><td style="text-align:center;color:var(--fg3)">R</td><td style="text-align:center;color:var(--fg3)">R</td><td style="text-align:center;color:var(--fg3)">R</td><td style="text-align:center;color:var(--fg3)">R</td><td style="text-align:center;color:var(--fg3)">R</td><td style="text-align:center;color:var(--fg3)">R</td><td style="text-align:center;color:var(--fg3)">R</td><td style="text-align:center;color:var(--fg3)">R</td></tr>
+    <tr style="border-bottom:1px solid var(--border)"><td style="padding:0.4rem;font-weight:600">Treasurer</td><td style="text-align:center;color:var(--fg3)">R/W</td><td style="text-align:center;color:var(--success)">R/W</td><td style="text-align:center;color:var(--fg3)">R/W</td><td style="text-align:center;color:var(--success)">R/W</td><td style="text-align:center;color:var(--fg3)">R</td><td style="text-align:center;color:var(--success)">R/W</td><td style="text-align:center;color:var(--success)">R/W</td><td style="text-align:center;color:var(--fg3)">R/W</td><td style="text-align:center;color:var(--fg3)">R</td><td style="text-align:center;color:var(--fg3)">R</td></tr>
+    <tr style="border-bottom:1px solid var(--border)"><td style="padding:0.4rem;font-weight:600">Risk Manager</td><td style="text-align:center;color:var(--fg3)">R/W</td><td style="text-align:center;color:var(--success)">R/W</td><td style="text-align:center;color:var(--success)">R/W</td><td style="text-align:center;color:var(--success)">R/W</td><td style="text-align:center;color:var(--success)">R/W</td><td style="text-align:center;color:var(--fg3)">R</td><td style="text-align:center;color:var(--fg3)">R</td><td style="text-align:center;color:var(--fg3)">R</td><td style="text-align:center;color:var(--success)">R/W</td><td style="text-align:center;color:var(--fg3)">R</td></tr>
+    <tr style="border-bottom:1px solid var(--border)"><td style="padding:0.4rem;font-weight:600">CRO</td><td style="text-align:center;color:var(--fg3)">R</td><td style="text-align:center;color:var(--fg3)">R</td><td style="text-align:center;color:var(--success)">R/W</td><td style="text-align:center;color:var(--fg3)">R</td><td style="text-align:center;color:var(--fg3)">R</td><td style="text-align:center;color:var(--fg3)">R</td><td style="text-align:center;color:var(--success)">R/W</td><td style="text-align:center;color:var(--success)">R/W</td><td style="text-align:center;color:var(--success)">R/W</td><td style="text-align:center;color:var(--fg3)">R</td></tr>
+    <tr style="border-bottom:1px solid var(--border)"><td style="padding:0.4rem;font-weight:600">Compliance Officer</td><td style="text-align:center;color:var(--fg3)">R</td><td style="text-align:center;color:var(--fg3)">R</td><td style="text-align:center;color:var(--fg3)">R</td><td style="text-align:center;color:var(--fg3)">R</td><td style="text-align:center;color:var(--fg3)">R</td><td style="text-align:center;color:var(--fg3)">R</td><td style="text-align:center;color:var(--fg3)">R</td><td style="text-align:center;color:var(--fg3)">R</td><td style="text-align:center;color:var(--success)">R/W</td><td style="text-align:center;color:var(--success)">R/W</td></tr>
+    <tr style="border-bottom:1px solid var(--border)"><td style="padding:0.4rem;font-weight:600">Model Validator</td><td style="text-align:center;color:var(--fg3)">R</td><td style="text-align:center;color:var(--fg3)">R</td><td style="text-align:center;color:var(--fg3)">R/W</td><td style="text-align:center;color:var(--success)">R/W</td><td style="text-align:center;color:var(--success)">R/W</td><td style="text-align:center;color:var(--fg3)">R</td><td style="text-align:center;color:var(--fg3)">R</td><td style="text-align:center;color:var(--fg3)">R</td><td style="text-align:center;color:var(--fg3)">R</td><td style="text-align:center;color:var(--fg3)">R</td></tr>
+    <tr style="border-bottom:1px solid var(--border)"><td style="padding:0.4rem;font-weight:600">Business Unit Head</td><td style="text-align:center;color:var(--fg3)">R</td><td style="text-align:center;color:var(--fg3)">R</td><td style="text-align:center;color:var(--fg3)">R</td><td style="text-align:center;color:var(--fg3)">R</td><td style="text-align:center;color:var(--fg3)">R</td><td style="text-align:center;color:var(--success)">R/W</td><td style="text-align:center;color:var(--fg3)">R</td><td style="text-align:center;color:var(--fg3)">R</td><td style="text-align:center;color:var(--fg3)">R</td><td style="text-align:center;color:var(--fg3)">R</td></tr>
+    <tr style="border-bottom:1px solid var(--border)"><td style="padding:0.4rem;font-weight:600">Finance / Accounting</td><td style="text-align:center;color:var(--fg3)">R</td><td style="text-align:center;color:var(--fg3)">R</td><td style="text-align:center;color:var(--success)">R/W</td><td style="text-align:center;color:var(--fg3)">R</td><td style="text-align:center;color:var(--success)">R/W</td><td style="text-align:center;color:var(--fg3)">R</td><td style="text-align:center;color:var(--fg3)">R</td><td style="text-align:center;color:var(--fg3)">R</td><td style="text-align:center;color:var(--fg3)">R</td><td style="text-align:center;color:var(--fg3)">R</td></tr>
+    <tr style="border-bottom:1px solid var(--border)"><td style="padding:0.4rem;font-weight:600">Data Engineer</td><td style="text-align:center;color:var(--success)">R/W</td><td style="text-align:center;color:var(--fg3)">R</td><td style="text-align:center;color:var(--fg3)">R</td><td style="text-align:center;color:var(--fg3)">R</td><td style="text-align:center;color:var(--fg3)">R</td><td style="text-align:center;color:var(--fg3)">R</td><td style="text-align:center;color:var(--fg3)">R</td><td style="text-align:center;color:var(--fg3)">R</td><td style="text-align:center;color:var(--fg3)">R</td><td style="text-align:center;color:var(--fg3)">R</td></tr>
+    <tr><td style="padding:0.4rem;font-weight:600">CISO</td><td style="text-align:center;color:var(--fg3)">R</td><td style="text-align:center;color:var(--fg3)">R</td><td style="text-align:center;color:var(--fg3)">R</td><td style="text-align:center;color:var(--fg3)">R</td><td style="text-align:center;color:var(--fg3)">R</td><td style="text-align:center;color:var(--fg3)">R</td><td style="text-align:center;color:var(--fg3)">R</td><td style="text-align:center;color:var(--fg3)">R</td><td style="text-align:center;color:var(--success)">R/W</td><td style="text-align:center;color:var(--fg3)">R</td></tr>
+  </tbody>
+</table>
+</div>
+<div style="margin-top:0.75rem;font-size:0.75rem;color:var(--fg3);display:flex;gap:1rem">
+  <span><span style="color:var(--success)">R/W</span> = Read + Write</span>
+  <span><span style="color:var(--fg3)">R</span> = Read Only</span>
+  <span><span style="color:var(--alert)">Approve</span> = Approval authority (varies per module)</span>
+  <span style="color:var(--fg3)">ALCO Member: All modules R/O + approval</span>
+</div>
+</section>
+
+<div style="margin-top:2rem;padding:1rem;text-align:center;border-top:1px solid var(--border);color:var(--fg3);font-size:0.8rem">
+  BankOS — ALM Platform Training &bull; Bank of Ghana 2026-Aligned &bull; DocomoZW/kzwa-lab
+  <br>Generated from 14 PRDs &bull; 12 bankOS Modules &bull; 50 Feature Tabs &bull; 150+ Data Tables &bull; 100+ Charts
+</div>
+
+</div>
+</body>
+</html>
